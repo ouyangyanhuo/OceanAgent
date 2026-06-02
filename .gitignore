@@ -1,0 +1,21 @@
+# Ignore Python virtual environments and cache directories
+.cache/
+.uv-cache/
+.bun-cache/
+
+server/.venv/
+server/app/__pycache__/
+
+client/node_modules/
+client/dist/
+
+.codex/
+.claude/
+.agents/
+
+1.png
+2.png
+3.png
+4.png
+5.png
+6.png
