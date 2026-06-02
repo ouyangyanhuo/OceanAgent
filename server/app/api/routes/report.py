@@ -1,3 +1,5 @@
+"""报告 API。"""
+
 from fastapi import APIRouter
 
 from app.core.response import success
@@ -10,6 +12,7 @@ report_service = ReportService()
 
 @router.post("/generate")
 def generate_report(request: ReportGenerateRequest) -> dict:
+    """生成 Markdown 分析报告。"""
     response = report_service.generate_report(
         request.report_type,
         request.node_id,

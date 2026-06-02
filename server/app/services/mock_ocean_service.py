@@ -1,3 +1,8 @@
+"""模拟海洋数据服务。
+
+读取 app/data/mock 下的 JSON 文件，为前端展示、智能体分析和报告生成提供上下文。
+"""
+
 from typing import Any
 
 from app.core.json_store import read_json
@@ -11,25 +16,36 @@ from app.core.paths import (
 
 
 class MockOceanService:
+    """封装 mock 海洋数据读取和简单过滤。"""
+
     def get_observations(self, sea_area_id: str | None = None) -> list[dict[str, Any]]:
+        """返回海洋观测记录，可按海域过滤。"""
         return self._filter_by_sea_area(read_json(OCEAN_OBSERVATIONS_FILE, []), sea_area_id)
 
     def get_buoy_status(self, buoy_id: str | None = None) -> list[dict[str, Any]]:
+        """返回浮标状态，可按浮标 ID 过滤。"""
         records = read_json(BUOY_STATUS_FILE, [])
         if buoy_id:
             return [record for record in records if record.get("id") == buoy_id]
         return records
 
     def get_current_fields(self, sea_area_id: str | None = None) -> list[dict[str, Any]]:
+        """返回海流场记录，可按海域过滤。"""
         return self._filter_by_sea_area(read_json(CURRENT_FIELDS_FILE, []), sea_area_id)
 
     def get_fishery_areas(self) -> list[dict[str, Any]]:
+        """返回渔场区域数据。"""
         return read_json(FISHERY_AREAS_FILE, [])
 
     def get_routes(self) -> list[dict[str, Any]]:
+        """返回航线数据。"""
         return read_json(ROUTES_FILE, [])
 
     def perturb_observation(self, observation: dict[str, Any]) -> dict[str, Any]:
+        """生成轻微扰动后的观测值。
+
+        仅用于展示模拟变化，不会回写基础 mock 数据文件。
+        """
         copy = dict(observation)
         value = copy.get("value")
         if isinstance(value, int | float):
@@ -41,6 +57,7 @@ class MockOceanService:
         records: list[dict[str, Any]],
         sea_area_id: str | None,
     ) -> list[dict[str, Any]]:
+        """按 sea_area_id 过滤记录。"""
         if not sea_area_id:
             return records
         return [record for record in records if record.get("sea_area_id") == sea_area_id]

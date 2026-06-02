@@ -48,12 +48,19 @@ button {
 .app-shell {
   height: 100vh;
   display: flex;
+  flex-direction: column;
   overflow: hidden;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar {
   position: relative;
-  min-height: 100vh;
+  height: 100%;
   border-right: 1px solid var(--line);
   background:
     linear-gradient(rgba(4, 18, 35, 0.78), rgba(2, 18, 35, 0.94)),
@@ -69,50 +76,57 @@ button {
   width: 78px;
 }
 
+.sidebar .toggle-btn {
+  margin-top: auto;
+  width: 100%;
+  height: 48px;
+  border-radius: 0;
+  border-top: 1px solid rgba(39, 151, 255, 0.15);
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 14px;
-  height: 82px;
-  padding: 18px 16px;
-  position: relative;
-}
-
-.sidebar.collapsed .brand {
-  justify-content: center;
-  padding: 18px 8px;
+  padding: 0 20px;
+  flex-shrink: 0;
 }
 
 .brand-text {
   min-width: 0;
-  flex: 1;
 }
 
 .brand strong {
   display: block;
   color: #f3fbff;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.2;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .brand span {
   display: block;
   margin-top: 2px;
   color: #8cb9d5;
-  font-size: 12px;
+  font-size: 11px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #c8f7ff;
+  background: radial-gradient(circle at 35% 30%, #13d8ff, #0557d8 68%, #062650);
+  box-shadow: 0 0 24px rgba(0, 132, 255, 0.55);
+  flex: 0 0 auto;
+  font-size: 28px;
+  font-weight: 800;
 }
 
 .toggle-btn {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
   width: 32px;
   height: 32px;
   border: 0;
@@ -123,17 +137,12 @@ button {
   place-items: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .toggle-btn:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
-}
-
-.sidebar.collapsed .toggle-btn {
-  right: auto;
-  position: static;
-  transform: none;
 }
 
 .logo,
@@ -156,15 +165,26 @@ button {
   font-weight: 800;
 }
 
-.sidebar nav {
-  display: grid;
-  gap: 7px;
-  padding: 14px 10px;
+/* Sidebar nav styles are now defined above */
+
+.sidebar .toggle-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(39, 151, 255, 0.15);
 }
 
-.sidebar button {
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 8px;
+  flex: 1;
+}
+
+.sidebar nav button {
   position: relative;
-  height: 58px;
+  height: 52px;
   padding: 0 20px;
   border: 0;
   border-radius: 8px;
@@ -172,12 +192,12 @@ button {
   background: transparent;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.sidebar.collapsed button {
+.sidebar.collapsed nav button {
   justify-content: center;
   padding: 0;
   gap: 0;
@@ -254,11 +274,11 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
   gap: 16px;
-  padding: 0 14px 0 18px;
-  background: rgba(4, 17, 35, 0.82);
-  min-height: 74px;
+  padding: 0 20px;
+  background: rgba(4, 17, 35, 0.95);
+  min-height: 64px;
+  flex-shrink: 0;
 }
 
 .global-search {

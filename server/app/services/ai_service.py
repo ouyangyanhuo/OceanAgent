@@ -1,8 +1,21 @@
+"""AI 服务封装。
+
+第一版保持 mock 模式，确保没有 API Key 时系统也能完整跑通。
+未来接 OpenAI 或自定义 LLM 时，应在这里新增 provider 分支，
+不要让 API 路由或业务服务直接调用外部模型。
+"""
+
 from typing import Any
 
 
 class AIService:
+    """统一封装图谱扩展、智能体回答和报告生成。"""
+
     def generate_graph_seed(self, topic: str) -> dict[str, Any]:
+        """生成种子图谱候选数据。
+
+        当前返回 mock 候选结构；后续真实 LLM 输出也必须保持候选数据格式。
+        """
         return {
             "nodes": [
                 {
@@ -16,19 +29,24 @@ class AIService:
         }
 
     def generate_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
-        # Real LLM providers can be wired here later; v1 always stays runnable in mock mode.
+        """生成图谱扩展候选节点和候选边。"""
+        # 后续真实 LLM provider 可在这里接入；v1 始终保持 mock 可运行。
         return self._mock_graph_expansion(context)
 
     def generate_agent_answer(self, context: dict[str, Any]) -> str:
+        """生成智能体回答文本。"""
         return self._mock_agent_answer(context)
 
     def generate_report(self, context: dict[str, Any]) -> str:
+        """生成 Markdown 报告文本。"""
         return self._mock_report(context)
 
     def _mock_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
+        """根据 expand_type 返回稳定的 mock 图谱扩展候选结果。"""
         expand_type = context["expand_type"]
         center_name = context["current_node"]["name"]
         if expand_type == "risk_factors":
+            # 赤潮风险因子扩展：生成风险因子和治理措施。
             return {
                 "nodes": [
                     {
@@ -68,6 +86,7 @@ class AIService:
                 "summary": "识别出叶绿素浓度升高等赤潮风险因子。",
             }
         if expand_type == "monitoring_buoys":
+            # 监测浮标扩展：生成浮标和观测记录。
             return {
                 "nodes": [
                     {
@@ -100,6 +119,7 @@ class AIService:
                 "summary": "补充了监测浮标和关键观测项。",
             }
         if expand_type == "ecological_species":
+            # 生态物种扩展：生成物种和渔业适宜区。
             return {
                 "nodes": [
                     {
@@ -124,6 +144,7 @@ class AIService:
                 ],
                 "summary": "补充了生态物种和渔场适宜性关联。",
             }
+        # 默认分支覆盖 related_events 等风险事件类扩展。
         return {
             "nodes": [
                 {
@@ -145,6 +166,7 @@ class AIService:
         }
 
     def _mock_agent_answer(self, context: dict[str, Any]) -> str:
+        """根据 agent_type 返回稳定的 mock 智能体回答。"""
         agent_type = context["agent_type"]
         node_name = (context.get("node") or {}).get("name", "目标海域")
         answers = {
@@ -158,6 +180,7 @@ class AIService:
         return answers.get(agent_type, "已完成 mock 智能体分析。")
 
     def _mock_report(self, context: dict[str, Any]) -> str:
+        """返回稳定的 Markdown mock 报告。"""
         title = context.get("title", "海洋分析报告")
         node_name = (context.get("node") or {}).get("name", "目标海域")
         return (

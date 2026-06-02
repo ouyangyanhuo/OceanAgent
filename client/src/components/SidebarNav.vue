@@ -1,5 +1,5 @@
 <script setup>
-import { Anchor, Fish, GitFork, Menu, MessageSquare, Network, RadioTower, SearchCheck, X } from 'lucide-vue-next'
+import { Anchor, Fish, GitFork, MessageSquare, PanelLeftClose, PanelLeftOpen, RadioTower, SearchCheck } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -26,16 +26,6 @@ function toggleSidebar() {
 
 <template>
   <aside class="sidebar" :class="{ collapsed: isCollapsed }">
-    <div class="brand">
-      <div class="logo"><Network :size="30" /></div>
-      <div v-if="!isCollapsed" class="brand-text">
-        <strong>海洋智能体平台</strong>
-        <span>Ocean Agent Intelligence Platform</span>
-      </div>
-      <button class="toggle-btn" @click="toggleSidebar" :title="isCollapsed ? '展开菜单' : '收起菜单'">
-        <component :is="isCollapsed ? Menu : X" :size="20" />
-      </button>
-    </div>
     <nav>
       <button
         v-for="item in navItems"
@@ -53,5 +43,8 @@ function toggleSidebar() {
       <div class="radar-rings"></div>
       <div class="ship">△</div>
     </div>
+    <button class="toggle-btn" @click="toggleSidebar" :title="isCollapsed ? '展开菜单' : '收起菜单'">
+      <component :is="isCollapsed ? PanelLeftOpen : PanelLeftClose" :size="20" />
+    </button>
   </aside>
 </template>

@@ -1,3 +1,14 @@
+"""图谱读写服务。
+
+GraphService 是 graph.json 的主要访问入口，负责：
+- 读取和保存完整图谱
+- 查询节点、边和邻居
+- 按稳定规则生成节点/边 ID
+- 按 type+name、source+target+relation 去重
+
+注意：这里不直接调用 LLM。LLM 生成的候选数据由 ExpansionService 校验后再通过本服务写入。
+"""
+
 import hashlib
 import re
 from datetime import datetime
@@ -10,38 +21,52 @@ from app.models.graph import GraphData, GraphEdge, GraphMetadata, GraphNode
 
 
 def now_iso() -> str:
+    """返回秒级 UTC 时间字符串，用于 metadata 和索引更新时间。"""
     return datetime.utcnow().replace(microsecond=0).isoformat()
 
 
 def to_snake_case(text: str) -> str:
+    """将 PascalCase 节点类型转换为 snake_case，作为 ID 前缀。"""
     return re.sub(r"(?<!^)(?=[A-Z])", "_", text).lower()
 
 
 def short_hash(value: str) -> str:
+    """生成短 hash，保证 ID 稳定且长度适中。"""
     return hashlib.md5(value.encode("utf-8")).hexdigest()[:8]
 
 
 def generate_node_id(node_type: str, name: str, parent_node_id: str | None = None) -> str:
+    """根据节点类型、名称和父节点生成稳定节点 ID。
+
+    parent_node_id 参与 hash，可让同名候选节点在不同扩展上下文下保持可区分。
+    """
     prefix = to_snake_case(node_type)
     raw = f"{node_type}:{name}:{parent_node_id or ''}"
     return f"{prefix}_{short_hash(raw)}"
 
 
 def generate_edge_id(source: str, relation: str, target: str) -> str:
+    """根据 source、relation、target 生成稳定边 ID。"""
     return f"edge_{short_hash(f'{source}:{relation}:{target}')}"
 
 
 class GraphService:
+    """封装 graph.json 的读写和基础查询。"""
+
     def load_graph(self) -> GraphData:
+        """读取 graph.json 并校验为 GraphData。"""
         return GraphData.model_validate(read_json(GRAPH_FILE, {"graph_id": "ocean_kg_demo_v1"}))
 
     def save_graph(self, graph: GraphData) -> None:
+        """保存完整图谱。"""
         write_json(GRAPH_FILE, graph.model_dump(mode="json"))
 
     def get_graph(self) -> GraphData:
+        """返回完整图谱。"""
         return self.load_graph()
 
     def get_node(self, node_id: str) -> GraphNode:
+        """按节点 ID 查询节点，不存在则抛业务异常。"""
         graph = self.load_graph()
         for node in graph.nodes:
             if node.id == node_id:
@@ -49,6 +74,7 @@ class GraphService:
         raise NotFoundError(f"Node not found: {node_id}", code="NODE_NOT_FOUND")
 
     def get_edge(self, edge_id: str) -> GraphEdge:
+        """按边 ID 查询边，不存在则抛业务异常。"""
         graph = self.load_graph()
         for edge in graph.edges:
             if edge.id == edge_id:
@@ -56,6 +82,11 @@ class GraphService:
         raise NotFoundError(f"Edge not found: {edge_id}", code="EDGE_NOT_FOUND")
 
     def get_neighbors(self, node_id: str, depth: int = 1) -> dict[str, Any]:
+        """查询节点邻居。
+
+        使用简单广度扩展，depth 最多限制为 3，避免图谱较大时单次请求过重。
+        返回值包含邻居节点和相关边。
+        """
         graph = self.load_graph()
         if not any(node.id == node_id for node in graph.nodes):
             raise NotFoundError(f"Node not found: {node_id}", code="NODE_NOT_FOUND")
@@ -66,6 +97,7 @@ class GraphService:
         frontier = {node_id}
         neighbor_edges: list[GraphEdge] = []
 
+        # 每一轮从当前 frontier 出发，收集相连边和下一层节点。
         for _ in range(depth):
             next_frontier: set[str] = set()
             for edge in graph.edges:
@@ -81,6 +113,11 @@ class GraphService:
         return {"nodes": neighbor_nodes, "edges": neighbor_edges}
 
     def add_node(self, graph: GraphData, node: GraphNode) -> GraphNode:
+        """向图谱添加节点。
+
+        去重规则：type 相同且 name 相同即视为同一节点。
+        返回最终存储的节点，可能是已有节点。
+        """
         existing = self.find_similar_node(graph, node.type, node.name)
         if existing:
             return existing
@@ -89,6 +126,10 @@ class GraphService:
         return node
 
     def add_edge(self, graph: GraphData, edge: GraphEdge) -> GraphEdge:
+        """向图谱添加边。
+
+        去重规则：source、target、relation 三者相同即视为同一条边。
+        """
         existing = self.find_edge(graph, edge.source, edge.target, edge.relation)
         if existing:
             return existing
@@ -97,6 +138,7 @@ class GraphService:
         return edge
 
     def find_similar_node(self, graph: GraphData, node_type: str, name: str) -> GraphNode | None:
+        """按节点去重规则查找已有节点。"""
         for node in graph.nodes:
             if node.type == node_type and node.name == name:
                 return node
@@ -109,15 +151,18 @@ class GraphService:
         target: str,
         relation: str,
     ) -> GraphEdge | None:
+        """按边去重规则查找已有边。"""
         for edge in graph.edges:
             if edge.source == source and edge.target == target and edge.relation == relation:
                 return edge
         return None
 
     def edge_exists(self, graph: GraphData, source: str, target: str, relation: str) -> bool:
+        """判断某条边是否存在。"""
         return self.find_edge(graph, source, target, relation) is not None
 
     def mark_expanded(self, graph: GraphData, node_id: str, expand_type: str) -> None:
+        """标记节点的某个扩展类型已完成。"""
         for node in graph.nodes:
             if node.id == node_id:
                 node.expanded[expand_type] = True
@@ -133,6 +178,10 @@ class GraphService:
         parent_node_id: str | None = None,
         source: str = "generated",
     ) -> GraphNode:
+        """根据候选节点数据构造后端正式节点。
+
+        LLM 不允许提供最终 ID；这里统一生成 ID 和 metadata。
+        """
         created_at = now_iso()
         return GraphNode(
             id=generate_node_id(node_type, name, parent_node_id),
@@ -157,6 +206,7 @@ class GraphService:
         parent_node_id: str | None = None,
         source_name: str = "generated",
     ) -> GraphEdge:
+        """根据候选边数据构造后端正式边。"""
         created_at = now_iso()
         return GraphEdge(
             id=generate_edge_id(source, relation, target),

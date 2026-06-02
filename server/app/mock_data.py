@@ -1,4 +1,17 @@
+"""仪表盘 mock 数据。
+
+该文件服务于早期前端首页接口 `/api/dashboard`，保持前端已使用的数据结构：
+- metrics: 指标卡片
+- agents: 智能体列表
+- tasks: 最近任务
+- sources: 数据源状态
+- graph: 首页关系图谱简化结构
+
+注意：这里的数据是前端展示 mock，不是正式 graph.json 事实源。
+"""
+
 DASHBOARD_DATA = {
+    # 首页顶部指标卡。
     "metrics": [
         {
             "label": "接入智能体",
@@ -33,6 +46,7 @@ DASHBOARD_DATA = {
             "sparkline": [24, 27, 25, 34, 31, 45, 36, 41, 49, 35, 52, 42],
         },
     ],
+    # 首页展示的智能体卡片。
     "agents": [
         {
             "name": "海流分析智能体",
@@ -77,12 +91,14 @@ DASHBOARD_DATA = {
             "status": "在线",
         },
     ],
+    # 最近任务列表。
     "tasks": [
         {"time": "10:24", "title": "检索海洋监测智能体", "status": "成功", "tone": "green"},
         {"time": "10:18", "title": "构建赤潮事件关系图谱", "status": "图谱构建", "tone": "violet"},
         {"time": "10:05", "title": "导入浮标观测数据", "status": "数据导入", "tone": "blue"},
         {"time": "09:52", "title": "生成分析报告", "status": "报告生成", "tone": "amber"},
     ],
+    # 数据源状态面板。
     "sources": [
         {"name": "浮标", "status": "在线", "count": "1,245", "tone": "blue"},
         {"name": "AIS", "status": "在线", "count": "3,628", "tone": "cyan"},
@@ -90,6 +106,7 @@ DASHBOARD_DATA = {
         {"name": "气象", "status": "在线", "count": "1,573", "tone": "sky"},
         {"name": "声呐", "status": "在线", "count": "456", "tone": "indigo"},
     ],
+    # 首页可视化用的简化图结构，与正式 GraphData 模型不同。
     "graph": {
         "center": {"id": "event", "label": "海洋\n环境事件", "x": 50, "y": 50, "tone": "core"},
         "nodes": [

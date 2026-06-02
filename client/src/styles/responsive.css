@@ -1,31 +1,18 @@
 @media (max-width: 1320px) {
-  .sidebar:not(.collapsed) {
+  .sidebar {
     width: 78px;
   }
 
-  .sidebar:not(.collapsed) .brand-text {
+  .sidebar nav button span {
     display: none;
   }
 
-  .sidebar:not(.collapsed) .brand {
-    justify-content: center;
-    padding: 18px 10px;
-  }
-
-  .sidebar:not(.collapsed) .toggle-btn {
-    display: none;
-  }
-
-  .sidebar:not(.collapsed) button span {
-    display: none;
-  }
-
-  .sidebar:not(.collapsed) button {
+  .sidebar nav button {
     justify-content: center;
     padding: 0;
   }
 
-  .sidebar:not(.collapsed) .radar-art {
+  .sidebar .radar-art {
     display: none;
   }
 
@@ -73,32 +60,47 @@
 
 @media (max-width: 900px) {
   .app-shell {
-    flex-direction: column;
     overflow: auto;
+  }
+
+  .main-layout {
+    flex-direction: column;
   }
 
   .sidebar {
-    min-height: auto;
-    height: 74px;
+    width: 100% !important;
+    height: auto;
     flex-direction: row;
-    overflow: auto;
-    width: 100%;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
   }
 
-  .brand {
-    width: 78px;
-    flex: 0 0 auto;
+  .sidebar .toggle-btn {
+    width: 48px;
+    height: 48px;
+    border-bottom: none;
+    border-right: 1px solid rgba(39, 151, 255, 0.15);
   }
 
   .sidebar nav {
-    display: flex;
+    flex-direction: row;
     padding: 8px;
+    gap: 4px;
   }
 
-  .sidebar button {
-    width: 58px;
-    height: 56px;
-    flex: 0 0 auto;
+  .sidebar nav button {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .sidebar nav button span {
+    display: none;
+  }
+
+  .sidebar .radar-art {
+    display: none;
   }
 
   .workspace {
@@ -107,14 +109,22 @@
   }
 
   .topbar {
-    height: auto;
     flex-direction: column;
     padding: 12px;
+    gap: 8px;
+  }
+
+  .brand {
+    justify-content: center;
   }
 
   .top-actions {
-    justify-content: space-between;
+    justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .global-search {
+    flex-basis: 100%;
   }
 
   .content-grid,
@@ -178,42 +188,18 @@
 
 /* Density pass: make the 1920x1080 dashboard fit at browser zoom 100%. */
 @media (min-width: 1321px) {
-  .sidebar:not(.collapsed) {
-    width: 190px;
+  .sidebar {
+    width: 220px;
   }
 
-  .brand {
-    height: 66px;
-    padding: 12px 16px;
-    gap: 10px;
-  }
-
-  .brand strong {
-    font-size: 17px;
-  }
-
-  .brand span {
-    font-size: 11px;
-  }
-
-  .logo {
-    width: 38px;
-    height: 38px;
-  }
-
-  .sidebar nav {
-    gap: 4px;
-    padding: 8px;
-  }
-
-  .sidebar button {
-    height: 47px;
-    padding: 0 15px;
-    gap: 13px;
+  .sidebar nav button {
+    height: 48px;
+    padding: 0 16px;
+    gap: 12px;
     font-size: 14px;
   }
 
-  .sidebar.collapsed button {
+  .sidebar.collapsed nav button {
     padding: 0;
     gap: 0;
   }
@@ -227,20 +213,18 @@
     font-size: 34px;
   }
 
-  .workspace {
-    grid-template-rows: 62px minmax(0, 1fr) 46px;
-  }
-
   .topbar {
-    min-height: 62px;
+    min-height: 60px;
     gap: 12px;
-    padding: 0 12px;
+    padding: 0 24px;
   }
 
-  .brand-mark {
-    width: 34px;
-    height: 34px;
-    font-size: 27px;
+  .brand strong {
+    font-size: 18px;
+  }
+
+  .brand span {
+    font-size: 11px;
   }
 
   .global-search {
