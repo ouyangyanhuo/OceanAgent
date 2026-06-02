@@ -25,6 +25,7 @@ class CacheService:
 
     def make_key(self, *parts: Any) -> str:
         """根据多个上下文片段生成稳定缓存 key。"""
+        # str(part) 足够满足当前 mock 场景；未来需要跨语言稳定性时可改成排序 JSON。
         raw = "|".join(str(part) for part in parts)
         return hashlib.md5(raw.encode("utf-8")).hexdigest()
 
@@ -36,9 +37,11 @@ class CacheService:
         data = read_json(self.cache_files[cache_name], {})
         item = data.get(key)
         if not item:
+            # 文件存在但 key 不存在，表示缓存未命中。
             return None
         expires_at = item.get("expires_at")
         if expires_at and expires_at < time.time():
+            # 过期缓存暂不立即删除，避免读路径产生写副作用。
             return None
         return item.get("value")
 
@@ -54,8 +57,12 @@ class CacheService:
         ttl_seconds 为空时使用全局默认 TTL；ttl 为 0/None 表示不设置过期时间。
         """
         settings = get_settings()
+
+        # 调用方显式传 ttl_seconds 时优先使用，否则用全局默认 TTL。
         ttl = ttl_seconds if ttl_seconds is not None else settings.cache_ttl_seconds
         data = read_json(self.cache_files[cache_name], {})
+
+        # 缓存文件结构是 key -> {value, created_at, expires_at}。
         data[key] = {
             "value": value,
             "created_at": time.time(),
@@ -66,6 +73,8 @@ class CacheService:
     def delete(self, cache_name: str, key: str) -> None:
         """删除指定缓存项。"""
         data = read_json(self.cache_files[cache_name], {})
+
+        # pop(..., None) 让删除不存在 key 时保持幂等。
         data.pop(key, None)
         write_json(self.cache_files[cache_name], data)
 
@@ -73,12 +82,14 @@ class CacheService:
         """清空指定缓存文件；未指定时清空全部缓存。"""
         names = [cache_name] if cache_name else list(self.cache_files)
         for name in names:
+            # 清空缓存就是把对应 JSON 文件写回空对象。
             write_json(self.cache_files[name], {})
 
     def status(self) -> dict[str, Any]:
         """返回缓存文件状态，供 /api/cache/status 使用。"""
         result = {}
         for name, path in self.cache_files.items():
+            # status 只读文件，不修改缓存内容。
             data = read_json(path, {})
             result[name] = {
                 "path": str(path),

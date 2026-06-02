@@ -52,10 +52,19 @@ def ensure_runtime_files() -> None:
     因此服务启动时必须保证 graph、schema、cache 等文件存在，
     这样后续 service 可以直接读取，不需要在每个业务入口重复兜底。
     """
+    # 先创建目录，再创建文件；否则 ensure_json_file 写入时父目录可能不存在。
     ensure_data_dirs()
+
+    # graph.json 是图谱事实源，最小默认值必须能通过 GraphData 校验。
     ensure_json_file(GRAPH_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1, "nodes": [], "edges": []})
+
+    # expansion_index 记录结构扩展历史，空对象表示尚未扩展任何节点。
     ensure_json_file(EXPANSION_INDEX_FILE, {})
+
+    # schema_rules 缺失时使用空规则兜底；真实规则由 app/data/graph/schema_rules.json 提供。
     ensure_json_file(SCHEMA_RULES_FILE, {"allowed_node_types": [], "allowed_relations": [], "expand_types": {}})
+
+    # 三类缓存都是表达层缓存，启动时只确保文件存在，不清空已有内容。
     ensure_json_file(AI_CACHE_FILE, {})
     ensure_json_file(REPORT_CACHE_FILE, {})
     ensure_json_file(AGENT_CACHE_FILE, {})

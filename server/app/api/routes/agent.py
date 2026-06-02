@@ -18,6 +18,7 @@ agent_service = AgentService()
 @router.get("/list")
 def list_agents() -> dict:
     """返回前端可展示和选择的智能体列表。"""
+    # AgentInfo 是 Pydantic 模型，返回前先转成普通 JSON 结构。
     return success([agent.model_dump(mode="json") for agent in agent_service.list_agents()])
 
 
@@ -27,6 +28,7 @@ def run_agent(request: AgentRunRequest) -> dict:
 
     具体上下文构造、缓存读取和 mock AI 回答都在 AgentService 中完成。
     """
+    # 路由层不拼接 steps 或回答内容，只把请求字段转交给服务层。
     response = agent_service.run_agent(
         request.agent_type,
         request.query,

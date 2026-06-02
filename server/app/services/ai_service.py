@@ -17,6 +17,7 @@ class AIService:
         当前返回 mock 候选结构；后续真实 LLM 输出也必须保持候选数据格式。
         """
         return {
+            # 候选节点不包含 id；后端会在 GraphService.build_node 中统一生成。
             "nodes": [
                 {
                     "type": "SeaArea",
@@ -24,6 +25,7 @@ class AIService:
                     "properties": {"description": f"{topic} 的种子海域节点。"},
                 }
             ],
+            # 种子图可以没有边，后续脚本或扩展流程再补充关系。
             "edges": [],
             "summary": "已生成 mock 种子图谱候选数据。",
         }
@@ -43,7 +45,10 @@ class AIService:
 
     def _mock_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
         """根据 expand_type 返回稳定的 mock 图谱扩展候选结果。"""
+        # expand_type 决定生成哪类候选结构；当前值来自 schema_rules 校验后的请求。
         expand_type = context["expand_type"]
+
+        # 中心节点名称用于生成更贴近上下文的 mock 名称和描述。
         center_name = context["current_node"]["name"]
         if expand_type == "risk_factors":
             # 赤潮风险因子扩展：生成风险因子和治理措施。
@@ -69,6 +74,7 @@ class AIService:
                 ],
                 "edges": [
                     {
+                        # source_ref 可以直接使用中心节点 ID，ExpansionService 会映射为正式 source。
                         "source_ref": context["current_node"]["id"],
                         "target_name": "叶绿素浓度升高",
                         "relation": "affected_by",
@@ -76,6 +82,7 @@ class AIService:
                         "properties": {"description": f"{center_name} 受到叶绿素浓度升高影响。"},
                     },
                     {
+                        # 这里用中文节点名作为 source_ref，模拟 LLM 常见的“按名称引用本次节点”输出。
                         "source_ref": "叶绿素浓度升高",
                         "target_name": "加强近岸营养盐排放管控",
                         "relation": "mitigated_by",
@@ -168,7 +175,11 @@ class AIService:
     def _mock_agent_answer(self, context: dict[str, Any]) -> str:
         """根据 agent_type 返回稳定的 mock 智能体回答。"""
         agent_type = context["agent_type"]
+
+        # 没有绑定节点时使用“目标海域”兜底，保证回答文本总是完整。
         node_name = (context.get("node") or {}).get("name", "目标海域")
+
+        # 每个 agent_type 固定一条领域化 mock 回答，便于前端调试不同页面。
         answers = {
             "red_tide": f"根据当前模拟观测数据，{node_name} 叶绿素和营养盐信号偏高，赤潮风险为中等。",
             "current_analysis": f"{node_name} 当前海流整体稳定，局部流速变化需要继续跟踪。",
@@ -177,11 +188,16 @@ class AIService:
             "buoy_diagnosis": "浮标状态总体在线，电量和最近上报时间未显示严重异常。",
             "fishery_assessment": f"{node_name} 渔业适宜性处于中等偏高水平，需关注赤潮风险对渔获的影响。",
         }
+
+        # 理论上 agent_type 已在 AgentService 校验；这里保留兜底，避免直接调用时报错。
         return answers.get(agent_type, "已完成 mock 智能体分析。")
 
     def _mock_report(self, context: dict[str, Any]) -> str:
         """返回稳定的 Markdown mock 报告。"""
+        # 标题由 ReportService 传入；缺省值用于直接调用 AIService 的兜底。
         title = context.get("title", "海洋分析报告")
+
+        # 报告正文尽量围绕节点名称；没有节点时使用通用称呼。
         node_name = (context.get("node") or {}).get("name", "目标海域")
         return (
             f"# {title}\n\n"

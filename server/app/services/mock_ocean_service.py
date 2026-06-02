@@ -20,12 +20,14 @@ class MockOceanService:
 
     def get_observations(self, sea_area_id: str | None = None) -> list[dict[str, Any]]:
         """返回海洋观测记录，可按海域过滤。"""
+        # 观测数据通常与海域绑定，因此复用按 sea_area_id 过滤的辅助函数。
         return self._filter_by_sea_area(read_json(OCEAN_OBSERVATIONS_FILE, []), sea_area_id)
 
     def get_buoy_status(self, buoy_id: str | None = None) -> list[dict[str, Any]]:
         """返回浮标状态，可按浮标 ID 过滤。"""
         records = read_json(BUOY_STATUS_FILE, [])
         if buoy_id:
+            # 浮标接口按 buoy_id 过滤，而不是 sea_area_id。
             return [record for record in records if record.get("id") == buoy_id]
         return records
 
@@ -49,6 +51,7 @@ class MockOceanService:
         copy = dict(observation)
         value = copy.get("value")
         if isinstance(value, int | float):
+            # 只扰动数值字段；非数值观测保持原样。
             copy["value"] = round(value * 1.01, 2)
         return copy
 
@@ -59,5 +62,8 @@ class MockOceanService:
     ) -> list[dict[str, Any]]:
         """按 sea_area_id 过滤记录。"""
         if not sea_area_id:
+            # 没有过滤条件时返回完整列表，供总览页面使用。
             return records
+
+        # mock 文件约定每条记录用 sea_area_id 字段关联海域。
         return [record for record in records if record.get("sea_area_id") == sea_area_id]

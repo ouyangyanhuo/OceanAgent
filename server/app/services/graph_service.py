@@ -55,10 +55,12 @@ class GraphService:
 
     def load_graph(self) -> GraphData:
         """读取 graph.json 并校验为 GraphData。"""
+        # read_json 的默认值只用于文件缺失兜底；正常情况下启动时已经确保文件存在。
         return GraphData.model_validate(read_json(GRAPH_FILE, {"graph_id": "ocean_kg_demo_v1"}))
 
     def save_graph(self, graph: GraphData) -> None:
         """保存完整图谱。"""
+        # model_dump(mode="json") 会把 Pydantic 对象转成可 JSON 序列化的基础类型。
         write_json(GRAPH_FILE, graph.model_dump(mode="json"))
 
     def get_graph(self) -> GraphData:
@@ -68,6 +70,8 @@ class GraphService:
     def get_node(self, node_id: str) -> GraphNode:
         """按节点 ID 查询节点，不存在则抛业务异常。"""
         graph = self.load_graph()
+
+        # 当前图谱规模较小，直接线性扫描即可；后续数据增大再考虑内存索引。
         for node in graph.nodes:
             if node.id == node_id:
                 return node
@@ -76,6 +80,8 @@ class GraphService:
     def get_edge(self, edge_id: str) -> GraphEdge:
         """按边 ID 查询边，不存在则抛业务异常。"""
         graph = self.load_graph()
+
+        # 边数量目前也较小，线性扫描比维护额外索引更简单。
         for edge in graph.edges:
             if edge.id == edge_id:
                 return edge
@@ -92,7 +98,11 @@ class GraphService:
             raise NotFoundError(f"Node not found: {node_id}", code="NODE_NOT_FOUND")
 
         depth = max(1, min(depth, 3))
+
+        # 先构造 id -> node 字典，最后把 visited 的节点 ID 快速转回节点对象。
         node_by_id = {node.id: node for node in graph.nodes}
+
+        # visited 防止环路导致重复扩展；frontier 是当前深度层要继续展开的节点集合。
         visited = {node_id}
         frontier = {node_id}
         neighbor_edges: list[GraphEdge] = []
@@ -101,14 +111,18 @@ class GraphService:
         for _ in range(depth):
             next_frontier: set[str] = set()
             for edge in graph.edges:
+                # 只要边的一端在当前 frontier，就说明这条边连接到当前层。
                 if edge.source in frontier or edge.target in frontier:
                     neighbor_edges.append(edge)
+
+                    # 取边的另一端作为下一层候选节点。
                     other = edge.target if edge.source in frontier else edge.source
                     if other not in visited:
                         next_frontier.add(other)
                         visited.add(other)
             frontier = next_frontier
 
+        # visited 包含中心节点自身；前端通常也需要中心节点来渲染局部图。
         neighbor_nodes = [node_by_id[node_id] for node_id in visited if node_id in node_by_id]
         return {"nodes": neighbor_nodes, "edges": neighbor_edges}
 
@@ -120,7 +134,10 @@ class GraphService:
         """
         existing = self.find_similar_node(graph, node.type, node.name)
         if existing:
+            # 去重命中时不增加版本号，因为图谱结构没有发生变化。
             return existing
+
+        # 只有真正新增节点时才提升 graph.version。
         graph.nodes.append(node)
         graph.version += 1
         return node
@@ -132,7 +149,10 @@ class GraphService:
         """
         existing = self.find_edge(graph, edge.source, edge.target, edge.relation)
         if existing:
+            # 已存在的边直接复用，避免重复关系污染图谱。
             return existing
+
+        # 只有真正新增边时才提升 graph.version。
         graph.edges.append(edge)
         graph.version += 1
         return edge
@@ -165,6 +185,7 @@ class GraphService:
         """标记节点的某个扩展类型已完成。"""
         for node in graph.nodes:
             if node.id == node_id:
+                # expanded 是按 expand_type 记录的布尔字典，便于前端展示扩展按钮状态。
                 node.expanded[expand_type] = True
                 node.metadata.updated_at = now_iso()
                 return
@@ -184,11 +205,13 @@ class GraphService:
         """
         created_at = now_iso()
         return GraphNode(
+            # ID 由后端稳定生成，保证同一候选在相同上下文中可重复得到相同 ID。
             id=generate_node_id(node_type, name, parent_node_id),
             type=node_type,
             name=name,
             properties=properties,
             metadata=GraphMetadata(
+                # source 区分 seed/manual/generated，便于后续审计和展示。
                 source=source,
                 parent_node=parent_node_id,
                 created_at=created_at,
@@ -209,6 +232,7 @@ class GraphService:
         """根据候选边数据构造后端正式边。"""
         created_at = now_iso()
         return GraphEdge(
+            # 边 ID 由三元组生成，配合 add_edge 的去重规则保持稳定。
             id=generate_edge_id(source, relation, target),
             source=source,
             target=target,

@@ -16,7 +16,10 @@ class PromptService:
 
     def load_prompt(self, name: str) -> str:
         """按名称读取 prompt JSON 的 template 字段。"""
+        # Prompt 文件名与逻辑名称保持一致，例如 graph_expand_prompt.json。
         prompt = read_json(PROMPT_DIR / f"{name}.json", {})
+
+        # 如果 template 缺失，直接抛 KeyError，让开发阶段尽早发现错误配置。
         return prompt["template"]
 
     def render(self, template: str, context: dict[str, Any]) -> str:
@@ -26,10 +29,14 @@ class PromptService:
         """
         result = template
         for key, value in context.items():
+            # 结构化数据用 JSON 表示，比 Python dict 字符串更适合放进 prompt。
             if isinstance(value, dict | list):
                 replacement = json.dumps(value, ensure_ascii=False, indent=2)
             else:
+                # 基础类型直接转字符串，例如 expand_type、max_nodes。
                 replacement = str(value)
+
+            # 模板变量格式固定为 {{key}}，不引入复杂模板引擎，降低依赖和认知成本。
             result = result.replace(f"{{{{{key}}}}}", replacement)
         return result
 
@@ -39,6 +46,7 @@ class PromptService:
 
     def render_agent_prompt(self, agent_type: str, context: dict[str, Any]) -> str:
         """按智能体类型渲染对应 prompt。"""
+        # agent_type 到 prompt 文件名的映射放在这里，避免前端需要知道文件命名。
         prompt_file_by_agent = {
             "red_tide": "red_tide_prompt",
             "current_analysis": "current_analysis_prompt",
@@ -47,6 +55,8 @@ class PromptService:
             "buoy_diagnosis": "buoy_diagnosis_prompt",
             "ecological_qa": "ecological_qa_prompt",
         }
+
+        # agent_type 已由 AgentService 校验；直接索引可以让错误类型尽早暴露。
         return self.render(self.load_prompt(prompt_file_by_agent[agent_type]), context)
 
     def render_report_prompt(self, context: dict[str, Any]) -> str:

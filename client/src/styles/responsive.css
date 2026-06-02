@@ -79,7 +79,8 @@
   .sidebar .toggle-btn {
     width: 48px;
     height: 48px;
-    border-bottom: none;
+    margin-top: 0;
+    border-top: none;
     border-right: 1px solid rgba(39, 151, 255, 0.15);
   }
 
@@ -460,12 +461,48 @@
     height: 24px;
   }
 
+  .graph-page {
+    padding: 12px;
+  }
+
+  .graph-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .graph-page-title h1 {
+    font-size: 20px;
+  }
+
+  .graph-page-grid {
+    flex-direction: column;
+  }
+
+  .graph-aside {
+    width: 100%;
+  }
+
   .graph-panel {
-    grid-template-rows: 46px minmax(350px, 1fr);
+    min-height: 400px;
   }
 
   .graph-header {
-    padding: 0 12px;
+    padding: 10px 12px;
+    flex-wrap: wrap;
+  }
+
+  .graph-header-left {
+    width: 100%;
+  }
+
+  .graph-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .graph-search {
+    flex: 1;
+    min-width: 150px;
   }
 
   .graph-canvas {
@@ -474,28 +511,27 @@
 
   .graph-tools {
     left: 12px;
-    top: 16px;
-    gap: 6px;
+    top: 12px;
   }
 
   .graph-tools button {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 
   .graph-node {
-    --size: 70px;
-    font-size: 13px;
+    --size: 64px;
+    font-size: 11px;
   }
 
   .graph-node.core {
-    --size: 112px;
-    font-size: 20px;
+    --size: 100px;
+    font-size: 16px;
   }
 
   .mini-map {
-    width: 140px;
-    height: 88px;
+    width: 120px;
+    height: 80px;
     right: 16px;
     bottom: 48px;
   }

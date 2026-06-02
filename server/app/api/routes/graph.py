@@ -22,6 +22,7 @@ validation_service = ValidationService()
 @router.get("")
 def get_graph() -> dict:
     """获取完整图谱。"""
+    # mode="json" 会把模型转换为前端可直接消费的 dict/list/str/number。
     return success(graph_service.get_graph().model_dump(mode="json"))
 
 
@@ -38,6 +39,8 @@ def get_neighbors(node_id: str, depth: int = Query(default=1, ge=1, le=3)) -> di
     depth 在 API 层限制为 1 到 3，避免一次请求展开过大范围。
     """
     neighbors = graph_service.get_neighbors(node_id, depth=depth)
+
+    # GraphService 返回 Pydantic 对象，这里统一序列化为 JSON 兼容结构。
     return success(
         {
             "nodes": [node.model_dump(mode="json") for node in neighbors["nodes"]],
@@ -49,7 +52,10 @@ def get_neighbors(node_id: str, depth: int = Query(default=1, ge=1, le=3)) -> di
 @router.get("/nodes/{node_id}/expand-options")
 def get_expand_options(node_id: str) -> dict:
     """返回某个节点可执行的扩展方向以及是否已扩展。"""
+    # 先读取节点，既能确认 node_id 存在，也能获取该节点 expanded 状态。
     node = graph_service.get_node(node_id)
+
+    # 扩展选项来自 schema_rules，而不是写死在前端或路由里。
     rules = validation_service.load_schema_rules().get("expand_types", {})
     return success(
         {
@@ -57,7 +63,9 @@ def get_expand_options(node_id: str) -> dict:
             "options": [
                 {
                     "expand_type": expand_type,
+                    # label 供前端直接展示；缺失时用 expand_type 兜底。
                     "label": rule.get("label", expand_type),
+                    # expanded 用于前端控制“已扩展/可扩展”状态。
                     "expanded": node.expanded.get(expand_type, False),
                 }
                 for expand_type, rule in rules.items()
@@ -73,6 +81,7 @@ def expand_node(request: ExpandNodeRequest) -> dict:
     ExpansionService 会负责检查 expansion_index、调用 mock AI、校验候选结果、
     写入 graph.json、更新 expansion_index 并创建快照。
     """
+    # request 已由 Pydantic 校验基础字段类型；业务校验交给 ExpansionService。
     response = expansion_service.expand_node(
         request.node_id,
         request.expand_type,

@@ -82,8 +82,10 @@ class AgentService:
         未命中缓存时调用 AIService 生成 mock 回答。
         """
         if agent_type not in {agent.agent_type for agent in AGENTS}:
+            # 尽早失败，避免后续构造无意义上下文或写入错误缓存。
             raise ValidationError(f"Unsupported agent_type: {agent_type}", code="INVALID_AGENT_TYPE")
 
+        # params 统一归一化成字典，后续上下文和缓存 key 可以稳定处理。
         params = params or {}
         context = self.build_agent_context(agent_type, query, node_id, params)
 
@@ -91,6 +93,7 @@ class AgentService:
         cache_key = self.cache_service.make_key(agent_type, query, context.get("node"), params)
         cached = self.cache_service.get("agent", cache_key)
         if cached:
+            # 缓存中保存的是 response 的 JSON 结构，这里重新校验成 Pydantic 模型。
             return AgentRunResponse.model_validate(cached | {"used_cache": True})
 
         # steps 是前端展示“智能体执行过程”的固定流程。
@@ -108,6 +111,8 @@ class AgentService:
                 AgentStep(name="AI 分析"),
             ],
         )
+
+        # 写缓存时存 JSON 结构，而不是 Pydantic 对象，保证文件内容可直接序列化。
         self.cache_service.set("agent", cache_key, response.model_dump(mode="json"))
         return response
 
@@ -122,18 +127,26 @@ class AgentService:
 
         上下文由图谱节点、一跳邻居、模拟观测数据、浮标状态、海流、渔场和航线组成。
         """
+        # node_id 可选：没有 node_id 时，智能体只基于 query、params 和 mock 数据分析。
         node = self.graph_service.get_node(node_id).model_dump(mode="json") if node_id else None
+
+        # 有节点时读取一跳邻居作为局部知识图谱上下文；没有节点时使用空上下文。
         neighbors = self.graph_service.get_neighbors(node_id, depth=1) if node_id else {"nodes": [], "edges": []}
 
         # 只有当前节点本身是 SeaArea 时，才直接把 node_id 当作海域 ID。
         sea_area_id = node_id if node and node.get("type") == "SeaArea" else params.get("sea_area_id")
         return {
+            # 原始请求信息保留在上下文中，方便 prompt 或 mock 逻辑使用。
             "agent_type": agent_type,
             "query": query,
             "node": node,
             "params": params,
+
+            # 图谱上下文转成 JSON dict，避免下游 AIService 依赖 Pydantic 类型。
             "related_nodes": [item.model_dump(mode="json") for item in neighbors["nodes"]],
             "related_edges": [item.model_dump(mode="json") for item in neighbors["edges"]],
+
+            # 领域 mock 数据按 sea_area_id 过滤，尽量让回答与当前海域相关。
             "observations": self.mock_ocean_service.get_observations(sea_area_id),
             "buoys": self.mock_ocean_service.get_buoy_status(),
             "current_fields": self.mock_ocean_service.get_current_fields(sea_area_id),

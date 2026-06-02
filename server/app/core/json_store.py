@@ -30,12 +30,19 @@ def atomic_write_json(path: Path, data: Any) -> None:
     同目录替换通常是原子操作，可避免半写入状态暴露给读者。
     """
     path.parent.mkdir(parents=True, exist_ok=True)
+
+    # 临时文件和目标文件放在同一目录，确保 replace 操作尽可能原子。
     tmp_path = path.with_suffix(f"{path.suffix}.tmp")
     with tmp_path.open("w", encoding="utf-8") as file:
+        # ensure_ascii=False 保留中文，方便直接查看 JSON 文件。
         json.dump(data, file, ensure_ascii=False, indent=2)
         file.write("\n")
+
+        # flush 将 Python 缓冲写到 OS，fsync 再要求 OS 尽量落盘。
         file.flush()
         os.fsync(file.fileno())
+
+    # replace 会覆盖旧文件；读者要么看到旧文件，要么看到完整新文件。
     tmp_path.replace(path)
 
 
