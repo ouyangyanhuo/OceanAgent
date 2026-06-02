@@ -1,0 +1,121 @@
+.qa-page {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 12px;
+  min-height: 0;
+}
+
+.qa-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(520px, 1.25fr) minmax(300px, 0.75fr) minmax(280px, 0.7fr);
+  grid-template-areas:
+    "chat knowledge sources"
+    "chat topic models"
+    "record distribution advice";
+  grid-auto-rows: minmax(220px, auto);
+  align-items: stretch;
+  gap: 12px;
+}
+
+.qa-page .chat-panel {
+  grid-area: chat;
+  min-height: 640px;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.qa-page .knowledge-card-panel {
+  grid-area: knowledge;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.qa-page .side-feed-panel:nth-of-type(3) {
+  grid-area: sources;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.qa-page .side-feed-panel:nth-of-type(4) {
+  grid-area: models;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.qa-page .record-panel {
+  grid-area: record;
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 240px;
+}
+
+.qa-page .topic-panel {
+  grid-area: topic;
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 220px;
+}
+
+.qa-page .distribution-panel {
+  grid-area: distribution;
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 240px;
+}
+
+.qa-page .qa-advice-panel {
+  grid-area: advice;
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 240px;
+}
+
+.qa-page .knowledge-card-panel,
+.qa-page .side-feed-panel,
+.qa-page .record-panel,
+.qa-page .topic-panel,
+.qa-page .distribution-panel,
+.qa-page .qa-advice-panel {
+  height: auto;
+  max-height: none;
+}
+
+.qa-page .messages {
+  max-height: none;
+}
+
+@media (max-width: 1560px) {
+  .qa-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    grid-template-areas:
+      "chat knowledge"
+      "chat sources"
+      "topic models"
+      "record distribution"
+      "advice advice";
+  }
+
+  .qa-page .chat-panel {
+    min-height: 620px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .qa-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "chat"
+      "knowledge"
+      "sources"
+      "models"
+      "topic"
+      "record"
+      "distribution"
+      "advice";
+  }
+
+  .qa-page .chat-panel {
+    min-height: 560px;
+  }
+}

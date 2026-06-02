@@ -1,0 +1,5 @@
+{
+  "name": "graph_expand_prompt",
+  "description": "图谱扩展 prompt，用于指导 LLM 生成候选节点和边。",
+  "template": "你是一个海洋知识图谱扩展器。\n\n你只能输出 JSON，不能输出 Markdown 或解释性文字。\n\n当前节点：\n{{current_node}}\n\n一跳邻居：\n{{neighbors}}\n\n已有关系：\n{{existing_edges}}\n\n扩展类型：\n{{expand_type}}\n\n允许生成的节点类型：\n{{allowed_node_types}}\n\n允许生成的关系类型：\n{{allowed_relations}}\n\n最大节点数量：\n{{max_nodes}}\n\n最大边数量：\n{{max_edges}}\n\n输出字段必须包含 nodes、edges、summary。节点不要包含 id，id 由后端生成。"
+}

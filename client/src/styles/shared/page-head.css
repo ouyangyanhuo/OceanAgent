@@ -1,0 +1,60 @@
+.page-title-row,
+.qa-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.page-title-row h1,
+.qa-hero h1 {
+  font-size: 27px;
+  line-height: 1.2;
+  margin: 0 0 7px;
+}
+
+.page-title-row h1 span,
+.qa-hero h1 span {
+  margin-left: 10px;
+  padding: 3px 10px;
+  border-radius: 5px;
+  color: #39f59d;
+  background: rgba(35, 209, 120, 0.16);
+  border: 1px solid rgba(35, 209, 120, 0.35);
+  font-size: 13px;
+}
+
+.page-title-row p,
+.qa-hero p {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.page-actions button,
+.tabs button,
+.task-table-panel button,
+.advice-panel button,
+.chat-input button {
+  min-height: 34px;
+  border: 1px solid rgba(75, 143, 210, 0.42);
+  border-radius: 7px;
+  color: #d9efff;
+  background: rgba(5, 28, 55, 0.8);
+}
+
+.page-actions button {
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+

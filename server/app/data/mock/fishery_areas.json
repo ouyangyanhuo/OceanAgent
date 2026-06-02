@@ -1,0 +1,16 @@
+[
+  {
+    "id": "fishery_001",
+    "name": "东海近岸渔场",
+    "sea_area_id": "sea_area_001",
+    "suitability": 0.74,
+    "main_species": ["小黄鱼", "带鱼"]
+  },
+  {
+    "id": "fishery_002",
+    "name": "南海北部渔场",
+    "sea_area_id": "sea_area_002",
+    "suitability": 0.82,
+    "main_species": ["鲐鱼", "马鲛鱼"]
+  }
+]

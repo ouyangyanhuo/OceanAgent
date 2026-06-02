@@ -1,0 +1,1059 @@
+@media (max-width: 1320px) {
+  .sidebar:not(.collapsed) {
+    width: 78px;
+  }
+
+  .sidebar:not(.collapsed) .brand-text {
+    display: none;
+  }
+
+  .sidebar:not(.collapsed) .brand {
+    justify-content: center;
+    padding: 18px 10px;
+  }
+
+  .sidebar:not(.collapsed) .toggle-btn {
+    display: none;
+  }
+
+  .sidebar:not(.collapsed) button span {
+    display: none;
+  }
+
+  .sidebar:not(.collapsed) button {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar:not(.collapsed) .radar-art {
+    display: none;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .right-stack {
+    grid-template-rows: auto 640px;
+  }
+
+  .task-page,
+  .qa-page,
+  .agent-detail-page {
+    display: block;
+  }
+
+  .task-grid,
+  .qa-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .flow-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .resource-panel,
+  .task-table-panel,
+  .advice-panel,
+  .record-panel,
+  .topic-panel,
+  .detail-table,
+  .detail-table.compact,
+  .sensor-panel,
+  .fault-distribution,
+  .fishery-grid .qa-advice-panel,
+  .route-grid .qa-advice-panel,
+  .buoy-grid .qa-advice-panel {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .sidebar {
+    min-height: auto;
+    height: 74px;
+    flex-direction: row;
+    overflow: auto;
+    width: 100%;
+  }
+
+  .brand {
+    width: 78px;
+    flex: 0 0 auto;
+  }
+
+  .sidebar nav {
+    display: flex;
+    padding: 8px;
+  }
+
+  .sidebar button {
+    width: 58px;
+    height: 56px;
+    flex: 0 0 auto;
+  }
+
+  .workspace {
+    min-height: 0;
+    height: auto;
+  }
+
+  .topbar {
+    height: auto;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .top-actions {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .content-grid,
+  .left-stack,
+  .right-stack,
+  .bottom-panels {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .left-stack,
+  .right-stack {
+    grid-template-rows: auto;
+  }
+
+  .agent-grid,
+  .metrics-grid,
+  .source-grid,
+  .resource-grid,
+  .flow-steps {
+    flex-direction: column;
+  }
+
+  .page-title-row,
+  .qa-hero,
+  .agent-detail-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .qa-hero .page-actions,
+  .agent-detail-head .page-actions {
+    margin-left: 0;
+  }
+
+  .source-distribution,
+  .distribution-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .graph-panel {
+    grid-template-rows: auto 560px;
+  }
+
+  .graph-header,
+  .graph-controls,
+  .statusbar {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .statusbar {
+    padding: 14px;
+  }
+
+  .statusbar span {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
+/* Density pass: make the 1920x1080 dashboard fit at browser zoom 100%. */
+@media (min-width: 1321px) {
+  .sidebar:not(.collapsed) {
+    width: 190px;
+  }
+
+  .brand {
+    height: 66px;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  .brand strong {
+    font-size: 17px;
+  }
+
+  .brand span {
+    font-size: 11px;
+  }
+
+  .logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .sidebar nav {
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .sidebar button {
+    height: 47px;
+    padding: 0 15px;
+    gap: 13px;
+    font-size: 14px;
+  }
+
+  .sidebar.collapsed button {
+    padding: 0;
+    gap: 0;
+  }
+
+  .radar-art {
+    height: 235px;
+  }
+
+  .ship {
+    bottom: 64px;
+    font-size: 34px;
+  }
+
+  .workspace {
+    grid-template-rows: 62px minmax(0, 1fr) 46px;
+  }
+
+  .topbar {
+    min-height: 62px;
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    font-size: 27px;
+  }
+
+  .global-search {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .top-actions {
+    gap: 10px;
+  }
+
+  .icon-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .user-chip {
+    font-size: 13px;
+  }
+
+  .primary-action {
+    height: 38px;
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+
+  .content-grid,
+  .page {
+    padding: 8px;
+  }
+
+  .content-grid,
+  .left-stack,
+  .right-stack,
+  .bottom-panels,
+  .task-grid,
+  .qa-grid,
+  .detail-grid,
+  .graph-page-grid,
+  .agent-search-page,
+  .agent-search-aside,
+  .graph-aside {
+    gap: 8px;
+  }
+
+  .left-stack {
+    grid-template-rows: minmax(380px, 1fr) 238px;
+  }
+
+  .right-stack {
+    grid-template-rows: 136px minmax(0, 1fr);
+  }
+
+  .metrics-grid,
+  .task-metrics,
+  .qa-metrics,
+  .detail-metrics,
+  .graph-metrics {
+    gap: 8px;
+  }
+
+  .metric-card {
+    min-height: 126px;
+    padding: 10px 10px 6px;
+  }
+
+  .metric-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .metric-top {
+    gap: 9px;
+    font-size: 13px;
+  }
+
+  .metric-card strong {
+    margin-top: 5px;
+    font-size: clamp(19px, 1.35vw, 25px);
+  }
+
+  .metric-card p {
+    margin-top: 7px;
+    font-size: 12px;
+  }
+
+  .metric-card svg {
+    height: 31px;
+    margin-top: 2px;
+  }
+
+  .panel-header h2,
+  .graph-header h2 {
+    font-size: 17px;
+  }
+
+  .section-heading h1,
+  .page-title-row h1,
+  .qa-hero h1,
+  .agent-detail-head h1 {
+    font-size: 22px;
+  }
+
+  .page-title-row,
+  .qa-hero,
+  .agent-detail-head {
+    margin-bottom: 8px;
+  }
+
+  .page-title-row p,
+  .qa-hero p,
+  .agent-detail-head p {
+    font-size: 12px;
+  }
+
+  .agent-orb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .page-actions {
+    gap: 6px;
+  }
+
+  .page-actions button {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .agent-search-panel,
+  .compact-panel,
+  .flow-panel,
+  .trend-panel,
+  .duration-panel,
+  .alert-panel,
+  .resource-panel,
+  .source-distribution,
+  .task-table-panel,
+  .advice-panel,
+  .record-panel,
+  .topic-panel,
+  .distribution-panel,
+  .qa-advice-panel,
+  .ocean-map,
+  .micro-panel,
+  .detail-table,
+  .sensor-panel,
+  .knowledge-card-panel,
+  .side-feed-panel,
+  .chat-panel {
+    padding: 10px;
+  }
+
+  .filters {
+    gap: 6px;
+    margin: 10px 0;
+  }
+
+  .filter {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .toolbar-row {
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .toolbar-row button,
+  .toolbar-row select,
+  .graph-controls button,
+  .graph-controls select,
+  .graph-controls label {
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .agent-grid {
+    gap: 8px;
+  }
+
+  .agent-card {
+    min-height: 128px;
+    height: auto;
+    padding: 12px 10px;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .agent-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .agent-title h2 {
+    font-size: 14px;
+  }
+
+  .agent-body p {
+    min-height: 35px;
+    margin-top: 5px;
+    font-size: 11px;
+  }
+
+  .agent-footer {
+    margin-top: 8px;
+  }
+
+  .tags span,
+  .timeline b {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .pager {
+    min-height: 30px;
+    padding-top: 6px;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .pager button {
+    width: 24px;
+    height: 24px;
+  }
+
+  .graph-panel {
+    grid-template-rows: 46px minmax(350px, 1fr);
+  }
+
+  .graph-header {
+    padding: 0 12px;
+  }
+
+  .graph-canvas {
+    min-height: 350px;
+  }
+
+  .graph-tools {
+    left: 12px;
+    top: 16px;
+    gap: 6px;
+  }
+
+  .graph-tools button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .graph-node {
+    --size: 70px;
+    font-size: 13px;
+  }
+
+  .graph-node.core {
+    --size: 112px;
+    font-size: 20px;
+  }
+
+  .mini-map {
+    width: 140px;
+    height: 88px;
+    right: 16px;
+    bottom: 48px;
+  }
+
+  .legend {
+    left: 16px;
+    right: 16px;
+    bottom: 12px;
+    gap: 14px;
+    font-size: 11px;
+  }
+
+  .qa-page,
+  .agent-detail-page {
+    grid-template-rows: auto 128px minmax(0, 1fr);
+  }
+
+  .qa-grid {
+    min-height: 720px;
+    grid-template-rows: 360px 180px 210px;
+  }
+
+  .detail-grid {
+    grid-template-rows: 318px 1fr;
+  }
+
+  .flow-steps article {
+    min-height: 158px;
+    padding: 8px;
+  }
+
+  .flow-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .flow-steps h3 {
+    font-size: 13px;
+  }
+
+  .micro-grid article {
+    min-height: 72px;
+    padding: 8px;
+  }
+
+  .micro-grid strong {
+    font-size: 17px;
+  }
+
+  .micro-grid svg {
+    height: 24px;
+  }
+
+  .map-surface {
+    min-height: 240px;
+  }
+
+  .statusbar {
+    grid-template-columns: 150px 170px 1fr 1fr 260px;
+    gap: 10px;
+    padding: 0 18px;
+    font-size: 12px;
+  }
+
+  .statusbar span {
+    padding-left: 16px;
+  }
+
+  .statusbar strong {
+    margin-left: 12px;
+  }
+
+  .statusbar i {
+    width: 96px;
+    margin: 0 10px;
+  }
+}
+
+@media (min-width: 1321px) {
+  .agent-search-layout {
+    grid-template-columns: minmax(720px, 1fr) 320px;
+  }
+
+  .graph-page-grid {
+    grid-template-columns: minmax(720px, 1fr) 320px;
+  }
+
+  .graph-page .graph-panel {
+    min-height: 590px;
+  }
+
+  .qa-grid {
+    grid-template-columns: minmax(640px, 1.55fr) minmax(330px, 0.76fr) minmax(300px, 0.68fr);
+  }
+
+  .qa-page .chat-panel {
+    min-height: 700px;
+  }
+
+  .detail-grid {
+    grid-template-columns: minmax(590px, 1.2fr) minmax(360px, 0.82fr) minmax(300px, 0.68fr);
+  }
+
+  .ocean-map {
+    min-height: 360px;
+  }
+
+  .map-surface {
+    min-height: 292px;
+  }
+
+  .line-chart {
+    height: 126px;
+    min-height: 126px;
+  }
+}
+
+@media (max-width: 1320px) {
+  .agent-search-layout,
+  .graph-page-grid,
+  .detail-grid,
+  .qa-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qa-page .chat-panel,
+  .qa-page .knowledge-card-panel,
+  .qa-page .topic-panel,
+  .qa-page .side-feed-panel:nth-of-type(3),
+  .qa-page .side-feed-panel:nth-of-type(4),
+  .qa-page .record-panel,
+  .qa-page .distribution-panel,
+  .qa-page .qa-advice-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .qa-page .chat-panel {
+    min-height: 560px;
+  }
+}
+
+/* Continuous layout hardening: prevent cards and columns from overlapping at
+   intermediate widths while preserving dense desktop dashboards. */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  overflow: hidden;
+}
+
+button,
+select,
+input {
+  min-width: 0;
+}
+
+.workspace {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.topbar,
+.statusbar {
+  min-width: 0;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.top-actions,
+.global-search {
+  min-width: 0;
+}
+
+.top-actions {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.user-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content-grid {
+  grid-template-columns: minmax(0, 1.12fr) minmax(340px, 0.88fr);
+}
+
+.left-stack,
+.right-stack,
+.agent-search-layout,
+.graph-page-grid,
+.qa-grid,
+.detail-grid,
+.bottom-panels,
+.graph-aside,
+.agent-search-aside {
+  min-width: 0;
+}
+
+.right-stack {
+  grid-template-rows: auto minmax(460px, 1fr);
+}
+
+.agent-search-layout,
+.graph-page-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+}
+
+.qa-grid {
+  grid-template-columns: minmax(0, 1.48fr) minmax(260px, 0.82fr) minmax(250px, 0.74fr);
+}
+
+.detail-grid {
+  grid-template-columns: minmax(0, 1.24fr) minmax(280px, 0.86fr) minmax(250px, 0.72fr);
+}
+
+.metrics-grid,
+.agent-search-metrics,
+.graph-metrics,
+.qa-metrics,
+.detail-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.metric-card {
+  flex: 1 1 188px;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-top span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.agent-grid,
+.agent-grid.expanded {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.agent-card {
+  flex: 1 1 218px;
+  display: flex;
+  gap: 11px;
+}
+
+.agent-title {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.agent-title h2,
+.panel-header h2,
+.graph-header h2,
+.page-title-row h1,
+.qa-hero h1,
+.agent-detail-head h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.agent-footer {
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.agent-footer button {
+  min-width: 52px;
+}
+
+.pager {
+  flex-wrap: wrap;
+}
+
+.pager .total {
+  margin-left: 0;
+}
+
+.panel-header,
+.graph-header,
+.graph-controls,
+.page-title-row,
+.qa-hero,
+.agent-detail-head {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.graph-controls {
+  justify-content: flex-end;
+}
+
+.graph-controls label {
+  width: clamp(150px, 22vw, 190px);
+}
+
+.compact-panel,
+.micro-panel,
+.side-feed-panel,
+.trend-panel,
+.duration-panel,
+.alert-panel,
+.resource-panel,
+.record-panel,
+.topic-panel,
+.distribution-panel,
+.qa-advice-panel,
+.detail-table,
+.sensor-panel {
+  min-height: 0;
+}
+
+.source-grid,
+.resource-grid,
+.micro-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.source-grid article,
+.resource-grid article,
+.micro-grid article {
+  flex: 1 1 180px;
+}
+
+.source-grid article,
+.resource-grid article,
+.timeline article,
+.sensor-panel article {
+  min-width: 0;
+}
+
+.timeline article {
+  grid-template-columns: 42px 16px minmax(0, 1fr) minmax(50px, auto);
+}
+
+.timeline b,
+.side-feed-panel li span {
+  white-space: nowrap;
+}
+
+.knowledge-card-panel article > div {
+  float: none;
+  margin: 0 8px 4px 0;
+  display: inline-grid;
+  vertical-align: top;
+}
+
+.distribution-panel,
+.source-distribution {
+  grid-template-columns: minmax(124px, auto) minmax(0, 1fr);
+}
+
+.donut,
+.donut.large {
+  width: min(136px, 100%);
+  height: auto;
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.map-legend,
+.mini-map,
+.legend {
+  max-width: calc(100% - 28px);
+}
+
+.map-legend {
+  max-height: calc(100% - 72px);
+  overflow: auto;
+}
+
+table {
+  table-layout: auto;
+}
+
+th,
+td {
+  max-width: 280px;
+}
+
+.detail-table,
+.record-panel,
+.task-table-panel {
+  overflow-x: auto;
+}
+
+.statusbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  overflow-x: auto;
+}
+
+.statusbar span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content-grid::-webkit-scrollbar,
+.page::-webkit-scrollbar,
+.panel::-webkit-scrollbar,
+.agent-grid::-webkit-scrollbar,
+.messages::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.content-grid::-webkit-scrollbar-thumb,
+.page::-webkit-scrollbar-thumb,
+.panel::-webkit-scrollbar-thumb,
+.agent-grid::-webkit-scrollbar-thumb,
+.messages::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(86, 169, 232, 0.42);
+}
+
+.content-grid::-webkit-scrollbar-track,
+.page::-webkit-scrollbar-track,
+.panel::-webkit-scrollbar-track,
+.agent-grid::-webkit-scrollbar-track,
+.messages::-webkit-scrollbar-track {
+  background: rgba(7, 28, 52, 0.44);
+}
+
+@media (max-width: 1560px) {
+  .topbar {
+    justify-content: space-between;
+  }
+
+  .top-actions {
+    justify-content: flex-start;
+  }
+
+  .content-grid,
+  .agent-search-layout,
+  .graph-page-grid,
+  .qa-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-stack {
+    grid-template-rows: auto minmax(520px, auto);
+  }
+
+  .qa-page .chat-panel,
+  .qa-page .knowledge-card-panel,
+  .qa-page .topic-panel,
+  .qa-page .side-feed-panel:nth-of-type(3),
+  .qa-page .side-feed-panel:nth-of-type(4),
+  .qa-page .record-panel,
+  .qa-page .distribution-panel,
+  .qa-page .qa-advice-panel,
+  .fishery-grid .ocean-map,
+  .route-grid .ocean-map,
+  .buoy-grid .ocean-map,
+  .fishery-grid .micro-panel,
+  .route-grid .micro-panel,
+  .buoy-grid .micro-panel,
+  .fishery-grid .detail-table,
+  .route-grid .detail-table,
+  .buoy-grid .detail-table,
+  .fishery-grid .qa-advice-panel,
+  .route-grid .qa-advice-panel,
+  .buoy-grid .qa-advice-panel,
+  .detail-table.compact,
+  .sensor-panel,
+  .fault-distribution {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .qa-page .chat-panel {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell,
+  .workspace {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .page,
+  .content-grid {
+    overflow: visible;
+  }
+
+  .metrics-grid,
+  .agent-search-metrics,
+  .graph-metrics,
+  .qa-metrics,
+  .detail-metrics,
+  .agent-grid,
+  .agent-grid.expanded,
+  .source-grid,
+  .resource-grid,
+  .micro-grid,
+  .bottom-panels {
+    flex-direction: column;
+  }
+
+  .statusbar {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .timeline article,
+  .sensor-panel article,
+  .resource-grid article {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .timeline::before {
+    display: none;
+  }
+
+  .timeline .node {
+    display: none;
+  }
+
+  .distribution-panel,
+  .source-distribution {
+    flex-direction: column;
+  }
+}

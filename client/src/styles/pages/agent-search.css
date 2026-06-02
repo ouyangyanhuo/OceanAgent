@@ -1,0 +1,67 @@
+.agent-search-page {
+  min-height: max-content;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+}
+
+.agent-search-layout {
+  min-height: max-content;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(760px, 1fr) 360px;
+  gap: 12px;
+}
+
+.agent-search-main,
+.agent-search-aside,
+.graph-aside {
+  min-height: max-content;
+  min-width: 0;
+}
+
+.agent-search-aside,
+.graph-aside {
+  display: grid;
+  gap: 12px;
+}
+
+.agent-search-aside {
+  grid-template-rows: auto auto;
+}
+
+.agent-grid.expanded {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.agent-search-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.agent-search-page,
+.graph-page,
+.qa-page,
+.agent-detail-page {
+  min-height: max-content;
+}
+
+.agent-search-page {
+  grid-template-rows: auto auto;
+}
+
+.agent-search-layout,
+.graph-page-grid,
+.detail-grid,
+.qa-grid {
+  align-items: start;
+}
+
+.agent-search-layout {
+  grid-template-columns: minmax(760px, 1fr) minmax(320px, 360px);
+}
+
+.agent-search-aside,
+.graph-aside {
+  grid-auto-rows: minmax(min-content, max-content);
+}
+

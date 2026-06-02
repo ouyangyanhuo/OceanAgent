@@ -22,8 +22,8 @@ const sideSources = ['卫星遥感', '海洋浮标网', '渔船AIS', '渔获上�
 </script>
 
 <template>
-  <section class="page agent-detail-page">
-    <div class="agent-detail-head">
+  <section class="page agent-detail-page min-w-0">
+    <div class="agent-detail-head min-w-0">
       <div class="agent-orb fishery"><Fish :size="34" /></div>
       <div>
         <h1>渔场评估智能体 <span>在线</span></h1>
@@ -37,11 +37,11 @@ const sideSources = ['卫星遥感', '海洋浮标网', '渔船AIS', '渔获上�
       </div>
     </div>
 
-    <div class="metrics-grid detail-metrics">
+    <div class="metrics-grid detail-metrics min-w-0">
       <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
     </div>
 
-    <div class="detail-grid fishery-grid">
+    <div class="detail-grid fishery-grid min-w-0">
       <section class="panel ocean-map fishery-map">
         <header class="panel-header"><h2>渔场适宜性分布</h2><div class="tabs"><button class="active">表层(0-10m)</button><button>适宜度综合</button></div></header>
         <div class="map-surface heatmap">

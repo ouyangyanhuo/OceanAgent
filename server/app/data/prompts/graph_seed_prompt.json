@@ -1,0 +1,5 @@
+{
+  "name": "graph_seed_prompt",
+  "description": "生成种子图谱候选数据。",
+  "template": "请根据主题 {{topic}} 生成海洋知识图谱候选种子节点和边，只输出 JSON。"
+}

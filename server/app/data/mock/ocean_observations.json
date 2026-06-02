@@ -1,0 +1,26 @@
+[
+  {
+    "id": "obs_001",
+    "sea_area_id": "sea_area_001",
+    "metric": "temperature",
+    "value": 25.6,
+    "unit": "C",
+    "observed_at": "2026-06-02T08:00:00"
+  },
+  {
+    "id": "obs_002",
+    "sea_area_id": "sea_area_001",
+    "metric": "chlorophyll",
+    "value": 8.7,
+    "unit": "mg/m3",
+    "observed_at": "2026-06-02T08:00:00"
+  },
+  {
+    "id": "obs_003",
+    "sea_area_id": "sea_area_002",
+    "metric": "salinity",
+    "value": 33.1,
+    "unit": "psu",
+    "observed_at": "2026-06-02T08:00:00"
+  }
+]

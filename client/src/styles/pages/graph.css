@@ -1,0 +1,33 @@
+.graph-page {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 158px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.graph-page-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(720px, 1fr) 360px;
+  gap: 12px;
+}
+
+.graph-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.graph-page .graph-panel {
+  min-height: 0;
+}
+
+.graph-page {
+  grid-template-rows: auto auto;
+}
+
+.graph-page-grid {
+  grid-template-columns: minmax(760px, 1fr) minmax(320px, 360px);
+}
+
+.graph-page .graph-panel {
+  min-height: 640px;
+}

@@ -28,17 +28,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="app-shell">
+  <div class="app-shell min-h-dvh" data-theme="dark">
     <SidebarNav :active-page="activePage" @change-page="activePage = $event" />
-    <main class="workspace">
-      <header class="topbar">
-        <div class="brand-inline">
-          <div class="brand-mark">≈</div>
-          <div>
-            <strong>海洋智能体平台</strong>
-            <span>Ocean Agent Intelligence Platform</span>
-          </div>
-        </div>
+    <main class="workspace min-w-0">
+      <header class="topbar min-w-0">
         <label class="global-search">
           <Search :size="22" />
           <input :placeholder="searchPlaceholder" />

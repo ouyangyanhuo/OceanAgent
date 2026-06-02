@@ -36,8 +36,8 @@ const records = [
 </script>
 
 <template>
-  <section class="page qa-page">
-    <div class="qa-hero">
+  <section class="page qa-page min-w-0">
+    <div class="qa-hero min-w-0">
       <div class="agent-orb"><MessageSquare :size="34" /></div>
       <div>
         <h1>海洋生态问答智能体 <span>在线</span></h1>
@@ -51,11 +51,11 @@ const records = [
       </div>
     </div>
 
-    <div class="metrics-grid qa-metrics">
+    <div class="metrics-grid qa-metrics min-w-0">
       <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
     </div>
 
-    <div class="qa-grid">
+    <div class="qa-grid min-w-0">
       <section class="panel chat-panel">
         <header class="panel-header"><h2>生态问答对话</h2><button>清空对话</button></header>
         <div class="messages">

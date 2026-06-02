@@ -19,14 +19,14 @@ const routeMetrics = ['风速', '浪高', '海流速度', '能见度', '预计�
 </script>
 
 <template>
-  <section class="page agent-detail-page">
-    <div class="agent-detail-head">
+  <section class="page agent-detail-page min-w-0">
+    <div class="agent-detail-head min-w-0">
       <div class="agent-orb route"><ShipWheel :size="34" /></div>
       <div><h1>航线优化智能体 <span>在线</span></h1><p>面向船舶航线规划、气象海况融合分析、风险规避与能效优化的智能体</p></div>
       <div class="page-actions"><button><Bot :size="17" />智能问答</button><button><FileText :size="17" />报告生成</button><button><Settings :size="17" />优化配置</button><button><Share2 :size="17" />分享</button></div>
     </div>
-    <div class="metrics-grid detail-metrics"><MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" /></div>
-    <div class="detail-grid route-grid">
+    <div class="metrics-grid detail-metrics min-w-0"><MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" /></div>
+    <div class="detail-grid route-grid min-w-0">
       <section class="panel ocean-map route-map">
         <header class="panel-header"><h2>航线优化地图</h2><div class="tabs"><button class="active">综合视图</button></div></header>
         <div class="map-surface route-surface">

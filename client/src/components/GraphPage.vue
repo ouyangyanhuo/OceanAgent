@@ -10,13 +10,13 @@ defineProps({
 </script>
 
 <template>
-  <section class="page graph-page">
-    <div class="metrics-grid graph-metrics">
+  <section class="page graph-page min-w-0">
+    <div class="metrics-grid graph-metrics min-w-0">
       <MetricCard v-for="metric in dashboard.metrics" :key="metric.label" :metric="metric" />
     </div>
-    <div class="graph-page-grid">
+    <div class="graph-page-grid min-w-0">
       <KnowledgeGraph :graph="dashboard.graph" />
-      <aside class="graph-aside">
+      <aside class="graph-aside min-w-0">
         <TaskFeed :tasks="dashboard.tasks" />
         <DataSources :sources="dashboard.sources" />
       </aside>

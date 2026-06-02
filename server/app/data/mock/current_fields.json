@@ -1,0 +1,16 @@
+[
+  {
+    "id": "current_001",
+    "sea_area_id": "sea_area_001",
+    "direction": "NE",
+    "speed": 0.62,
+    "unit": "m/s"
+  },
+  {
+    "id": "current_002",
+    "sea_area_id": "sea_area_002",
+    "direction": "SW",
+    "speed": 0.48,
+    "unit": "m/s"
+  }
+]

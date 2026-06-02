@@ -1,0 +1,28 @@
+.content-grid,
+.page {
+  min-height: 0;
+  padding: 12px;
+  overflow: auto;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(520px, 44%) minmax(600px, 1fr);
+  gap: 12px;
+}
+
+.left-stack,
+.right-stack {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.left-stack {
+  grid-template-rows: minmax(440px, 1fr) 306px;
+}
+
+.right-stack {
+  grid-template-rows: 178px minmax(0, 1fr);
+}

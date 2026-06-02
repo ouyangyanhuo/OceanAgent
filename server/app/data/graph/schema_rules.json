@@ -1,0 +1,62 @@
+{
+  "allowed_node_types": [
+    "SeaArea",
+    "Buoy",
+    "Observation",
+    "RiskFactor",
+    "RedTideEvent",
+    "CurrentField",
+    "Species",
+    "FisheryArea",
+    "Route",
+    "PreventionMeasure",
+    "Agent",
+    "Report"
+  ],
+  "allowed_relations": [
+    "located_in",
+    "monitored_by",
+    "observed_by",
+    "has_observation",
+    "has_risk_event",
+    "affected_by",
+    "indicates",
+    "may_trigger",
+    "mitigated_by",
+    "correlated_with",
+    "suitable_for",
+    "route_passes_through",
+    "influences",
+    "generates_report"
+  ],
+  "expand_types": {
+    "risk_factors": {
+      "label": "赤潮风险因子",
+      "allowed_node_types": ["RiskFactor", "Observation", "RedTideEvent", "PreventionMeasure"],
+      "allowed_relations": ["affected_by", "indicates", "may_trigger", "mitigated_by"],
+      "max_nodes": 4,
+      "max_edges": 4
+    },
+    "related_events": {
+      "label": "相关风险事件",
+      "allowed_node_types": ["RedTideEvent", "Observation"],
+      "allowed_relations": ["has_risk_event", "indicates", "correlated_with"],
+      "max_nodes": 3,
+      "max_edges": 3
+    },
+    "ecological_species": {
+      "label": "生态物种关联",
+      "allowed_node_types": ["Species", "FisheryArea", "RiskFactor"],
+      "allowed_relations": ["suitable_for", "affected_by", "correlated_with"],
+      "max_nodes": 4,
+      "max_edges": 4
+    },
+    "monitoring_buoys": {
+      "label": "监测浮标",
+      "allowed_node_types": ["Buoy", "Observation"],
+      "allowed_relations": ["monitored_by", "observed_by", "has_observation"],
+      "max_nodes": 4,
+      "max_edges": 4
+    }
+  }
+}

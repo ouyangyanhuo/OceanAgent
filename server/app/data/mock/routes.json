@@ -1,0 +1,16 @@
+[
+  {
+    "id": "route_001",
+    "name": "上海港至舟山航线",
+    "sea_area_ids": ["sea_area_001"],
+    "risk_level": "medium",
+    "distance_nm": 96
+  },
+  {
+    "id": "route_002",
+    "name": "广州港至汕头航线",
+    "sea_area_ids": ["sea_area_002"],
+    "risk_level": "low",
+    "distance_nm": 214
+  }
+]

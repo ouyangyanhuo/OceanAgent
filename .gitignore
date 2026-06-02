@@ -2,6 +2,7 @@
 .cache/
 .uv-cache/
 .bun-cache/
+*.pyc
 
 server/.venv/
 server/app/__pycache__/

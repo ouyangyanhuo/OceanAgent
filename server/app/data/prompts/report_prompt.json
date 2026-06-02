@@ -1,0 +1,5 @@
+{
+  "name": "report_prompt",
+  "description": "报告生成 prompt。",
+  "template": "请基于输入上下文生成 Markdown 海洋分析报告，包含结论、数据依据、图谱关联和建议。"
+}

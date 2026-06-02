@@ -28,14 +28,14 @@ const faults = [
 </script>
 
 <template>
-  <section class="page agent-detail-page">
-    <div class="agent-detail-head">
+  <section class="page agent-detail-page min-w-0">
+    <div class="agent-detail-head min-w-0">
       <div class="agent-orb buoy"><RadioTower :size="34" /></div>
       <div><h1>浮标数据诊断智能体 <span>在线</span></h1><p>面向海洋浮标监测数据质控、异常诊断、设备健康评估与维护预警的智能体</p></div>
       <div class="page-actions"><button><Bot :size="17" />智能问答</button><button><FileText :size="17" />诊断报告</button><button><Settings :size="17" />诊断配置</button><button><Share2 :size="17" />分享</button></div>
     </div>
-    <div class="metrics-grid detail-metrics"><MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" /></div>
-    <div class="detail-grid buoy-grid">
+    <div class="metrics-grid detail-metrics min-w-0"><MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" /></div>
+    <div class="detail-grid buoy-grid min-w-0">
       <section class="panel ocean-map buoy-map">
         <header class="panel-header"><h2>浮标分布与状态</h2><div class="tabs"><button>全部海域</button></div></header>
         <div class="map-surface buoy-surface">

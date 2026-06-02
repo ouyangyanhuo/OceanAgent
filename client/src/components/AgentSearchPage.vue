@@ -10,13 +10,13 @@ defineProps({
 </script>
 
 <template>
-  <section class="page agent-search-page">
-    <div class="metrics-grid agent-search-metrics">
+  <section class="page agent-search-page min-w-0">
+    <div class="metrics-grid agent-search-metrics min-w-0">
       <MetricCard v-for="metric in dashboard.metrics" :key="metric.label" :metric="metric" />
     </div>
 
-    <div class="agent-search-layout">
-      <div class="agent-search-main">
+    <div class="agent-search-layout min-w-0">
+      <div class="agent-search-main min-w-0">
         <section class="panel agent-search-panel">
           <div class="section-heading">
             <div>
@@ -48,7 +48,7 @@ defineProps({
         </section>
       </div>
 
-      <aside class="agent-search-aside">
+      <aside class="agent-search-aside min-w-0">
         <TaskFeed :tasks="dashboard.tasks" />
         <DataSources :sources="dashboard.sources" />
       </aside>

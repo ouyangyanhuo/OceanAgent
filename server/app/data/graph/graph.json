@@ -1,0 +1,189 @@
+{
+  "graph_id": "ocean_kg_demo_v1",
+  "version": 1,
+  "nodes": [
+    {
+      "id": "sea_area_001",
+      "type": "SeaArea",
+      "name": "东海近岸海域",
+      "properties": {
+        "location": "中国东部近岸",
+        "temperature": 25.6,
+        "salinity": 31.2,
+        "chlorophyll": 8.7,
+        "risk_level": "medium"
+      },
+      "expanded": {
+        "risk_factors": false,
+        "related_events": false,
+        "ecological_species": false,
+        "monitoring_buoys": false
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "sea_area_002",
+      "type": "SeaArea",
+      "name": "南海北部海域",
+      "properties": {
+        "location": "中国南部近岸",
+        "temperature": 28.4,
+        "salinity": 33.1,
+        "chlorophyll": 4.2,
+        "risk_level": "low"
+      },
+      "expanded": {
+        "risk_factors": false,
+        "related_events": false,
+        "ecological_species": false,
+        "monitoring_buoys": false
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "buoy_001",
+      "type": "Buoy",
+      "name": "东海一号浮标",
+      "properties": {
+        "status": "online",
+        "battery": 87,
+        "sea_area_id": "sea_area_001"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_001",
+      "type": "Observation",
+      "name": "东海叶绿素观测",
+      "properties": {
+        "metric": "chlorophyll",
+        "value": 8.7,
+        "unit": "mg/m3",
+        "risk_signal": "elevated"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_001",
+      "type": "RiskFactor",
+      "name": "营养盐输入升高",
+      "properties": {
+        "description": "近岸营养盐输入升高会增加赤潮发生概率。",
+        "risk_weight": 0.72
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "agent_red_tide",
+      "type": "Agent",
+      "name": "赤潮预警智能体",
+      "properties": {
+        "agent_type": "red_tide",
+        "status": "online"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_seed_001",
+      "source": "sea_area_001",
+      "target": "buoy_001",
+      "relation": "monitored_by",
+      "weight": 0.95,
+      "properties": {
+        "description": "东海一号浮标监测东海近岸海域。"
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_seed_002",
+      "source": "buoy_001",
+      "target": "observation_001",
+      "relation": "has_observation",
+      "weight": 0.9,
+      "properties": {
+        "description": "浮标产生叶绿素观测记录。"
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_seed_003",
+      "source": "sea_area_001",
+      "target": "risk_factor_001",
+      "relation": "affected_by",
+      "weight": 0.72,
+      "properties": {
+        "description": "该海域受营养盐输入升高影响。"
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    }
+  ]
+}
