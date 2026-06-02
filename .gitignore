@@ -13,6 +13,8 @@ client/dist/
 .claude/
 .agents/
 
+dev-doc/
+dev.md
 1.png
 2.png
 3.png

@@ -1,5 +1,5 @@
 <script setup>
-import { Bot, Link2, Search, Share2 } from 'lucide-vue-next'
+import { AlertTriangle, Bot, CheckCircle2, Flame, Link2, Play, Search, Share2, Target } from 'lucide-vue-next'
 
 const props = defineProps({
   metric: { type: Object, required: true },
@@ -10,6 +10,14 @@ const iconMap = {
   今日检索: Search,
   知识节点: Share2,
   关系边数: Link2,
+  执行中任务: Play,
+  已完成任务: CheckCircle2,
+  异常任务: AlertTriangle,
+  智能体协同次数: Share2,
+  今日问答量: Bot,
+  知识节点命中: Target,
+  问答准确率: CheckCircle2,
+  热点生态主题: Flame,
 }
 
 function sparklinePath(values) {
@@ -28,7 +36,7 @@ function sparklinePath(values) {
 <template>
   <article class="metric-card" :class="`tone-${metric.tone}`">
     <div class="metric-top">
-      <div class="metric-icon"><component :is="iconMap[metric.label]" :size="26" /></div>
+      <div class="metric-icon"><component :is="iconMap[metric.label] || Bot" :size="26" /></div>
       <span>{{ metric.label }}</span>
     </div>
     <strong>{{ metric.value }}</strong>

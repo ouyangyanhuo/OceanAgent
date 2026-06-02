@@ -1,15 +1,26 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Bell, CircleHelp, Plus, Search } from 'lucide-vue-next'
 import SidebarNav from './components/SidebarNav.vue'
-import MetricCard from './components/MetricCard.vue'
-import AgentCard from './components/AgentCard.vue'
-import TaskFeed from './components/TaskFeed.vue'
-import DataSources from './components/DataSources.vue'
-import KnowledgeGraph from './components/KnowledgeGraph.vue'
+import AgentSearchPage from './components/AgentSearchPage.vue'
+import BuoyDiagnosticsPage from './components/BuoyDiagnosticsPage.vue'
+import EcoQaPage from './components/EcoQaPage.vue'
+import FisheryAssessmentPage from './components/FisheryAssessmentPage.vue'
+import GraphPage from './components/GraphPage.vue'
+import RouteOptimizationPage from './components/RouteOptimizationPage.vue'
 import { fallbackDashboard, fetchDashboard } from './services/dashboard'
 
 const dashboard = ref(fallbackDashboard)
+const activePage = ref('agents')
+
+const searchPlaceholder = computed(() => {
+  if (activePage.value === 'qa') return '搜索生态知识 / 数据源 / 关系节点'
+  if (activePage.value === 'fishery') return '搜索渔场 / 鱼种 / 评估指标'
+  if (activePage.value === 'route') return '搜索航线 / 港口 / 气象海况'
+  if (activePage.value === 'buoy') return '搜索浮标 / 传感器 / 异常记录'
+  if (activePage.value === 'graph') return '搜索关系节点 / 数据源 / 图谱实体'
+  return '搜索智能体 / 数据源 / 关系节点'
+})
 
 onMounted(async () => {
   dashboard.value = await fetchDashboard()
@@ -18,7 +29,7 @@ onMounted(async () => {
 
 <template>
   <div class="app-shell">
-    <SidebarNav />
+    <SidebarNav :active-page="activePage" @change-page="activePage = $event" />
     <main class="workspace">
       <header class="topbar">
         <div class="brand-inline">
@@ -30,7 +41,7 @@ onMounted(async () => {
         </div>
         <label class="global-search">
           <Search :size="22" />
-          <input placeholder="搜索智能体 / 数据源 / 关系节点" />
+          <input :placeholder="searchPlaceholder" />
         </label>
         <div class="top-actions">
           <button class="icon-button alert" aria-label="通知"><Bell :size="22" /><span>12</span></button>
@@ -43,51 +54,12 @@ onMounted(async () => {
         </div>
       </header>
 
-      <section class="content-grid">
-        <div class="left-stack">
-          <section class="panel agent-search-panel">
-            <div class="section-heading">
-              <div>
-                <span class="heading-icon">▣</span>
-                <h1>智能体检索</h1>
-              </div>
-            </div>
-            <div class="filters">
-              <button class="filter active">全部</button>
-              <button class="filter">海洋监测</button>
-              <button class="filter">生态分析</button>
-              <button class="filter">航运预测</button>
-              <button class="filter">灾害预警</button>
-              <button class="filter">设备巡检</button>
-            </div>
-            <div class="toolbar-row">
-              <div class="view-toggle"><button class="active">▦</button><button>☰</button></div>
-              <select aria-label="排序">
-                <option>综合排序</option>
-              </select>
-            </div>
-            <div class="agent-grid">
-              <AgentCard v-for="agent in dashboard.agents" :key="agent.name" :agent="agent" />
-            </div>
-            <div class="pager">
-              <button>‹</button><button>‹</button><button class="active">1</button><button>2</button><button>3</button><button>4</button><button>5</button><span>...</span><button>12</button><button>›</button>
-              <span class="total">共 72 项</span>
-            </div>
-          </section>
-
-          <div class="bottom-panels">
-            <TaskFeed :tasks="dashboard.tasks" />
-            <DataSources :sources="dashboard.sources" />
-          </div>
-        </div>
-
-        <div class="right-stack">
-          <div class="metrics-grid">
-            <MetricCard v-for="metric in dashboard.metrics" :key="metric.label" :metric="metric" />
-          </div>
-          <KnowledgeGraph :graph="dashboard.graph" />
-        </div>
-      </section>
+      <AgentSearchPage v-if="activePage === 'agents'" :dashboard="dashboard" />
+      <GraphPage v-else-if="activePage === 'graph'" :dashboard="dashboard" />
+      <EcoQaPage v-else-if="activePage === 'qa'" />
+      <FisheryAssessmentPage v-else-if="activePage === 'fishery'" />
+      <RouteOptimizationPage v-else-if="activePage === 'route'" />
+      <BuoyDiagnosticsPage v-else-if="activePage === 'buoy'" />
 
       <footer class="statusbar">
         <span>系统状态 <b class="dot"></b> 运行正常</span>
