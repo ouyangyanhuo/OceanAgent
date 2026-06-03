@@ -275,28 +275,103 @@
   grid-column: 2;
 }
 
+/* Grid-area assignments for detail grids to prevent panel overlap */
+.fishery-grid,
+.route-grid {
+  grid-template-areas:
+    "map     micro    sources"
+    "map     trend    models"
+    "table   compact  advice";
+  grid-auto-rows: minmax(220px, auto);
+}
+
+.buoy-grid {
+  grid-template-areas:
+    "map      micro    sources"
+    "map      sensor   models"
+    "table    trend    distribution"
+    "advice   advice   advice";
+  grid-auto-rows: minmax(220px, auto);
+}
+
 .fishery-grid .ocean-map,
 .route-grid .ocean-map,
 .buoy-grid .ocean-map {
-  grid-column: 1;
+  grid-area: map;
+  grid-column: auto;
+  grid-row: auto;
 }
 
 .fishery-grid .micro-panel,
 .route-grid .micro-panel,
 .buoy-grid .micro-panel {
-  grid-column: 2;
+  grid-area: micro;
+  grid-column: auto;
+  grid-row: auto;
 }
 
-.fishery-grid .detail-table,
-.route-grid .detail-table,
-.buoy-grid .detail-table {
-  grid-column: 1;
+.fishery-grid .detail-side:nth-of-type(3),
+.route-grid .detail-side:nth-of-type(3),
+.buoy-grid .detail-side:nth-of-type(3) {
+  grid-area: sources;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.fishery-grid .detail-side:nth-of-type(4),
+.route-grid .detail-side:nth-of-type(4),
+.buoy-grid .detail-side:nth-of-type(4) {
+  grid-area: models;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.fishery-grid .detail-table:not(.compact),
+.route-grid .detail-table:not(.compact),
+.buoy-grid .detail-table:not(.compact) {
+  grid-area: table;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.fishery-grid .trend-panel,
+.route-grid .trend-panel,
+.buoy-grid .trend-panel {
+  grid-area: trend;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.fishery-grid .detail-table.compact,
+.route-grid .detail-table.compact {
+  grid-area: compact;
+  grid-column: auto;
+  grid-row: auto;
 }
 
 .fishery-grid .qa-advice-panel,
-.route-grid .qa-advice-panel,
+.route-grid .qa-advice-panel {
+  grid-area: advice;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.buoy-grid .sensor-panel {
+  grid-area: sensor;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.buoy-grid .fault-distribution {
+  grid-area: distribution;
+  grid-column: auto;
+  grid-row: auto;
+}
+
 .buoy-grid .qa-advice-panel {
-  grid-column: 3;
+  grid-area: advice;
+  grid-column: auto;
+  grid-row: auto;
 }
 
 .route-surface svg {

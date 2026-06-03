@@ -6,28 +6,17 @@
   padding: 20px;
 }
 
-.graph-page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+.graph-hero {
+  justify-content: start;
 }
 
-.graph-page-title h1 {
-  font-size: 24px;
-  color: #fff;
-  margin: 0;
+.graph-hero .page-actions {
+  margin-left: auto;
 }
 
-.graph-page-title p {
-  font-size: 14px;
-  color: #8fb9df;
-  margin: 4px 0 0 0;
-}
-
-.graph-page-actions {
-  display: flex;
-  gap: 10px;
+.graph-orb {
+  background: radial-gradient(circle at 35% 30%, #4facfe, #0952f5 68%, #08263c);
+  box-shadow: 0 0 24px rgba(79, 172, 254, 0.5);
 }
 
 .btn-primary {

@@ -50,11 +50,17 @@
   .detail-table,
   .detail-table.compact,
   .sensor-panel,
+  .trend-panel,
   .fault-distribution,
+  .fishery-grid .detail-side,
+  .route-grid .detail-side,
+  .buoy-grid .detail-side,
   .fishery-grid .qa-advice-panel,
   .route-grid .qa-advice-panel,
   .buoy-grid .qa-advice-panel {
+    grid-area: auto;
     grid-column: auto;
+    grid-row: auto;
   }
 }
 
@@ -665,6 +671,7 @@
   .qa-page .record-panel,
   .qa-page .distribution-panel,
   .qa-page .qa-advice-panel {
+    grid-area: auto;
     grid-column: auto;
     grid-row: auto;
   }
@@ -1003,6 +1010,9 @@ td {
   .fishery-grid .micro-panel,
   .route-grid .micro-panel,
   .buoy-grid .micro-panel,
+  .fishery-grid .detail-side,
+  .route-grid .detail-side,
+  .buoy-grid .detail-side,
   .fishery-grid .detail-table,
   .route-grid .detail-table,
   .buoy-grid .detail-table,
@@ -1011,7 +1021,9 @@ td {
   .buoy-grid .qa-advice-panel,
   .detail-table.compact,
   .sensor-panel,
+  .trend-panel,
   .fault-distribution {
+    grid-area: auto;
     grid-column: auto;
     grid-row: auto;
   }

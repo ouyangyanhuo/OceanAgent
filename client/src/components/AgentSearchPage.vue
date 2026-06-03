@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 import AgentCard from './AgentCard.vue'
 import DataSources from './DataSources.vue'
 import MetricCard from './MetricCard.vue'
@@ -7,6 +8,17 @@ import TaskFeed from './TaskFeed.vue'
 defineProps({
   dashboard: { type: Object, required: true },
 })
+
+const toasts = ref([])
+let toastId = 0
+
+function handleInvoke(agent) {
+  const id = ++toastId
+  toasts.value.push({ id, name: agent.name })
+  setTimeout(() => {
+    toasts.value = toasts.value.filter(t => t.id !== id)
+  }, 3000)
+}
 </script>
 
 <template>
@@ -39,11 +51,7 @@ defineProps({
             </select>
           </div>
           <div class="agent-grid expanded">
-            <AgentCard v-for="agent in dashboard.agents" :key="agent.name" :agent="agent" />
-          </div>
-          <div class="pager">
-            <button>‹</button><button>‹</button><button class="active">1</button><button>2</button><button>3</button><button>4</button><button>5</button><span>...</span><button>12</button><button>›</button>
-            <span class="total">共 72 项</span>
+            <AgentCard v-for="agent in dashboard.agents" :key="agent.name" :agent="agent" @invoke="handleInvoke" />
           </div>
         </section>
       </div>
@@ -52,6 +60,15 @@ defineProps({
         <TaskFeed :tasks="dashboard.tasks" />
         <DataSources :sources="dashboard.sources" />
       </aside>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast-container">
+      <TransitionGroup name="toast">
+        <div v-for="toast in toasts" :key="toast.id" class="toast">
+          ✓ 已成功调用「{{ toast.name }}」
+        </div>
+      </TransitionGroup>
     </div>
   </section>
 </template>

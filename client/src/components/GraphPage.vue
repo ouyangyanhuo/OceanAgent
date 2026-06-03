@@ -1,4 +1,5 @@
 <script setup>
+import { Network } from 'lucide-vue-next'
 import DataSources from './DataSources.vue'
 import KnowledgeGraph from './KnowledgeGraph.vue'
 import MetricCard from './MetricCard.vue'
@@ -11,12 +12,13 @@ defineProps({
 
 <template>
   <section class="page graph-page">
-    <div class="graph-page-header">
-      <div class="graph-page-title">
+    <div class="qa-hero graph-hero min-w-0">
+      <div class="agent-orb graph-orb"><Network :size="34" /></div>
+      <div>
         <h1>关系图谱</h1>
         <p>海洋环境事件与各要素之间的关联关系可视化</p>
       </div>
-      <div class="graph-page-actions">
+      <div class="page-actions">
         <button class="btn-secondary">导出图谱</button>
         <button class="btn-primary">新建节点</button>
       </div>

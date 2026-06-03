@@ -8,11 +8,11 @@
 .qa-grid {
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(520px, 1.25fr) minmax(300px, 0.75fr) minmax(280px, 0.7fr);
+  grid-template-columns: minmax(560px, 1.45fr) minmax(300px, 0.65fr) minmax(280px, 0.6fr);
   grid-template-areas:
     "chat knowledge sources"
-    "chat topic models"
-    "record distribution advice";
+    "chat topic     models"
+    "chat distribution advice";
   grid-auto-rows: minmax(220px, auto);
   align-items: stretch;
   gap: 12px;
@@ -44,7 +44,6 @@
 }
 
 .qa-page .record-panel {
-  grid-area: record;
   grid-column: auto;
   grid-row: auto;
   min-height: 240px;
@@ -87,12 +86,12 @@
 
 @media (max-width: 1560px) {
   .qa-grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
     grid-template-areas:
       "chat knowledge"
       "chat sources"
-      "topic models"
-      "record distribution"
+      "chat models"
+      "topic distribution"
       "advice advice";
   }
 

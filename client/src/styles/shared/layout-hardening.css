@@ -71,3 +71,218 @@
 .advice-panel span {
   overflow-wrap: anywhere;
 }
+
+/* Last-mile structure guard: keep every panel inside its own layout cell.
+   Page-specific CSS can tune visuals, but these rules own containment. */
+.workspace {
+  height: auto;
+  min-height: 0;
+}
+
+.page,
+.content-grid {
+  min-width: 0;
+  min-height: 0;
+}
+
+.panel,
+.metric-card,
+.agent-card {
+  z-index: 0;
+  isolation: isolate;
+}
+
+.panel {
+  max-width: 100%;
+  min-height: 0;
+}
+
+.panel-header,
+.tabs,
+.page-actions,
+.graph-page-actions,
+.toolbar-row,
+.agent-detail-head,
+.graph-page-header {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.tabs,
+.page-actions,
+.graph-page-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.tabs button,
+.page-actions button,
+.graph-page-actions button {
+  min-width: 0;
+  white-space: normal;
+}
+
+.agent-detail-head > div:not(.agent-orb),
+.graph-page-title,
+.section-heading > div {
+  min-width: 0;
+}
+
+.agent-search-layout,
+.graph-page-grid,
+.qa-grid,
+.detail-grid,
+.bottom-panels,
+.left-stack,
+.right-stack,
+.agent-search-main,
+.agent-search-aside,
+.graph-aside {
+  min-width: 0;
+  align-items: stretch;
+}
+
+.agent-search-layout,
+.graph-page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+}
+
+.graph-page-grid {
+  flex: none;
+}
+
+.graph-page .graph-panel,
+.agent-search-panel {
+  min-width: 0;
+  width: 100%;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.86fr) minmax(240px, 0.72fr);
+  grid-template-rows: minmax(340px, auto) auto auto;
+  grid-auto-rows: minmax(180px, auto);
+}
+
+.qa-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.42fr) minmax(260px, 0.84fr) minmax(240px, 0.74fr);
+  grid-auto-rows: minmax(200px, auto);
+}
+
+.ocean-map,
+.chat-panel {
+  min-height: 0;
+}
+
+.map-surface {
+  height: auto;
+  min-height: 280px;
+}
+
+.micro-grid,
+.source-grid,
+.resource-grid,
+.agent-grid,
+.metrics-grid {
+  min-width: 0;
+}
+
+.micro-grid article,
+.source-grid article,
+.resource-grid article {
+  min-width: 0;
+}
+
+.side-feed-panel ul,
+.detail-table table {
+  min-width: max-content;
+}
+
+.side-feed-panel {
+  overflow-x: auto;
+}
+
+.detail-table,
+.record-panel,
+.task-table-panel {
+  overflow: auto;
+}
+
+.distribution-panel,
+.source-distribution {
+  min-width: 0;
+}
+
+.line-chart {
+  max-width: 100%;
+}
+
+@media (max-width: 1560px) {
+  .agent-search-layout,
+  .graph-page-grid,
+  .qa-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qa-page .chat-panel,
+  .qa-page .knowledge-card-panel,
+  .qa-page .topic-panel,
+  .qa-page .side-feed-panel:nth-of-type(3),
+  .qa-page .side-feed-panel:nth-of-type(4),
+  .qa-page .record-panel,
+  .qa-page .distribution-panel,
+  .qa-page .qa-advice-panel,
+  .fishery-grid .ocean-map,
+  .route-grid .ocean-map,
+  .buoy-grid .ocean-map,
+  .fishery-grid .micro-panel,
+  .route-grid .micro-panel,
+  .buoy-grid .micro-panel,
+  .fishery-grid .detail-side,
+  .route-grid .detail-side,
+  .buoy-grid .detail-side,
+  .fishery-grid .detail-table,
+  .route-grid .detail-table,
+  .buoy-grid .detail-table,
+  .fishery-grid .qa-advice-panel,
+  .route-grid .qa-advice-panel,
+  .buoy-grid .qa-advice-panel,
+  .detail-table.compact,
+  .sensor-panel,
+  .trend-panel,
+  .fault-distribution {
+    grid-area: auto;
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .detail-grid,
+  .qa-grid {
+    grid-template-areas: none;
+    grid-template-rows: none;
+    grid-auto-rows: minmax(180px, auto);
+  }
+
+  .qa-page .chat-panel {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 900px) {
+  .panel {
+    overflow: auto;
+  }
+
+  .map-surface {
+    min-height: 240px;
+  }
+
+  .distribution-panel,
+  .source-distribution {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
