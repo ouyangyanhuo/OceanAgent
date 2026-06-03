@@ -1,13 +1,12 @@
 <script setup>
+import { inject } from 'vue'
 import { Network } from 'lucide-vue-next'
-import DataSources from './DataSources.vue'
-import KnowledgeGraph from './KnowledgeGraph.vue'
-import MetricCard from './MetricCard.vue'
-import TaskFeed from './TaskFeed.vue'
+import DataSources from '../components/DataSources.vue'
+import KnowledgeGraph from '../components/KnowledgeGraph.vue'
+import MetricCard from '../components/MetricCard.vue'
+import TaskFeed from '../components/TaskFeed.vue'
 
-defineProps({
-  dashboard: { type: Object, required: true },
-})
+const dashboard = inject('dashboard')
 </script>
 
 <template>
@@ -27,7 +26,7 @@ defineProps({
       <MetricCard v-for="metric in dashboard.metrics" :key="metric.label" :metric="metric" />
     </div>
     <div class="graph-page-grid">
-      <KnowledgeGraph :graph="dashboard.graph" />
+      <KnowledgeGraph />
       <aside class="graph-aside">
         <TaskFeed :tasks="dashboard.tasks" />
         <DataSources :sources="dashboard.sources" />

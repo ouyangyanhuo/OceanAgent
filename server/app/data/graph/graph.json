@@ -1,6 +1,6 @@
 {
   "graph_id": "ocean_kg_demo_v1",
-  "version": 1,
+  "version": 17,
   "nodes": [
     {
       "id": "sea_area_001",
@@ -14,7 +14,7 @@
         "risk_level": "medium"
       },
       "expanded": {
-        "risk_factors": false,
+        "risk_factors": true,
         "related_events": false,
         "ecological_species": false,
         "monitoring_buoys": false
@@ -23,7 +23,7 @@
         "source": "seed",
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
-        "updated_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-03T11:37:37",
         "version": 1,
         "locked": true
       }
@@ -101,12 +101,14 @@
         "description": "近岸营养盐输入升高会增加赤潮发生概率。",
         "risk_weight": 0.72
       },
-      "expanded": {},
+      "expanded": {
+        "risk_factors": true
+      },
       "metadata": {
         "source": "seed",
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
-        "updated_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-03T11:37:34",
         "version": 1,
         "locked": true
       }
@@ -119,12 +121,146 @@
         "agent_type": "red_tide",
         "status": "online"
       },
-      "expanded": {},
+      "expanded": {
+        "risk_factors": true,
+        "related_events": true,
+        "ecological_species": true,
+        "monitoring_buoys": true
+      },
       "metadata": {
         "source": "seed",
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
-        "updated_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-03T11:37:30",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_25b1356f",
+      "type": "RiskFactor",
+      "name": "叶绿素浓度升高",
+      "properties": {
+        "description": "叶绿素浓度升高可能表示浮游植物异常繁殖。",
+        "risk_weight": 0.82,
+        "confidence": 0.76
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:16",
+        "updated_at": "2026-06-03T11:37:16",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "prevention_measure_4a9e0793",
+      "type": "PreventionMeasure",
+      "name": "加强近岸营养盐排放管控",
+      "properties": {
+        "description": "通过削减近岸营养盐输入降低赤潮风险。",
+        "priority": "high"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:16",
+        "updated_at": "2026-06-03T11:37:16",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "red_tide_event_480fc81c",
+      "type": "RedTideEvent",
+      "name": "赤潮预警智能体 赤潮风险事件",
+      "properties": {
+        "risk_level": "medium",
+        "confidence": 0.7
+      },
+      "expanded": {
+        "risk_factors": true
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:24",
+        "updated_at": "2026-06-03T11:38:02",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "species_fea40c75",
+      "type": "Species",
+      "name": "小黄鱼",
+      "properties": {
+        "habitat": "赤潮预警智能体",
+        "sensitivity": "medium"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:29",
+        "updated_at": "2026-06-03T11:37:29",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "fishery_area_460cd09a",
+      "type": "FisheryArea",
+      "name": "赤潮预警智能体 渔业适宜区",
+      "properties": {
+        "suitability": 0.74
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:29",
+        "updated_at": "2026-06-03T11:37:29",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "buoy_897b1651",
+      "type": "Buoy",
+      "name": "赤潮预警智能体 综合监测浮标",
+      "properties": {
+        "status": "planned",
+        "battery": 100
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:30",
+        "updated_at": "2026-06-03T11:37:30",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_1f87d17c",
+      "type": "Observation",
+      "name": "赤潮预警智能体 溶解氧观测",
+      "properties": {
+        "metric": "dissolved_oxygen",
+        "value": 6.4,
+        "unit": "mg/L"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:30",
+        "updated_at": "2026-06-03T11:37:30",
         "version": 1,
         "locked": true
       }
@@ -181,6 +317,160 @@
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
         "updated_at": "2026-06-02T00:00:00",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_84f99212",
+      "source": "agent_red_tide",
+      "target": "risk_factor_25b1356f",
+      "relation": "affected_by",
+      "weight": 0.84,
+      "properties": {
+        "description": "赤潮预警智能体 受到叶绿素浓度升高影响。"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:16",
+        "updated_at": "2026-06-03T11:37:16",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_5aecb1d7",
+      "source": "risk_factor_25b1356f",
+      "target": "prevention_measure_4a9e0793",
+      "relation": "mitigated_by",
+      "weight": 0.66,
+      "properties": {
+        "description": "管控措施可缓解赤潮风险因子。"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:16",
+        "updated_at": "2026-06-03T11:37:16",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_8f247a30",
+      "source": "agent_red_tide",
+      "target": "red_tide_event_480fc81c",
+      "relation": "has_risk_event",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:24",
+        "updated_at": "2026-06-03T11:37:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_2772378f",
+      "source": "fishery_area_460cd09a",
+      "target": "species_fea40c75",
+      "relation": "suitable_for",
+      "weight": 0.72,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:29",
+        "updated_at": "2026-06-03T11:37:29",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_9383cd02",
+      "source": "agent_red_tide",
+      "target": "buoy_897b1651",
+      "relation": "monitored_by",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:30",
+        "updated_at": "2026-06-03T11:37:30",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_c55a6a4d",
+      "source": "buoy_897b1651",
+      "target": "observation_1f87d17c",
+      "relation": "has_observation",
+      "weight": 0.75,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "agent_red_tide",
+        "created_at": "2026-06-03T11:37:30",
+        "updated_at": "2026-06-03T11:37:30",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_f4c8669b",
+      "source": "risk_factor_001",
+      "target": "risk_factor_25b1356f",
+      "relation": "affected_by",
+      "weight": 0.84,
+      "properties": {
+        "description": "营养盐输入升高 受到叶绿素浓度升高影响。"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "risk_factor_001",
+        "created_at": "2026-06-03T11:37:34",
+        "updated_at": "2026-06-03T11:37:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_3bb9e207",
+      "source": "sea_area_001",
+      "target": "risk_factor_25b1356f",
+      "relation": "affected_by",
+      "weight": 0.84,
+      "properties": {
+        "description": "东海近岸海域 受到叶绿素浓度升高影响。"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "sea_area_001",
+        "created_at": "2026-06-03T11:37:37",
+        "updated_at": "2026-06-03T11:37:37",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_02935d9a",
+      "source": "red_tide_event_480fc81c",
+      "target": "risk_factor_25b1356f",
+      "relation": "affected_by",
+      "weight": 0.84,
+      "properties": {
+        "description": "赤潮预警智能体 赤潮风险事件 受到叶绿素浓度升高影响。"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "red_tide_event_480fc81c",
+        "created_at": "2026-06-03T11:38:02",
+        "updated_at": "2026-06-03T11:38:02",
         "version": 1,
         "locked": true
       }

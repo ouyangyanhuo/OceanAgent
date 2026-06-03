@@ -181,7 +181,8 @@ button {
   flex: 1;
 }
 
-.sidebar nav button {
+.sidebar nav button,
+.sidebar nav a {
   position: relative;
   height: 52px;
   padding: 0 20px;
@@ -194,9 +195,11 @@ button {
   gap: 14px;
   overflow: hidden;
   white-space: nowrap;
+  text-decoration: none;
 }
 
-.sidebar.collapsed nav button {
+.sidebar.collapsed nav button,
+.sidebar.collapsed nav a {
   justify-content: center;
   padding: 0;
   gap: 0;
@@ -207,13 +210,15 @@ button {
   opacity: 0.76;
 }
 
-.sidebar button.active {
+.sidebar button.active,
+.sidebar a.active {
   color: #fff;
   background: linear-gradient(90deg, rgba(0, 166, 255, 0.55), rgba(0, 166, 255, 0.08));
   box-shadow: inset 4px 0 0 #13ddff;
 }
 
-.sidebar button.active::after {
+.sidebar button.active::after,
+.sidebar a.active::after {
   content: "";
   position: absolute;
   right: 0;
@@ -289,8 +294,6 @@ button {
   border-radius: 8px;
   background: rgba(5, 22, 43, 0.9);
   color: #9ec8e7;
-  flex: 1 1 280px;
-  max-width: 680px;
 }
 
 .global-search input,

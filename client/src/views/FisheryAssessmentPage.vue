@@ -1,6 +1,6 @@
 <script setup>
 import { Anchor, Bot, FileText, Fish, RadioTower, Settings, Share2, ShieldCheck } from 'lucide-vue-next'
-import MetricCard from './MetricCard.vue'
+import MetricCard from '../components/MetricCard.vue'
 
 const metrics = [
   { label: '综合适宜度', value: '86.3 /100', trend: '12.6%', tone: 'blue', sparkline: [18, 22, 21, 30, 26, 36, 32, 41, 37, 48, 42, 55] },

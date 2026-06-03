@@ -1,6 +1,6 @@
 <script setup>
 import { AlertTriangle, Battery, Bot, FileText, RadioTower, Settings, Share2, Wrench } from 'lucide-vue-next'
-import MetricCard from './MetricCard.vue'
+import MetricCard from '../components/MetricCard.vue'
 
 const metrics = [
   { label: '在线浮标', value: '128', trend: '8', tone: 'teal', sparkline: [16, 19, 18, 24, 21, 27, 24, 34, 28, 38, 31, 44] },

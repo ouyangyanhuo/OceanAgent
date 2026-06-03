@@ -1,22 +1,19 @@
 <script setup>
 import { Anchor, Fish, GitFork, MessageSquare, PanelLeftClose, PanelLeftOpen, RadioTower, SearchCheck } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-const props = defineProps({
-  activePage: { type: String, required: true },
-})
-
-const emit = defineEmits(['change-page'])
+const route = useRoute()
 
 const isCollapsed = ref(false)
 
 const navItems = [
-  { label: '智能体检索', icon: SearchCheck, page: 'agents' },
-  { label: '关系图谱', icon: GitFork, page: 'graph' },
-  { label: '生态问答', icon: MessageSquare, page: 'qa' },
-  { label: '渔场评估', icon: Fish, page: 'fishery' },
-  { label: '航线优化', icon: Anchor, page: 'route' },
-  { label: '浮标诊断', icon: RadioTower, page: 'buoy' },
+  { label: '智能体检索', icon: SearchCheck, to: '/agents' },
+  { label: '关系图谱', icon: GitFork, to: '/graph' },
+  { label: '生态问答', icon: MessageSquare, to: '/qa' },
+  { label: '渔场评估', icon: Fish, to: '/fishery' },
+  { label: '航线优化', icon: Anchor, to: '/route' },
+  { label: '浮标诊断', icon: RadioTower, to: '/buoy' },
 ]
 
 function toggleSidebar() {
@@ -27,17 +24,16 @@ function toggleSidebar() {
 <template>
   <aside class="sidebar" :class="{ collapsed: isCollapsed }">
     <nav>
-      <button
+      <router-link
         v-for="item in navItems"
         :key="item.label"
-        :class="{ active: item.page === activePage }"
-        :disabled="!item.page"
+        :to="item.to"
+        :class="{ active: route.path === item.to }"
         :title="isCollapsed ? item.label : ''"
-        @click="item.page && emit('change-page', item.page)"
       >
         <component :is="item.icon" :size="23" />
         <span v-if="!isCollapsed">{{ item.label }}</span>
-      </button>
+      </router-link>
     </nav>
     <div v-if="!isCollapsed" class="radar-art">
       <div class="radar-rings"></div>

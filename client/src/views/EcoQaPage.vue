@@ -1,6 +1,6 @@
 <script setup>
 import { Bot, Brain, Cloud, Database, Flame, Leaf, MessageSquare, Send, Settings, Share2 } from 'lucide-vue-next'
-import MetricCard from './MetricCard.vue'
+import MetricCard from '../components/MetricCard.vue'
 
 const metrics = [
   { label: '今日问答量', value: '2,184', trend: '18.7%', tone: 'blue', sparkline: [25, 24, 31, 28, 37, 33, 44, 32, 38, 40, 36, 48] },

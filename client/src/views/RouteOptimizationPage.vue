@@ -1,6 +1,6 @@
 <script setup>
 import { AlertTriangle, Bot, FileText, Fuel, Navigation, Settings, Share2, ShipWheel } from 'lucide-vue-next'
-import MetricCard from './MetricCard.vue'
+import MetricCard from '../components/MetricCard.vue'
 
 const metrics = [
   { label: '当前推荐航线', value: 'A1 航线', trend: '推荐中', tone: 'blue', sparkline: [15, 18, 23, 28, 35, 42, 50, 58, 64, 71, 77, 83] },

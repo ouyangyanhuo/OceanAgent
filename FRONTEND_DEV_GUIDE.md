@@ -42,7 +42,7 @@ git clone https://gitee.com/magneto110/OceanAgent
 | 图标库     | lucide-vue-next               | 全量 Lucide 图标的 Vue 版本   |
 | UI 样式库  | @heroui/styles                | 提供基础组件样式              |
 | 包管理器   | Bun (推荐) / npm              | 项目 lockfile 为 bun.lock     |
-| 路由       | 无 Vue Router                 | 通过 ref + v-if 手动切换页面  |
+| 路由       | Vue Router 4 (hash mode)      | 路由配置在 `src/router/index.js` |
 | 状态管理   | 无 Pinia/Vuex                 | 各组件本地 ref 管理状态       |
 
 ---
@@ -140,27 +140,32 @@ client/
 ├── vite.config.js              # Vite 配置：Vue 插件 + Tailwind 插件 + API 代理
 │
 └── src/
-    ├── main.js                 # 应用入口：创建 Vue 实例，导入全局样式，挂载到 #app
-    ├── App.vue                 # 根组件：顶部栏 + 侧边栏 + 页面切换 + 状态栏
+    ├── main.js                 # 应用入口：创建 Vue 实例，注册路由，导入全局样式，挂载到 #app
+    ├── App.vue                 # 根组件：顶部栏 + 侧边栏 + <router-view> + 状态栏
     ├── styles.css              # 全局样式入口，按顺序导入所有 CSS 文件
     │
-    ├── components/             # 所有 Vue 组件（页面 + 可复用组件）
-    │   ├── SidebarNav.vue          # 侧边栏导航（6 个页面入口，支持折叠/展开）
+    ├── router/                 # Vue Router 路由配置
+    │   └── index.js                # 路由定义：6 个页面路由（懒加载）+ 根路径重定向
+    │
+    ├── views/                  # 路由级页面组件（由 router-view 渲染）
     │   ├── AgentSearchPage.vue     # 智能体搜索页（默认首页）
     │   ├── GraphPage.vue           # 关系图谱页
     │   ├── EcoQaPage.vue           # 海洋生态问答页
     │   ├── FisheryAssessmentPage.vue  # 渔业评估页
     │   ├── RouteOptimizationPage.vue  # 航线优化页
-    │   ├── BuoyDiagnosticsPage.vue    # 浮标诊断页
-    │   ├── DashboardPage.vue       # 仪表盘页（当前未使用，备用）
-    │   ├── AgentCard.vue           # 可复用：智能体卡片
-    │   ├── MetricCard.vue          # 可复用：指标卡片（含迷你折线图）
-    │   ├── TaskFeed.vue            # 可复用：任务时间线面板
-    │   ├── DataSources.vue         # 可复用：数据源列表面板
-    │   └── KnowledgeGraph.vue      # 可复用：SVG 知识图谱可视化
+    │   └── BuoyDiagnosticsPage.vue    # 浮标诊断页
+    │
+    ├── components/             # 可复用 UI 组件
+    │   ├── SidebarNav.vue          # 侧边栏导航（router-link，支持折叠/展开）
+    │   ├── AgentCard.vue           # 智能体卡片
+    │   ├── MetricCard.vue          # 指标卡片（含迷你折线图）
+    │   ├── TaskFeed.vue            # 任务时间线面板
+    │   ├── DataSources.vue         # 数据源列表面板
+    │   └── KnowledgeGraph.vue      # SVG 知识图谱可视化
     │
     ├── services/               # API 调用层
-    │   └── dashboard.js            # 唯一的服务文件：fetchDashboard() + fallback 数据
+    │   ├── dashboard.js            # fetchDashboard() + fallback 数据
+    │   └── graph.js                # 图谱 API 调用
     │
     └── styles/                 # 样式文件（按职责分层）
         ├── base.css                # 基础样式：CSS 变量、重置、布局骨架、顶栏、侧栏
@@ -185,8 +190,8 @@ client/
 | 文件                  | 一句话说明                            |
 | --------------------- | ------------------------------------- |
 | `index.html`          | HTML 外壳，只有一行 `<div id="app">`  |
-| `main.js`             | 创建 Vue app，导入样式，挂载          |
-| `App.vue`             | 全局布局 + 页面路由（v-if 切换）      |
+| `main.js`             | 创建 Vue app，注册路由，导入样式，挂载 |
+| `App.vue`             | 全局布局 + `<router-view>` 渲染页面   |
 | `styles.css`          | CSS 入口，@import 所有样式文件        |
 | `vite.config.js`      | 构建配置 + API 代理                   |
 | `dashboard.js`        | 唯一的 API 调用 + 全局 fallback 数据  |
@@ -208,24 +213,26 @@ client/
 
 ### 5.1 页面切换机制
 
-本项目 **没有使用 Vue Router**，页面切换通过 `App.vue` 中的 `activePage` ref 实现：
+本项目使用 **Vue Router 4** 进行页面路由，采用 hash 模式（`createWebHashHistory`）。
+
+路由配置在 `src/router/index.js` 中定义：
 
 ```js
-// App.vue
-const activePage = ref('agents')  // 默认页面
+// src/router/index.js
+const routes = [
+  { path: '/', redirect: '/agents' },
+  { path: '/agents',  name: 'agents',  component: () => import('../views/AgentSearchPage.vue') },
+  { path: '/graph',   name: 'graph',   component: () => import('../views/GraphPage.vue') },
+  { path: '/qa',      name: 'qa',      component: () => import('../views/EcoQaPage.vue') },
+  { path: '/fishery', name: 'fishery', component: () => import('../views/FisheryAssessmentPage.vue') },
+  { path: '/route',   name: 'route',   component: () => import('../views/RouteOptimizationPage.vue') },
+  { path: '/buoy',    name: 'buoy',    component: () => import('../views/BuoyDiagnosticsPage.vue') },
+]
 ```
 
-```html
-<!-- 模板中用 v-if 切换 -->
-<AgentSearchPage      v-if="activePage === 'agents'"   :dashboard="dashboard" />
-<GraphPage        v-else-if="activePage === 'graph'"   :dashboard="dashboard" />
-<EcoQaPage        v-else-if="activePage === 'qa'"      />
-<FisheryAssessmentPage v-else-if="activePage === 'fishery'" />
-<RouteOptimizationPage v-else-if="activePage === 'route'"  />
-<BuoyDiagnosticsPage   v-else-if="activePage === 'buoy'"   />
-```
+所有页面组件均通过动态 `import()` 懒加载，实现路由级代码分割。
 
-`SidebarNav` 通过 `emit('change-page', pageName)` 通知 `App.vue` 切换页面。
+`App.vue` 中使用 `<router-view />` 渲染当前路由匹配的页面组件，`SidebarNav` 使用 `<router-link>` 进行导航，通过 `useRoute()` 获取当前路由状态来高亮活跃项。
 
 ### 5.2 数据流
 
@@ -236,13 +243,15 @@ dashboard.js::fetchDashboard()
        │
    App.vue::dashboard ref
        │
-       ├──► AgentSearchPage (props: dashboard)
+       ├──► provide('dashboard', dashboard)
+       │
+       ├──► AgentSearchPage (inject: dashboard)
        │       ├──► MetricCard × 4  (dashboard.metrics)
        │       ├──► AgentCard × 6   (dashboard.agents)
        │       ├──► TaskFeed        (dashboard.tasks)
        │       └──► DataSources     (dashboard.sources)
        │
-       └──► GraphPage (props: dashboard)
+       └──► GraphPage (inject: dashboard)
                └──► KnowledgeGraph  (dashboard.graph)
 ```
 
@@ -262,14 +271,14 @@ dashboard.js::fetchDashboard()
 
 ### 步骤 1：创建页面组件
 
-在 `src/components/` 下新建 `MarinePollutionPage.vue`：
+在 `src/views/` 下新建 `MarinePollutionPage.vue`：
 
 ```vue
 <script setup>
 // 从 lucide-vue-next 导入需要的图标
 import { Waves } from 'lucide-vue-next'
-// 导入可复用组件
-import MetricCard from './MetricCard.vue'
+// 导入可复用组件（注意路径：views/ 到 components/ 需要 ../components/）
+import MetricCard from '../components/MetricCard.vue'
 </script>
 
 <template>
@@ -287,17 +296,16 @@ import MetricCard from './MetricCard.vue'
 </template>
 ```
 
-### 步骤 2：注册页面到 App.vue
+### 步骤 2：添加路由配置
+
+在 `src/router/index.js` 的 `routes` 数组中追加一条懒加载路由：
 
 ```js
-// App.vue <script setup> 中导入
-import MarinePollutionPage from './components/MarinePollutionPage.vue'
-```
-
-```html
-<!-- App.vue template 中添加 v-else-if 分支 -->
-<BuoyDiagnosticsPage   v-else-if="activePage === 'buoy'" />
-<MarinePollutionPage   v-else-if="activePage === 'pollution'" />
+{
+  path: '/pollution',
+  name: 'pollution',
+  component: () => import('../views/MarinePollutionPage.vue'),
+},
 ```
 
 ### 步骤 3：添加导航入口
@@ -305,7 +313,7 @@ import MarinePollutionPage from './components/MarinePollutionPage.vue'
 在 `SidebarNav.vue` 的 `navItems` 数组中追加一项：
 
 ```js
-{ key: 'pollution', icon: Waves, label: '污染监测' }
+{ label: '污染监测', icon: Waves, to: '/pollution' }
 ```
 
 ### 步骤 4（可选）：添加页面专属样式
@@ -324,10 +332,10 @@ import MarinePollutionPage from './components/MarinePollutionPage.vue'
 
 | 类型       | 存放位置             | 是否被多个页面使用 | 示例               |
 | ---------- | -------------------- | ------------------ | ------------------ |
-| 页面组件   | `src/components/`    | 否，只在一个页面用 | `EcoQaPage.vue`    |
+| 页面组件   | `src/views/`         | 否，由路由渲染     | `EcoQaPage.vue`    |
 | 可复用组件 | `src/components/`    | 是，被多个页面引用 | `MetricCard.vue`   |
 
-> 目前两种组件都放在同一目录下，通过命名约定区分：页面组件以 `Page.vue` 结尾。
+> 页面组件放在 `views/` 目录下，可复用组件放在 `components/` 目录下，职责清晰分离。
 
 ### 组件模板
 
@@ -528,9 +536,9 @@ bun run build
 # 产物在 dist/ 目录下
 ```
 
-### Q: 为什么没有 Vue Router？
+### Q: Vue Router 是如何使用的？
 
-当前项目规模较小（6 个页面），使用 `v-if` 切换已经足够，引入 Vue Router 会增加不必要的复杂度。如果后续页面数量增长到 10+，可以考虑迁移。
+项目使用 Vue Router 4 的 hash 模式（`createWebHashHistory`），路由配置在 `src/router/index.js`。页面组件放在 `src/views/` 目录下，通过动态 `import()` 懒加载。`App.vue` 使用 `<router-view>` 渲染页面，`SidebarNav` 使用 `<router-link>` 导航。共享数据（如 dashboard）通过 `provide`/`inject` 传递。
 
 ### Q: 如何添加新的 Lucide 图标？
 
@@ -549,25 +557,28 @@ import { NewIconName } from 'lucide-vue-next'
 App.vue
 ├── Topbar (header)
 ├── SidebarNav.vue
-│   └── navItems → emit('change-page')
+│   └── router-link → /agents, /graph, /qa, /fishery, /route, /buoy
 │
-├── [agents]   AgentSearchPage.vue
-│   ├── MetricCard.vue × 4
-│   ├── AgentCard.vue × 6
-│   ├── TaskFeed.vue
-│   └── DataSources.vue
+├── <router-view />
+│   ├── [/agents]   AgentSearchPage.vue (inject: dashboard)
+│   │   ├── MetricCard.vue × 4
+│   │   ├── AgentCard.vue × 6
+│   │   ├── TaskFeed.vue
+│   │   └── DataSources.vue
+│   │
+│   ├── [/graph]    GraphPage.vue (inject: dashboard)
+│   │   ├── MetricCard.vue × 4
+│   │   ├── KnowledgeGraph.vue
+│   │   ├── TaskFeed.vue
+│   │   └── DataSources.vue
+│   │
+│   ├── [/qa]       EcoQaPage.vue (内部硬编码数据)
+│   │
+│   ├── [/fishery]  FisheryAssessmentPage.vue (内部硬编码数据)
+│   │
+│   ├── [/route]    RouteOptimizationPage.vue (内部硬编码数据)
+│   │
+│   └── [/buoy]     BuoyDiagnosticsPage.vue (内部硬编码数据)
 │
-├── [graph]    GraphPage.vue
-│   ├── MetricCard.vue × 4
-│   ├── KnowledgeGraph.vue
-│   ├── TaskFeed.vue
-│   └── DataSources.vue
-│
-├── [qa]       EcoQaPage.vue (内部硬编码数据)
-│
-├── [fishery]  FisheryAssessmentPage.vue (内部硬编码数据)
-│
-├── [route]    RouteOptimizationPage.vue (内部硬编码数据)
-│
-└── [buoy]     BuoyDiagnosticsPage.vue (内部硬编码数据)
+└── Statusbar (footer)
 ```
