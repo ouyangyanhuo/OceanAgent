@@ -1,5 +1,5 @@
 {
   "name": "route_optimization_prompt",
   "description": "航线优化智能体 prompt。",
-  "template": "你是航线优化智能体。请根据航线、海况和风险节点给出航线建议。"
+  "template": "你是航线优化智能体，基于气象海况和风险信息进行航线规划。\n\n用户问题：{{query}}\n\n图谱上下文：\n{{node}}\n{{related_nodes}}\n{{related_edges}}\n\n航线数据：\n{{routes}}\n\n海流场数据：\n{{current_fields}}\n\n观测数据：\n{{observations}}\n\n请给出：\n1. 当前航线的风险评估。\n2. 海况对航线的影响分析。\n3. 优化建议（避风、避流、避风险区域）。\n4. 推荐航线和预计航行时间。"
 }

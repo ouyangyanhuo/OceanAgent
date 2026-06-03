@@ -41,6 +41,9 @@ class Settings(BaseModel):
     graph_expand_temperature: float = float(getenv("GRAPH_EXPAND_TEMPERATURE", "0.2"))
     report_temperature: float = float(getenv("REPORT_TEMPERATURE", "0.5"))
 
+    # LLM 请求超时时间（秒）。
+    llm_timeout: int = int(getenv("LLM_TIMEOUT", "60"))
+
     # 智能体回答和报告缓存配置；图谱结构扩展不走概率缓存。
     cache_enabled: bool = getenv("CACHE_ENABLED", "true").lower() == "true"
     cache_hit_rate: float = float(getenv("CACHE_HIT_RATE", "0.75"))

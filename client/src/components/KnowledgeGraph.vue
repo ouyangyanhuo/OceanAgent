@@ -1,13 +1,20 @@
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import cytoscape from 'cytoscape'
 import {
+  Database,
   Expand,
+  Eye,
+  EyeOff,
   GitFork,
   Maximize,
+  Minimize,
   MousePointer2,
   Move,
+  RefreshCw,
   Search,
   Settings,
+  WifiOff,
   X,
   ZoomIn,
   ZoomOut,
@@ -16,6 +23,21 @@ import { fetchExpandOptions, fetchGraph, expandNode as apiExpandNode } from '../
 
 /* ── 常量映射 ── */
 const NODE_TYPE_COLORS = {
+  SeaArea: '#3b82f6',
+  Buoy: '#22c55e',
+  Observation: '#06b6d4',
+  RiskFactor: '#f43f5e',
+  RedTideEvent: '#f43f5e',
+  CurrentField: '#3b82f6',
+  Species: '#14b8a6',
+  FisheryArea: '#22c55e',
+  Route: '#8b5cf6',
+  PreventionMeasure: '#f59e0b',
+  Agent: '#8b5cf6',
+  Report: '#f59e0b',
+}
+
+const NODE_TYPE_TONES = {
   SeaArea: 'blue',
   Buoy: 'green',
   Observation: 'cyan',
@@ -72,17 +94,17 @@ const SOLID_RELATIONS = new Set([
 const graphNodes = ref([])
 const graphEdges = ref([])
 const loading = ref(true)
+const loadError = ref(false)
+const loadErrorMsg = ref('')
 const selectedNode = ref(null)
 const expandOptions = ref([])
 const expanding = ref(false)
 const searchQuery = ref('')
 const filterRelation = ref('all')
-const canvasRef = ref(null)
+const cyContainerRef = ref(null)
+const canvasWrapperRef = ref(null)
 
-/* ── 画布变换 ── */
-const transform = reactive({ x: 0, y: 0, scale: 1 })
-const isDragging = ref(false)
-const dragStart = reactive({ x: 0, y: 0 })
+let cy = null
 
 /* ── 工具栏 ── */
 const tools = [
@@ -95,114 +117,45 @@ const tools = [
 ]
 const activeTool = ref(0)
 
-/* ── 力导向布局 ── */
-const layoutPositions = ref({})
+/* ── 全屏 ── */
+const isFullscreen = ref(false)
 
-function runForceLayout(nodes, edges, width = 900, height = 600) {
-  const positions = {}
-  const n = nodes.length
-  if (n === 0) return positions
+function toggleFullscreen() {
+  const el = canvasWrapperRef.value
+  if (!el) return
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch(() => {})
+  } else {
+    document.exitFullscreen().catch(() => {})
+  }
+}
 
-  // 初始位置：圆形分布
-  const cx = width / 2
-  const cy = height / 2
-  const radius = Math.min(width, height) * 0.32
+function onFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+  // 全屏切换后 Cytoscape 需要 resize
+  if (cy) {
+    setTimeout(() => cy.resize(), 100)
+  }
+}
 
-  nodes.forEach((node, i) => {
-    const angle = (2 * Math.PI * i) / n
-    positions[node.id] = {
-      x: cx + radius * Math.cos(angle) + (Math.random() - 0.5) * 40,
-      y: cy + radius * Math.sin(angle) + (Math.random() - 0.5) * 40,
-    }
-  })
+/* ── 设置面板 ── */
+const showSettings = ref(false)
+const settings = ref({
+  showEdgeLabels: true,
+  showLegend: true,
+  animateLayout: true,
+})
 
-  // 参数
-  const k = Math.sqrt((width * height) / n) * 0.85 // 理想距离
-  const iterations = 120
-  const gravity = 0.06
-  const repulsion = k * k
-  const damping = 0.85
-
-  const velocities = {}
-  nodes.forEach((node) => { velocities[node.id] = { x: 0, y: 0 } })
-
-  const edgeSet = new Set(edges.map((e) => `${e.source}|${e.target}`))
-
-  for (let iter = 0; iter < iterations; iter++) {
-    const temp = 1 - iter / iterations // 降温
-
-    // 排斥力
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const a = nodes[i].id
-        const b = nodes[j].id
-        let dx = positions[a].x - positions[b].x
-        let dy = positions[a].y - positions[b].y
-        const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1)
-        const force = repulsion / (dist * dist)
-        const fx = (dx / dist) * force * temp
-        const fy = (dy / dist) * force * temp
-        velocities[a].x += fx
-        velocities[a].y += fy
-        velocities[b].x -= fx
-        velocities[b].y -= fy
-      }
-    }
-
-    // 吸引力（边）
-    edges.forEach((edge) => {
-      const sa = positions[edge.source]
-      const sb = positions[edge.target]
-      if (!sa || !sb) return
-      let dx = sb.x - sa.x
-      let dy = sb.y - sa.y
-      const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1)
-      const force = (dist * dist) / k
-      const fx = (dx / dist) * force * temp * 0.4
-      const fy = (dy / dist) * force * temp * 0.4
-      velocities[edge.source].x += fx
-      velocities[edge.source].y += fy
-      velocities[edge.target].x -= fx
-      velocities[edge.target].y -= fy
-    })
-
-    // 向心力
-    nodes.forEach((node) => {
-      const pos = positions[node.id]
-      velocities[node.id].x += (cx - pos.x) * gravity * temp
-      velocities[node.id].y += (cy - pos.y) * gravity * temp
-    })
-
-    // 应用速度
-    nodes.forEach((node) => {
-      const vel = velocities[node.id]
-      vel.x *= damping
-      vel.y *= damping
-      positions[node.id].x += vel.x
-      positions[node.id].y += vel.y
-
-      // 边界约束
-      const margin = 60
-      positions[node.id].x = Math.max(margin, Math.min(width - margin, positions[node.id].x))
-      positions[node.id].y = Math.max(margin, Math.min(height - margin, positions[node.id].y))
+function toggleSetting(key) {
+  settings.value[key] = !settings.value[key]
+  if (key === 'showEdgeLabels' && cy) {
+    cy.edges().forEach((e) => {
+      e.style('label', settings.value.showEdgeLabels ? (RELATION_LABELS[e.data('relation')] || e.data('relation')) : '')
     })
   }
-
-  return positions
 }
 
 /* ── 计算属性 ── */
-const nodeById = computed(() => {
-  const map = {}
-  graphNodes.value.forEach((n) => { map[n.id] = n })
-  return map
-})
-
-const visibleEdges = computed(() => {
-  if (filterRelation.value === 'all') return graphEdges.value
-  return graphEdges.value.filter((e) => e.relation === filterRelation.value)
-})
-
 const relationTypes = computed(() => {
   const set = new Set(graphEdges.value.map((e) => e.relation))
   return [...set]
@@ -215,53 +168,342 @@ const usedNodeTypes = computed(() => {
 
 const graphStats = computed(() => `${graphNodes.value.length} 个节点 · ${graphEdges.value.length} 条关系`)
 
+/* ── Cytoscape 初始化 ── */
+function toElements(nodes, edges) {
+  const nodeElements = nodes.map((n) => ({
+    data: {
+      id: n.id,
+      label: n.name,
+      color: NODE_TYPE_COLORS[n.type] || '#3b82f6',
+      nodeType: n.type,
+      size: n.type === 'SeaArea' ? 70 : 46,
+      raw: n,
+    },
+  }))
+  const edgeElements = edges.map((e) => ({
+    data: {
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      label: settings.value.showEdgeLabels ? (RELATION_LABELS[e.relation] || e.relation) : '',
+      relation: e.relation,
+      raw: e,
+    },
+    classes: SOLID_RELATIONS.has(e.relation) ? '' : 'dashed',
+  }))
+  return [...nodeElements, ...edgeElements]
+}
+
+function initCytoscape() {
+  if (cy) {
+    cy.destroy()
+    cy = null
+  }
+
+  const elements = toElements(graphNodes.value, graphEdges.value)
+
+  cy = cytoscape({
+    container: cyContainerRef.value,
+    elements,
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(label)',
+          'background-color': 'data(color)',
+          'width': 'data(size)',
+          'height': 'data(size)',
+          'text-valign': 'bottom',
+          'text-margin-y': 6,
+          'font-size': 11,
+          'font-weight': 600,
+          'color': '#e2e8f0',
+          'border-width': 2,
+          'border-color': 'data(color)',
+          'border-opacity': 0.6,
+          'text-outline-width': 2,
+          'text-outline-color': '#06192f',
+          'text-wrap': 'wrap',
+          'text-max-width': '80px',
+          'background-opacity': 0.85,
+          'overlay-opacity': 0,
+          'transition-property': 'border-width, border-color, background-opacity',
+          'transition-duration': '0.2s',
+        },
+      },
+      {
+        selector: 'node[?isCore]',
+        style: {
+          'width': 80,
+          'height': 80,
+          'font-size': 15,
+          'font-weight': 700,
+          'border-width': 3,
+          'background-color': '#1894ff',
+          'border-color': '#1894ff',
+          'background-opacity': 0.9,
+        },
+      },
+      {
+        selector: 'node:selected',
+        style: {
+          'border-width': 4,
+          'border-color': '#60a5fa',
+          'background-opacity': 1,
+          'overlay-color': '#60a5fa',
+          'overlay-padding': 4,
+          'overlay-opacity': 0.25,
+        },
+      },
+      {
+        selector: 'node.dimmed',
+        style: {
+          'opacity': 0.15,
+        },
+      },
+      {
+        selector: 'edge',
+        style: {
+          'width': 1.8,
+          'line-color': 'rgba(25, 207, 255, 0.5)',
+          'target-arrow-color': 'rgba(25, 207, 255, 0.5)',
+          'target-arrow-shape': 'triangle',
+          'arrow-scale': 0.8,
+          'curve-style': 'bezier',
+          'label': 'data(label)',
+          'font-size': 9,
+          'color': 'rgba(180, 210, 240, 0.7)',
+          'text-rotation': 'autorotate',
+          'text-outline-width': 1.5,
+          'text-outline-color': '#06192f',
+          'text-margin-y': -6,
+          'overlay-opacity': 0,
+          'transition-property': 'line-color, opacity',
+          'transition-duration': '0.2s',
+        },
+      },
+      {
+        selector: 'edge.dashed',
+        style: {
+          'line-style': 'dashed',
+          'line-dash-pattern': [6, 4],
+          'line-color': 'rgba(241, 154, 252, 0.5)',
+          'target-arrow-color': 'rgba(241, 154, 252, 0.5)',
+        },
+      },
+      {
+        selector: 'edge.dimmed',
+        style: {
+          'opacity': 0.1,
+        },
+      },
+    ],
+    layout: {
+      name: 'cose',
+      animate: settings.value.animateLayout,
+      animationDuration: 800,
+      randomize: true,
+      nodeRepulsion: () => 60000,
+      idealEdgeLength: () => 180,
+      edgeElasticity: () => 80,
+      gravity: 0.08,
+      numIter: 1200,
+      initialTemp: 300,
+      coolingFactor: 0.95,
+      minTemp: 1.0,
+      padding: 60,
+    },
+    minZoom: 0.2,
+    maxZoom: 3,
+    wheelSensitivity: 0.3,
+    boxSelectionEnabled: false,
+  })
+
+  // 布局完成后消除任何残余重叠
+  cy.one('layoutstop', () => resolveOverlaps())
+
+  // 事件绑定
+  cy.on('tap', 'node', (evt) => {
+    const raw = evt.target.data('raw')
+    onNodeClick(raw)
+  })
+
+  cy.on('tap', (evt) => {
+    if (evt.target === cy) {
+      closeDetail()
+    }
+  })
+
+  // 鼠标样式
+  cy.on('mouseover', 'node', () => {
+    if (cyContainerRef.value) cyContainerRef.value.style.cursor = 'pointer'
+  })
+  cy.on('mouseout', 'node', () => {
+    if (cyContainerRef.value) cyContainerRef.value.style.cursor = 'default'
+  })
+
+  // 拖拽时实时排斥附近节点，防止重叠
+  let repelRaf = null
+  cy.on('position', 'node', (evt) => {
+    const dragged = evt.target
+    if (!dragged.grabbed()) return
+    if (repelRaf) return
+    repelRaf = requestAnimationFrame(() => {
+      repelRaf = null
+      repelFromNode(dragged)
+    })
+  })
+
+  // 松手后再做一轮全局消除残余
+  cy.on('free', 'node', () => {
+    resolveOverlaps()
+  })
+
+  // 聚焦中心节点
+  focusCenterNode()
+}
+
+/* ── 拖拽节点排斥周围节点 ── */
+function repelFromNode(dragged) {
+  if (!cy) return
+  const pd = dragged.position()
+  const rd = Math.max(dragged.width(), dragged.height()) / 2 + 18
+
+  cy.nodes().forEach((other) => {
+    if (other.id() === dragged.id()) return
+    const po = other.position()
+    let dx = po.x - pd.x
+    let dy = po.y - pd.y
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1
+    const ro = Math.max(other.width(), other.height()) / 2 + 18
+    const minDist = rd + ro
+
+    if (dist < minDist) {
+      const push = minDist - dist + 2
+      const nx = dx / dist
+      const ny = dy / dist
+      other.position({ x: po.x + nx * push, y: po.y + ny * push })
+    }
+  })
+}
+
+/* ── 消除节点重叠 ── */
+function resolveOverlaps() {
+  if (!cy) return
+  const nodes = cy.nodes()
+  const n = nodes.length
+  if (n < 2) return
+
+  // 每个节点的有效半径（含标签间距）
+  const radiusOf = (node) => {
+    const w = node.width()
+    const h = node.height()
+    return Math.max(w, h) / 2 + 18
+  }
+
+  // 迭代推开重叠，最多 80 轮
+  for (let round = 0; round < 80; round++) {
+    let moved = false
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const a = nodes[i]
+        const b = nodes[j]
+        const pa = a.position()
+        const pb = b.position()
+        let dx = pa.x - pb.x
+        let dy = pa.y - pb.y
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1
+        const minDist = radiusOf(a) + radiusOf(b)
+        if (dist < minDist) {
+          const overlap = (minDist - dist) / 2 + 1
+          const nx = dx / dist
+          const ny = dy / dist
+          a.position({ x: pa.x + nx * overlap, y: pa.y + ny * overlap })
+          b.position({ x: pb.x - nx * overlap, y: pb.y - ny * overlap })
+          moved = true
+        }
+      }
+    }
+    if (!moved) break
+  }
+}
+
+/* ── 聚焦中心节点 ── */
+function focusCenterNode() {
+  if (!cy || graphNodes.value.length === 0) return
+
+  // 优先找 SeaArea 类型作为中心节点，否则取第一个节点
+  const centerNode = graphNodes.value.find((n) => n.type === 'SeaArea') || graphNodes.value[0]
+  const cyNode = cy.getElementById(centerNode.id)
+  if (!cyNode.length) return
+
+  // 布局完成后动画聚焦到中心节点
+  cy.animate({
+    center: { eles: cyNode },
+    zoom: 1.2,
+    duration: 600,
+    easing: 'ease-in-out-cubic',
+  })
+}
+
 /* ── 数据加载 ── */
 async function loadGraph() {
   loading.value = true
-  const data = await fetchGraph()
-  graphNodes.value = data.nodes || []
-  graphEdges.value = data.edges || []
+  loadError.value = false
+  loadErrorMsg.value = ''
+
+  const result = await fetchGraph()
+
+  if (!result.ok) {
+    loading.value = false
+    loadError.value = true
+    loadErrorMsg.value = result.error || '无法连接到图数据库'
+    return
+  }
+
+  graphNodes.value = result.data.nodes || []
+  graphEdges.value = result.data.edges || []
   loading.value = false
 
   await nextTick()
-  relayout()
+  initCytoscape()
 }
 
-function relayout() {
-  const canvas = canvasRef.value
-  const w = canvas?.clientWidth || 900
-  const h = canvas?.clientHeight || 600
-  layoutPositions.value = runForceLayout(graphNodes.value, graphEdges.value, w, h)
-  fitCanvas()
-}
-
-function fitCanvas() {
-  const canvas = canvasRef.value
-  if (!canvas || graphNodes.value.length === 0) return
-
-  const w = canvas.clientWidth
-  const h = canvas.clientHeight
-  const positions = layoutPositions.value
-
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
-  Object.values(positions).forEach((p) => {
-    minX = Math.min(minX, p.x)
-    maxX = Math.max(maxX, p.x)
-    minY = Math.min(minY, p.y)
-    maxY = Math.max(maxY, p.y)
+/* ── 搜索高亮 ── */
+watch(searchQuery, (q) => {
+  if (!cy) return
+  const trimmed = q.trim().toLowerCase()
+  if (!trimmed) {
+    cy.nodes().removeClass('dimmed')
+    cy.edges().removeClass('dimmed')
+    return
+  }
+  const matchIds = new Set(
+    graphNodes.value
+      .filter((n) => n.name.toLowerCase().includes(trimmed))
+      .map((n) => n.id),
+  )
+  cy.nodes().forEach((n) => {
+    n.toggleClass('dimmed', !matchIds.has(n.id()))
   })
+  cy.edges().forEach((e) => {
+    const src = e.data('source')
+    const tgt = e.data('target')
+    e.toggleClass('dimmed', !matchIds.has(src) && !matchIds.has(tgt))
+  })
+})
 
-  const padding = 100
-  const graphW = maxX - minX + padding * 2
-  const graphH = maxY - minY + padding * 2
-  const scale = Math.min(w / graphW, h / graphH, 1.5)
-  const cx = (minX + maxX) / 2
-  const cy = (minY + maxY) / 2
-
-  transform.scale = scale
-  transform.x = w / 2 - cx * scale
-  transform.y = h / 2 - cy * scale
-}
+/* ── 关系筛选 ── */
+watch(filterRelation, (val) => {
+  if (!cy) return
+  cy.edges().forEach((e) => {
+    if (val === 'all') {
+      e.style('display', 'element')
+    } else {
+      e.style('display', e.data('relation') === val ? 'element' : 'none')
+    }
+  })
+})
 
 /* ── 交互 ── */
 function onNodeClick(node) {
@@ -272,6 +514,13 @@ function onNodeClick(node) {
   }
   selectedNode.value = node
   loadExpandOptions(node.id)
+
+  // 高亮选中节点
+  if (cy) {
+    cy.nodes().unselect()
+    const cyNode = cy.getElementById(node.id)
+    if (cyNode.length) cyNode.select()
+  }
 }
 
 async function loadExpandOptions(nodeId) {
@@ -285,12 +534,12 @@ async function handleExpand(expandType) {
 
   const result = await apiExpandNode(selectedNode.value.id, expandType)
   if (result) {
-    // 合并新节点
+    // 合并新节点到本地数据
     const existingIds = new Set(graphNodes.value.map((n) => n.id))
     const newNodes = (result.new_nodes || []).filter((n) => !existingIds.has(n.id))
     graphNodes.value.push(...newNodes)
 
-    // 合并新边
+    // 合并新边到本地数据
     const existingEdgeIds = new Set(graphEdges.value.map((e) => e.id))
     const newEdges = (result.new_edges || []).filter((e) => !existingEdgeIds.has(e.id))
     graphEdges.value.push(...newEdges)
@@ -301,9 +550,43 @@ async function handleExpand(expandType) {
       if (idx !== -1) graphNodes.value[idx] = result.center_node
     }
 
-    // 重新布局
-    await nextTick()
-    relayout()
+    // 向 Cytoscape 添加新元素并重新布局
+    if (cy) {
+      const newCyElements = toElements(
+        [...newNodes, ...(result.center_node ? [result.center_node] : [])],
+        newEdges,
+      )
+      // 去掉已存在的元素
+      const filtered = newCyElements.filter((el) => !cy.getElementById(el.data.id).length)
+      if (filtered.length) {
+        cy.add(filtered)
+      }
+      // 更新中心节点数据
+      if (result.center_node) {
+        const cyNode = cy.getElementById(result.center_node.id)
+        if (cyNode.length) {
+          cyNode.data('raw', result.center_node)
+        }
+      }
+      // 重新布局
+      const expandLayout = cy.layout({
+        name: 'cose',
+        animate: settings.value.animateLayout,
+        animationDuration: 600,
+        randomize: false,
+        nodeRepulsion: () => 60000,
+        idealEdgeLength: () => 180,
+        edgeElasticity: () => 80,
+        gravity: 0.08,
+        numIter: 800,
+        initialTemp: 200,
+        coolingFactor: 0.95,
+        minTemp: 1.0,
+        padding: 60,
+      })
+      expandLayout.one('layoutstop', () => resolveOverlaps())
+      expandLayout.run()
+    }
 
     // 刷新展开选项
     if (selectedNode.value) {
@@ -313,51 +596,18 @@ async function handleExpand(expandType) {
   expanding.value = false
 }
 
-function onCanvasMouseDown(e) {
-  if (tools[activeTool.value].mode === 'drag' || e.shiftKey) {
-    isDragging.value = true
-    dragStart.x = e.clientX - transform.x
-    dragStart.y = e.clientY - transform.y
-    e.preventDefault()
-  }
-}
-
-function onCanvasMouseMove(e) {
-  if (isDragging.value) {
-    transform.x = e.clientX - dragStart.x
-    transform.y = e.clientY - dragStart.y
-  }
-}
-
-function onCanvasMouseUp() {
-  isDragging.value = false
-}
-
-function onCanvasWheel(e) {
-  const delta = e.deltaY > 0 ? 0.92 : 1.08
-  const rect = canvasRef.value.getBoundingClientRect()
-  const mx = e.clientX - rect.left
-  const my = e.clientY - rect.top
-
-  transform.x = mx - (mx - transform.x) * delta
-  transform.y = my - (my - transform.y) * delta
-  transform.scale *= delta
-  transform.scale = Math.max(0.2, Math.min(3, transform.scale))
-  e.preventDefault()
-}
-
 function setTool(index) {
   const mode = tools[index].mode
   if (mode === 'fit') {
-    fitCanvas()
+    if (cy) cy.fit(undefined, 40)
     return
   }
   if (mode === 'zoomIn') {
-    transform.scale = Math.min(3, transform.scale * 1.25)
+    if (cy) cy.zoom({ level: cy.zoom() * 1.25, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } })
     return
   }
   if (mode === 'zoomOut') {
-    transform.scale = Math.max(0.2, transform.scale * 0.8)
+    if (cy) cy.zoom({ level: cy.zoom() * 0.8, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } })
     return
   }
   if (mode === 'expand' && selectedNode.value) {
@@ -366,37 +616,44 @@ function setTool(index) {
     return
   }
   activeTool.value = index
+
+  // 切换拖拽/选择模式
+  if (cy) {
+    if (mode === 'drag') {
+      cy.autoungrabify(false)
+    } else {
+      cy.autoungrabify(true)
+    }
+  }
 }
 
 function closeDetail() {
   selectedNode.value = null
   expandOptions.value = []
+  if (cy) cy.nodes().unselect()
 }
 
-/* ── 节点位置辅助 ── */
-function nodePos(nodeId) {
-  return layoutPositions.value[nodeId] || { x: 0, y: 0 }
-}
-
-/* ── 搜索高亮 ── */
-const highlightedIds = computed(() => {
-  if (!searchQuery.value.trim()) return null
-  const q = searchQuery.value.trim().toLowerCase()
-  return new Set(
-    graphNodes.value
-      .filter((n) => n.name.toLowerCase().includes(q))
-      .map((n) => n.id),
-  )
-})
-
-function isDimmed(nodeId) {
-  if (!highlightedIds.value) return false
-  return !highlightedIds.value.has(nodeId)
+/* ── 点击外部关闭设置面板 ── */
+function onDocumentClick(e) {
+  if (showSettings.value && !e.target.closest('.settings-wrapper')) {
+    showSettings.value = false
+  }
 }
 
 /* ── 生命周期 ── */
 onMounted(() => {
   loadGraph()
+  document.addEventListener('fullscreenchange', onFullscreenChange)
+  document.addEventListener('click', onDocumentClick)
+})
+
+onBeforeUnmount(() => {
+  if (cy) {
+    cy.destroy()
+    cy = null
+  }
+  document.removeEventListener('fullscreenchange', onFullscreenChange)
+  document.removeEventListener('click', onDocumentClick)
 })
 </script>
 
@@ -406,36 +663,72 @@ onMounted(() => {
     <header class="graph-header">
       <div class="graph-header-left">
         <h2>信息关系图谱</h2>
-        <span class="graph-stats">{{ graphStats }}</span>
+        <span v-if="!loadError" class="graph-stats">{{ graphStats }}</span>
       </div>
       <div class="graph-controls">
         <div class="graph-search">
           <Search :size="16" />
-          <input v-model="searchQuery" placeholder="搜索节点..." />
+          <input v-model="searchQuery" placeholder="搜索节点..." :disabled="loadError" />
         </div>
-        <select v-model="filterRelation" class="graph-select">
+        <select v-model="filterRelation" class="graph-select" :disabled="loadError">
           <option value="all">全部关系</option>
           <option v-for="r in relationTypes" :key="r" :value="r">
             {{ RELATION_LABELS[r] || r }}
           </option>
         </select>
         <div class="graph-actions">
-          <button aria-label="全屏" title="全屏"><Maximize :size="16" /></button>
-          <button aria-label="设置" title="设置"><Settings :size="16" /></button>
+          <button
+            aria-label="全屏"
+            :title="isFullscreen ? '退出全屏' : '全屏'"
+            @click="toggleFullscreen"
+          >
+            <Minimize v-if="isFullscreen" :size="16" />
+            <Maximize v-else :size="16" />
+          </button>
+          <div class="settings-wrapper">
+            <button
+              aria-label="设置"
+              title="设置"
+              :class="{ active: showSettings }"
+              @click.stop="showSettings = !showSettings"
+            >
+              <Settings :size="16" />
+            </button>
+            <Transition name="dropdown">
+              <div v-if="showSettings" class="settings-dropdown">
+                <label class="settings-item" @click.stop="toggleSetting('showEdgeLabels')">
+                  <span>
+                    <Eye v-if="settings.showEdgeLabels" :size="14" />
+                    <EyeOff v-else :size="14" />
+                    边标签
+                  </span>
+                  <span class="settings-toggle" :class="{ on: settings.showEdgeLabels }"></span>
+                </label>
+                <label class="settings-item" @click.stop="toggleSetting('showLegend')">
+                  <span>
+                    <Eye v-if="settings.showLegend" :size="14" />
+                    <EyeOff v-else :size="14" />
+                    图例
+                  </span>
+                  <span class="settings-toggle" :class="{ on: settings.showLegend }"></span>
+                </label>
+                <label class="settings-item" @click.stop="toggleSetting('animateLayout')">
+                  <span>
+                    <Eye v-if="settings.animateLayout" :size="14" />
+                    <EyeOff v-else :size="14" />
+                    布局动画
+                  </span>
+                  <span class="settings-toggle" :class="{ on: settings.animateLayout }"></span>
+                </label>
+              </div>
+            </Transition>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- 画布 -->
-    <div
-      ref="canvasRef"
-      class="graph-canvas"
-      @mousedown="onCanvasMouseDown"
-      @mousemove="onCanvasMouseMove"
-      @mouseup="onCanvasMouseUp"
-      @mouseleave="onCanvasMouseUp"
-      @wheel="onCanvasWheel"
-    >
+    <div ref="canvasWrapperRef" class="graph-canvas">
       <!-- 工具栏 -->
       <div class="graph-tools">
         <button
@@ -443,64 +736,31 @@ onMounted(() => {
           :key="tool.label"
           :class="{ active: activeTool === index }"
           :title="tool.label"
+          :disabled="loadError"
           @click="setTool(index)"
         >
           <component :is="tool.icon" :size="18" />
         </button>
       </div>
 
-      <!-- 世界坐标容器：统一处理平移缩放 -->
-      <div
-        class="world-wrapper"
-        :style="{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }"
-      >
-        <!-- SVG 边层 -->
-        <svg class="edge-layer">
-          <defs>
-            <filter id="edgeGlow">
-              <feGaussianBlur stdDeviation="0.6" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          <g v-for="edge in visibleEdges" :key="edge.id">
-            <line
-              :x1="nodePos(edge.source).x"
-              :y1="nodePos(edge.source).y"
-              :x2="nodePos(edge.target).x"
-              :y2="nodePos(edge.target).y"
-              :class="{ dashed: !SOLID_RELATIONS.has(edge.relation) }"
-              filter="url(#edgeGlow)"
-            />
-            <text
-              class="edge-label"
-              :x="(nodePos(edge.source).x + nodePos(edge.target).x) / 2"
-              :y="(nodePos(edge.source).y + nodePos(edge.target).y) / 2 - 6"
-            >
-              {{ RELATION_LABELS[edge.relation] || edge.relation }}
-            </text>
-          </g>
-        </svg>
+      <!-- Cytoscape 容器 -->
+      <div ref="cyContainerRef" class="cy-container"></div>
 
-        <!-- 节点层 -->
-        <div
-          v-for="node in graphNodes"
-          :key="node.id"
-          class="graph-node"
-          :class="[
-            `tone-${NODE_TYPE_COLORS[node.type] || 'blue'}`,
-            { core: node.type === 'SeaArea', dimmed: isDimmed(node.id), selected: selectedNode?.id === node.id },
-          ]"
-          :style="{
-            left: `${nodePos(node.id).x}px`,
-            top: `${nodePos(node.id).y}px`,
-          }"
-          @click="onNodeClick(node)"
-        >
-          <span>{{ node.name }}</span>
+      <!-- 连接失败占位符 -->
+      <div v-if="loadError" class="graph-error">
+        <div class="graph-error-icon">
+          <WifiOff :size="48" />
         </div>
+        <div class="graph-error-title">无法连接到图数据库</div>
+        <div class="graph-error-desc">{{ loadErrorMsg }}</div>
+        <div class="graph-error-hint">
+          <Database :size="14" />
+          <span>请确认后端服务已启动（默认 http://localhost:8000）</span>
+        </div>
+        <button class="graph-error-retry" @click="loadGraph">
+          <RefreshCw :size="14" />
+          重新连接
+        </button>
       </div>
 
       <!-- Loading -->
@@ -509,23 +769,8 @@ onMounted(() => {
         <span>加载图谱数据...</span>
       </div>
 
-      <!-- 缩略图 -->
-      <div class="mini-map">
-        <div class="mini-map-header"><span>缩略图</span></div>
-        <div class="mini-map-content">
-          <span
-            v-for="node in graphNodes"
-            :key="`mini-${node.id}`"
-            :style="{
-              left: `${((nodePos(node.id).x || 0) / 1000) * 100}%`,
-              top: `${((nodePos(node.id).y || 0) / 700) * 100}%`,
-            }"
-          ></span>
-        </div>
-      </div>
-
       <!-- 图例 -->
-      <div class="legend">
+      <div v-if="settings.showLegend && !loadError" class="legend">
         <div class="legend-section">
           <span class="legend-title">关系类型</span>
           <span v-for="r in relationTypes" :key="r">
@@ -535,7 +780,7 @@ onMounted(() => {
         <div class="legend-section">
           <span class="legend-title">节点类型</span>
           <span v-for="t in usedNodeTypes" :key="t">
-            <b :class="NODE_TYPE_COLORS[t] || 'blue'"></b>{{ NODE_TYPE_LABELS[t] || t }}
+            <b :style="{ background: NODE_TYPE_COLORS[t] || '#3b82f6' }"></b>{{ NODE_TYPE_LABELS[t] || t }}
           </span>
         </div>
       </div>
@@ -546,7 +791,7 @@ onMounted(() => {
       <div v-if="selectedNode" class="node-detail">
         <div class="node-detail-header">
           <div>
-            <span class="node-detail-type" :class="`tone-${NODE_TYPE_COLORS[selectedNode.type] || 'blue'}`">
+            <span class="node-detail-type" :class="`tone-${NODE_TYPE_TONES[selectedNode.type] || 'blue'}`">
               {{ NODE_TYPE_LABELS[selectedNode.type] || selectedNode.type }}
             </span>
             <h3>{{ selectedNode.name }}</h3>
@@ -555,7 +800,7 @@ onMounted(() => {
         </div>
 
         <div class="node-detail-body">
-          <div v-if="Object.keys(selectedNode.properties).length" class="node-detail-section">
+          <div v-if="Object.keys(selectedNode.properties || {}).length" class="node-detail-section">
             <span class="node-detail-label">属性</span>
             <div class="node-detail-props">
               <div v-for="(val, key) in selectedNode.properties" :key="key" class="node-detail-prop">
@@ -598,3 +843,184 @@ onMounted(() => {
     </Transition>
   </section>
 </template>
+
+<style scoped>
+.cy-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── 设置面板 ── */
+.settings-wrapper {
+  position: relative;
+}
+
+.settings-wrapper button.active {
+  border-color: rgba(83, 171, 255, 0.6);
+  color: #fff;
+  background: rgba(22, 141, 255, 0.2);
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 180px;
+  background: rgba(7, 31, 58, 0.96);
+  border: 1px solid rgba(39, 151, 255, 0.28);
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #b9d6ee;
+  transition: background 0.15s;
+}
+
+.settings-item:hover {
+  background: rgba(22, 141, 255, 0.12);
+  color: #fff;
+}
+
+.settings-item span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-toggle {
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(75, 143, 210, 0.3);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.settings-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #8fb9df;
+  transition: all 0.2s;
+}
+
+.settings-toggle.on {
+  background: rgba(34, 197, 94, 0.5);
+}
+
+.settings-toggle.on::after {
+  left: 17px;
+  background: #22c55e;
+}
+
+/* ── 设置面板动画 ── */
+.dropdown-enter-active {
+  animation: dropdown-in 0.15s ease-out;
+}
+
+.dropdown-leave-active {
+  animation: dropdown-in 0.1s ease-in reverse;
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 连接错误占位符 ── */
+.graph-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 10;
+  color: #8fb9df;
+}
+
+.graph-error-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.08);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  display: grid;
+  place-items: center;
+  color: #f43f5e;
+  margin-bottom: 4px;
+}
+
+.graph-error-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.graph-error-desc {
+  font-size: 13px;
+  color: #6b8aab;
+  max-width: 400px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.graph-error-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #4a7a9e;
+  padding: 8px 14px;
+  background: rgba(14, 51, 86, 0.3);
+  border-radius: 6px;
+  border: 1px solid rgba(39, 151, 255, 0.1);
+}
+
+.graph-error-retry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 10px 24px;
+  border: 1px solid rgba(39, 151, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(22, 141, 255, 0.15);
+  color: #60a5fa;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.graph-error-retry:hover {
+  background: rgba(22, 141, 255, 0.3);
+  border-color: rgba(39, 151, 255, 0.6);
+  color: #93c5fd;
+}
+</style>

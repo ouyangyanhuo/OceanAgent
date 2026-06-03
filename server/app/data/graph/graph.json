@@ -1,6 +1,6 @@
 {
   "graph_id": "ocean_kg_demo_v1",
-  "version": 17,
+  "version": 36,
   "nodes": [
     {
       "id": "sea_area_001",
@@ -15,7 +15,7 @@
       },
       "expanded": {
         "risk_factors": true,
-        "related_events": false,
+        "related_events": true,
         "ecological_species": false,
         "monitoring_buoys": false
       },
@@ -23,7 +23,7 @@
         "source": "seed",
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
-        "updated_at": "2026-06-03T11:37:37",
+        "updated_at": "2026-06-03T16:20:33",
         "version": 1,
         "locked": true
       }
@@ -63,12 +63,14 @@
         "battery": 87,
         "sea_area_id": "sea_area_001"
       },
-      "expanded": {},
+      "expanded": {
+        "related_events": true
+      },
       "metadata": {
         "source": "seed",
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
-        "updated_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-03T16:22:42",
         "version": 1,
         "locked": true
       }
@@ -83,12 +85,17 @@
         "unit": "mg/m3",
         "risk_signal": "elevated"
       },
-      "expanded": {},
+      "expanded": {
+        "related_events": true,
+        "ecological_species": true,
+        "monitoring_buoys": true,
+        "risk_factors": true
+      },
       "metadata": {
         "source": "seed",
         "parent_node": null,
         "created_at": "2026-06-02T00:00:00",
-        "updated_at": "2026-06-02T00:00:00",
+        "updated_at": "2026-06-03T16:22:18",
         "version": 1,
         "locked": true
       }
@@ -255,12 +262,178 @@
         "value": 6.4,
         "unit": "mg/L"
       },
-      "expanded": {},
+      "expanded": {
+        "monitoring_buoys": true
+      },
       "metadata": {
         "source": "generated",
         "parent_node": "agent_red_tide",
         "created_at": "2026-06-03T11:37:30",
-        "updated_at": "2026-06-03T11:37:30",
+        "updated_at": "2026-06-03T16:20:38",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "red_tide_event_11584719",
+      "type": "RedTideEvent",
+      "name": "东海近岸海域 赤潮风险事件",
+      "properties": {
+        "risk_level": "medium",
+        "confidence": 0.7
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "sea_area_001",
+        "created_at": "2026-06-03T16:20:33",
+        "updated_at": "2026-06-03T16:20:33",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "buoy_f89bb1fa",
+      "type": "Buoy",
+      "name": "赤潮预警智能体 溶解氧观测 综合监测浮标",
+      "properties": {
+        "status": "planned",
+        "battery": 100
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_1f87d17c",
+        "created_at": "2026-06-03T16:20:38",
+        "updated_at": "2026-06-03T16:20:38",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_b4dcb353",
+      "type": "Observation",
+      "name": "赤潮预警智能体 溶解氧观测 溶解氧观测",
+      "properties": {
+        "metric": "dissolved_oxygen",
+        "value": 6.4,
+        "unit": "mg/L"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_1f87d17c",
+        "created_at": "2026-06-03T16:20:38",
+        "updated_at": "2026-06-03T16:20:38",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "red_tide_event_eaef506f",
+      "type": "RedTideEvent",
+      "name": "东海叶绿素观测 赤潮风险事件",
+      "properties": {
+        "risk_level": "medium",
+        "confidence": 0.7
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:15",
+        "updated_at": "2026-06-03T16:22:15",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "fishery_area_171d8c9b",
+      "type": "FisheryArea",
+      "name": "东海叶绿素观测 渔业适宜区",
+      "properties": {
+        "suitability": 0.74
+      },
+      "expanded": {
+        "ecological_species": true
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:16",
+        "updated_at": "2026-06-03T16:23:04",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "buoy_2c5ba415",
+      "type": "Buoy",
+      "name": "东海叶绿素观测 综合监测浮标",
+      "properties": {
+        "status": "planned",
+        "battery": 100
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:17",
+        "updated_at": "2026-06-03T16:22:17",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_f832bb35",
+      "type": "Observation",
+      "name": "东海叶绿素观测 溶解氧观测",
+      "properties": {
+        "metric": "dissolved_oxygen",
+        "value": 6.4,
+        "unit": "mg/L"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:17",
+        "updated_at": "2026-06-03T16:22:17",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "red_tide_event_7a1f132c",
+      "type": "RedTideEvent",
+      "name": "东海一号浮标 赤潮风险事件",
+      "properties": {
+        "risk_level": "medium",
+        "confidence": 0.7
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_001",
+        "created_at": "2026-06-03T16:22:42",
+        "updated_at": "2026-06-03T16:22:42",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "fishery_area_95ce33ac",
+      "type": "FisheryArea",
+      "name": "东海叶绿素观测 渔业适宜区 渔业适宜区",
+      "properties": {
+        "suitability": 0.74
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "fishery_area_171d8c9b",
+        "created_at": "2026-06-03T16:23:04",
+        "updated_at": "2026-06-03T16:23:04",
         "version": 1,
         "locked": true
       }
@@ -471,6 +644,168 @@
         "parent_node": "red_tide_event_480fc81c",
         "created_at": "2026-06-03T11:38:02",
         "updated_at": "2026-06-03T11:38:02",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_9c54c685",
+      "source": "sea_area_001",
+      "target": "red_tide_event_11584719",
+      "relation": "has_risk_event",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "sea_area_001",
+        "created_at": "2026-06-03T16:20:33",
+        "updated_at": "2026-06-03T16:20:33",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_a22726a3",
+      "source": "observation_1f87d17c",
+      "target": "buoy_f89bb1fa",
+      "relation": "monitored_by",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_1f87d17c",
+        "created_at": "2026-06-03T16:20:38",
+        "updated_at": "2026-06-03T16:20:38",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_d96daaf1",
+      "source": "buoy_f89bb1fa",
+      "target": "observation_b4dcb353",
+      "relation": "has_observation",
+      "weight": 0.75,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_1f87d17c",
+        "created_at": "2026-06-03T16:20:38",
+        "updated_at": "2026-06-03T16:20:38",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_487ce150",
+      "source": "observation_001",
+      "target": "red_tide_event_eaef506f",
+      "relation": "has_risk_event",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:15",
+        "updated_at": "2026-06-03T16:22:15",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_4668f1f7",
+      "source": "fishery_area_171d8c9b",
+      "target": "species_fea40c75",
+      "relation": "suitable_for",
+      "weight": 0.72,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:16",
+        "updated_at": "2026-06-03T16:22:16",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_1f8a7f69",
+      "source": "observation_001",
+      "target": "buoy_2c5ba415",
+      "relation": "monitored_by",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:17",
+        "updated_at": "2026-06-03T16:22:17",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_2363676b",
+      "source": "buoy_2c5ba415",
+      "target": "observation_f832bb35",
+      "relation": "has_observation",
+      "weight": 0.75,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:17",
+        "updated_at": "2026-06-03T16:22:17",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_000efa0c",
+      "source": "observation_001",
+      "target": "risk_factor_25b1356f",
+      "relation": "affected_by",
+      "weight": 0.84,
+      "properties": {
+        "description": "东海叶绿素观测 受到叶绿素浓度升高影响。"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_001",
+        "created_at": "2026-06-03T16:22:18",
+        "updated_at": "2026-06-03T16:22:18",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_9cec04d1",
+      "source": "buoy_001",
+      "target": "red_tide_event_7a1f132c",
+      "relation": "has_risk_event",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_001",
+        "created_at": "2026-06-03T16:22:42",
+        "updated_at": "2026-06-03T16:22:42",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_c5e19973",
+      "source": "fishery_area_95ce33ac",
+      "target": "species_fea40c75",
+      "relation": "suitable_for",
+      "weight": 0.72,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "fishery_area_171d8c9b",
+        "created_at": "2026-06-03T16:23:04",
+        "updated_at": "2026-06-03T16:23:04",
         "version": 1,
         "locked": true
       }

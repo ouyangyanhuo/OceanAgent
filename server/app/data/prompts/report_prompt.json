@@ -1,5 +1,5 @@
 {
   "name": "report_prompt",
   "description": "报告生成 prompt。",
-  "template": "请基于输入上下文生成 Markdown 海洋分析报告，包含结论、数据依据、图谱关联和建议。"
+  "template": "你是一个海洋分析报告生成器。请基于以下上下文生成一份专业的 Markdown 格式海洋分析报告。\n\n报告类型：{{report_type}}\n报告标题：{{title}}\n\n分析对象节点：\n{{node}}\n\n海洋观测数据：\n{{observations}}\n\n浮标状态数据：\n{{buoys}}\n\n海流场数据：\n{{current_fields}}\n\n渔场数据：\n{{fishery_areas}}\n\n报告结构要求：\n1. # 标题\n2. ## 摘要 — 一段话总结核心发现\n3. ## 数据分析 — 分析观测数据和图谱关系\n4. ## 风险评估 — 当前风险等级和趋势\n5. ## 建议 — 具体可执行的建议措施\n\n请直接输出 Markdown 内容，不要包裹在代码块中。"
 }

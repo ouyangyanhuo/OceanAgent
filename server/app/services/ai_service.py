@@ -1,23 +1,121 @@
 """AI 服务封装。
 
-第一版保持 mock 模式，确保没有 API Key 时系统也能完整跑通。
-未来接 OpenAI 或自定义 LLM 时，应在这里新增 provider 分支，
-不要让 API 路由或业务服务直接调用外部模型。
+支持 mock 和真实 LLM 两种模式：
+- 没有 API Key 时自动使用 mock 输出，保证系统可独立运行。
+- 配置了 API Key 后走 OpenAI 兼容接口，PromptService 负责渲染 prompt。
 """
 
+import logging
 from typing import Any
+
+from app.core.config import get_settings
+from app.core.errors import LLMError
+from app.services.llm_client import LLMClient
+from app.services.prompt_service import PromptService
+
+logger = logging.getLogger(__name__)
 
 
 class AIService:
     """统一封装图谱扩展、智能体回答和报告生成。"""
 
-    def generate_graph_seed(self, topic: str) -> dict[str, Any]:
-        """生成种子图谱候选数据。
+    def __init__(self) -> None:
+        """初始化 AI 服务，根据配置决定 mock 或真实 LLM 模式。"""
+        self.settings = get_settings()
+        self.prompt_service = PromptService()
 
-        当前返回 mock 候选结构；后续真实 LLM 输出也必须保持候选数据格式。
-        """
+        # 只有非 mock 模式才创建 LLM 客户端。
+        if not self.settings.use_mock_llm:
+            self.llm_client = LLMClient(
+                base_url=self.settings.llm_base_url,
+                api_key=self.settings.llm_api_key,
+                model=self.settings.llm_model,
+                timeout=self.settings.llm_timeout,
+            )
+            logger.info("AIService 已连接 LLM: %s / %s", self.settings.llm_base_url, self.settings.llm_model)
+        else:
+            self.llm_client = None
+            logger.info("AIService 运行在 mock 模式（未配置 LLM_API_KEY）")
+
+    # ── 公开接口 ──────────────────────────────────────────────
+
+    def generate_graph_seed(self, topic: str) -> dict[str, Any]:
+        """生成种子图谱候选数据。"""
+        if self.llm_client and self.settings.allow_llm_graph_seed:
+            return self._real_graph_seed(topic)
+        return self._mock_graph_seed(topic)
+
+    def generate_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
+        """生成图谱扩展候选节点和候选边。"""
+        if self.llm_client and self.settings.allow_llm_graph_expand:
+            return self._real_graph_expansion(context)
+        return self._mock_graph_expansion(context)
+
+    def generate_agent_answer(self, context: dict[str, Any]) -> str:
+        """生成智能体回答文本。"""
+        if self.llm_client:
+            return self._real_agent_answer(context)
+        return self._mock_agent_answer(context)
+
+    def generate_report(self, context: dict[str, Any]) -> str:
+        """生成 Markdown 报告文本。"""
+        if self.llm_client:
+            return self._real_report(context)
+        return self._mock_report(context)
+
+    # ── 真实 LLM 调用 ─────────────────────────────────────────
+
+    def _real_graph_seed(self, topic: str) -> dict[str, Any]:
+        """通过 LLM 生成种子图谱候选数据。"""
+        prompt = self.prompt_service.render_graph_expand_prompt({
+            "current_node": {"name": topic, "type": "SeaArea"},
+            "neighbors": {"nodes": [], "edges": []},
+            "existing_edges": [],
+            "expand_type": "seed",
+            "allowed_node_types": ["SeaArea", "Buoy", "Observation", "RiskFactor", "CurrentField"],
+            "allowed_relations": ["located_in", "monitored_by", "has_observation"],
+            "max_nodes": 5,
+            "max_edges": 5,
+        })
+        return self.llm_client.chat_json(
+            user_prompt=prompt,
+            temperature=self.settings.graph_expand_temperature,
+        )
+
+    def _real_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
+        """通过 LLM 生成图谱扩展候选数据。"""
+        prompt = self.prompt_service.render_graph_expand_prompt(context)
+        result = self.llm_client.chat_json(
+            user_prompt=prompt,
+            temperature=self.settings.graph_expand_temperature,
+        )
+        # 确保返回结构包含必要字段
+        if "nodes" not in result or "edges" not in result:
+            raise LLMError("LLM 扩展结果缺少 nodes 或 edges 字段", code="LLM_INVALID_STRUCTURE")
+        return result
+
+    def _real_agent_answer(self, context: dict[str, Any]) -> str:
+        """通过 LLM 生成智能体回答。"""
+        agent_type = context["agent_type"]
+        prompt = self.prompt_service.render_agent_prompt(agent_type, context)
+        return self.llm_client.chat_text(
+            user_prompt=prompt,
+            temperature=0.5,
+        )
+
+    def _real_report(self, context: dict[str, Any]) -> str:
+        """通过 LLM 生成 Markdown 报告。"""
+        prompt = self.prompt_service.render_report_prompt(context)
+        return self.llm_client.chat_text(
+            user_prompt=prompt,
+            temperature=self.settings.report_temperature,
+        )
+
+    # ── Mock 实现（无 API Key 时使用） ────────────────────────
+
+    def _mock_graph_seed(self, topic: str) -> dict[str, Any]:
+        """返回 mock 种子图谱候选数据。"""
         return {
-            # 候选节点不包含 id；后端会在 GraphService.build_node 中统一生成。
             "nodes": [
                 {
                     "type": "SeaArea",
@@ -25,33 +123,16 @@ class AIService:
                     "properties": {"description": f"{topic} 的种子海域节点。"},
                 }
             ],
-            # 种子图可以没有边，后续脚本或扩展流程再补充关系。
             "edges": [],
             "summary": "已生成 mock 种子图谱候选数据。",
         }
 
-    def generate_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
-        """生成图谱扩展候选节点和候选边。"""
-        # 后续真实 LLM provider 可在这里接入；v1 始终保持 mock 可运行。
-        return self._mock_graph_expansion(context)
-
-    def generate_agent_answer(self, context: dict[str, Any]) -> str:
-        """生成智能体回答文本。"""
-        return self._mock_agent_answer(context)
-
-    def generate_report(self, context: dict[str, Any]) -> str:
-        """生成 Markdown 报告文本。"""
-        return self._mock_report(context)
-
     def _mock_graph_expansion(self, context: dict[str, Any]) -> dict[str, Any]:
         """根据 expand_type 返回稳定的 mock 图谱扩展候选结果。"""
-        # expand_type 决定生成哪类候选结构；当前值来自 schema_rules 校验后的请求。
         expand_type = context["expand_type"]
-
-        # 中心节点名称用于生成更贴近上下文的 mock 名称和描述。
         center_name = context["current_node"]["name"]
+
         if expand_type == "risk_factors":
-            # 赤潮风险因子扩展：生成风险因子和治理措施。
             return {
                 "nodes": [
                     {
@@ -74,7 +155,6 @@ class AIService:
                 ],
                 "edges": [
                     {
-                        # source_ref 可以直接使用中心节点 ID，ExpansionService 会映射为正式 source。
                         "source_ref": context["current_node"]["id"],
                         "target_name": "叶绿素浓度升高",
                         "relation": "affected_by",
@@ -82,7 +162,6 @@ class AIService:
                         "properties": {"description": f"{center_name} 受到叶绿素浓度升高影响。"},
                     },
                     {
-                        # 这里用中文节点名作为 source_ref，模拟 LLM 常见的“按名称引用本次节点”输出。
                         "source_ref": "叶绿素浓度升高",
                         "target_name": "加强近岸营养盐排放管控",
                         "relation": "mitigated_by",
@@ -92,8 +171,8 @@ class AIService:
                 ],
                 "summary": "识别出叶绿素浓度升高等赤潮风险因子。",
             }
+
         if expand_type == "monitoring_buoys":
-            # 监测浮标扩展：生成浮标和观测记录。
             return {
                 "nodes": [
                     {
@@ -125,8 +204,8 @@ class AIService:
                 ],
                 "summary": "补充了监测浮标和关键观测项。",
             }
+
         if expand_type == "ecological_species":
-            # 生态物种扩展：生成物种和渔业适宜区。
             return {
                 "nodes": [
                     {
@@ -151,7 +230,8 @@ class AIService:
                 ],
                 "summary": "补充了生态物种和渔场适宜性关联。",
             }
-        # 默认分支覆盖 related_events 等风险事件类扩展。
+
+        # 默认分支覆盖 related_events 等扩展
         return {
             "nodes": [
                 {
@@ -175,11 +255,8 @@ class AIService:
     def _mock_agent_answer(self, context: dict[str, Any]) -> str:
         """根据 agent_type 返回稳定的 mock 智能体回答。"""
         agent_type = context["agent_type"]
-
-        # 没有绑定节点时使用“目标海域”兜底，保证回答文本总是完整。
         node_name = (context.get("node") or {}).get("name", "目标海域")
 
-        # 每个 agent_type 固定一条领域化 mock 回答，便于前端调试不同页面。
         answers = {
             "red_tide": f"根据当前模拟观测数据，{node_name} 叶绿素和营养盐信号偏高，赤潮风险为中等。",
             "current_analysis": f"{node_name} 当前海流整体稳定，局部流速变化需要继续跟踪。",
@@ -189,15 +266,11 @@ class AIService:
             "fishery_assessment": f"{node_name} 渔业适宜性处于中等偏高水平，需关注赤潮风险对渔获的影响。",
         }
 
-        # 理论上 agent_type 已在 AgentService 校验；这里保留兜底，避免直接调用时报错。
         return answers.get(agent_type, "已完成 mock 智能体分析。")
 
     def _mock_report(self, context: dict[str, Any]) -> str:
         """返回稳定的 Markdown mock 报告。"""
-        # 标题由 ReportService 传入；缺省值用于直接调用 AIService 的兜底。
         title = context.get("title", "海洋分析报告")
-
-        # 报告正文尽量围绕节点名称；没有节点时使用通用称呼。
         node_name = (context.get("node") or {}).get("name", "目标海域")
         return (
             f"# {title}\n\n"

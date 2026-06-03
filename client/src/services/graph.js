@@ -5,9 +5,9 @@ export async function fetchGraph() {
     const res = await fetch('/api/graph')
     if (!res.ok) throw new Error(`Graph request failed: ${res.status}`)
     const json = await res.json()
-    return json.data ?? { nodes: [], edges: [] }
-  } catch {
-    return { nodes: [], edges: [] }
+    return { ok: true, data: json.data ?? { nodes: [], edges: [] } }
+  } catch (err) {
+    return { ok: false, error: err.message || '无法连接到后端服务', data: { nodes: [], edges: [] } }
   }
 }
 
