@@ -1,18 +1,16 @@
 <script setup>
-import { computed, onMounted, provide, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Bell, CircleHelp, FileText, Plus, Search, Sparkles } from 'lucide-vue-next'
 import SidebarNav from './components/SidebarNav.vue'
-import { fallbackDashboard, fetchDashboard } from './services/dashboard'
+import { useDashboardStore } from './stores/dashboard'
 
-const dashboard = ref(fallbackDashboard)
+const dashboard = useDashboardStore()
 const searchQuery = ref('')
 const showDropdown = ref(false)
 
 const router = useRouter()
 const route = useRoute()
-
-provide('dashboard', dashboard)
 
 const pages = [
   { label: '智能体检索', page: 'agents' },
@@ -40,7 +38,7 @@ const searchResults = computed(() => {
     p.label.toLowerCase().includes(q)
   )
 
-  const matchedAgents = dashboard.value.agents.filter(a =>
+  const matchedAgents = dashboard.data.agents.filter(a =>
     a.name.toLowerCase().includes(q)
     || a.description.toLowerCase().includes(q)
     || a.tags.some(t => t.toLowerCase().includes(q))
@@ -79,8 +77,8 @@ const searchPlaceholder = computed(() => {
   return '搜索页面 / 智能体'
 })
 
-onMounted(async () => {
-  dashboard.value = await fetchDashboard()
+onMounted(() => {
+  dashboard.fetch()
 })
 </script>
 

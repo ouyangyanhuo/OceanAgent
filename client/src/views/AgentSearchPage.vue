@@ -1,11 +1,12 @@
 <script setup>
-import { inject, ref } from 'vue'
+import { ref } from 'vue'
 import AgentCard from '../components/AgentCard.vue'
 import DataSources from '../components/DataSources.vue'
 import MetricCard from '../components/MetricCard.vue'
 import TaskFeed from '../components/TaskFeed.vue'
+import { useDashboardStore } from '../stores/dashboard'
 
-const dashboard = inject('dashboard')
+const dashboard = useDashboardStore()
 
 const toasts = ref([])
 let toastId = 0
@@ -22,7 +23,7 @@ function handleInvoke(agent) {
 <template>
   <section class="page agent-search-page min-w-0">
     <div class="metrics-grid agent-search-metrics min-w-0">
-      <MetricCard v-for="metric in dashboard.metrics" :key="metric.label" :metric="metric" />
+      <MetricCard v-for="metric in dashboard.data.metrics" :key="metric.label" :metric="metric" />
     </div>
 
     <div class="agent-search-layout min-w-0">
@@ -49,14 +50,14 @@ function handleInvoke(agent) {
             </select>
           </div>
           <div class="agent-grid expanded">
-            <AgentCard v-for="agent in dashboard.agents" :key="agent.name" :agent="agent" @invoke="handleInvoke" />
+            <AgentCard v-for="agent in dashboard.data.agents" :key="agent.name" :agent="agent" @invoke="handleInvoke" />
           </div>
         </section>
       </div>
 
       <aside class="agent-search-aside min-w-0">
-        <TaskFeed :tasks="dashboard.tasks" />
-        <DataSources :sources="dashboard.sources" />
+        <TaskFeed :tasks="dashboard.data.tasks" />
+        <DataSources :sources="dashboard.data.sources" />
       </aside>
     </div>
 

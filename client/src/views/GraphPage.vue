@@ -1,12 +1,12 @@
 <script setup>
-import { inject } from 'vue'
 import { Network } from 'lucide-vue-next'
 import DataSources from '../components/DataSources.vue'
 import KnowledgeGraph from '../components/KnowledgeGraph.vue'
 import MetricCard from '../components/MetricCard.vue'
 import TaskFeed from '../components/TaskFeed.vue'
+import { useDashboardStore } from '../stores/dashboard'
 
-const dashboard = inject('dashboard')
+const dashboard = useDashboardStore()
 </script>
 
 <template>
@@ -23,13 +23,13 @@ const dashboard = inject('dashboard')
       </div>
     </div>
     <div class="metrics-grid graph-metrics">
-      <MetricCard v-for="metric in dashboard.metrics" :key="metric.label" :metric="metric" />
+      <MetricCard v-for="metric in dashboard.data.metrics" :key="metric.label" :metric="metric" />
     </div>
     <div class="graph-page-grid">
       <KnowledgeGraph />
       <aside class="graph-aside">
-        <TaskFeed :tasks="dashboard.tasks" />
-        <DataSources :sources="dashboard.sources" />
+        <TaskFeed :tasks="dashboard.data.tasks" />
+        <DataSources :sources="dashboard.data.sources" />
       </aside>
     </div>
   </section>

@@ -43,7 +43,7 @@ git clone https://gitee.com/magneto110/OceanAgent
 | UI 样式库  | @heroui/styles                | 提供基础组件样式              |
 | 包管理器   | Bun (推荐) / npm              | 项目 lockfile 为 bun.lock     |
 | 路由       | Vue Router 4 (hash mode)      | 路由配置在 `src/router/index.js` |
-| 状态管理   | 无 Pinia/Vuex                 | 各组件本地 ref 管理状态       |
+| 状态管理   | Pinia                         | Dashboard store 在 `src/stores/dashboard.js` |
 
 ---
 
@@ -147,6 +147,9 @@ client/
     ├── router/                 # Vue Router 路由配置
     │   └── index.js                # 路由定义：6 个页面路由（懒加载）+ 根路径重定向
     │
+    ├── stores/                 # Pinia 状态管理
+    │   └── dashboard.js            # Dashboard 全局状态：数据 + 加载 + fetch
+    │
     ├── views/                  # 路由级页面组件（由 router-view 渲染）
     │   ├── AgentSearchPage.vue     # 智能体搜索页（默认首页）
     │   ├── GraphPage.vue           # 关系图谱页
@@ -195,6 +198,7 @@ client/
 | `styles.css`          | CSS 入口，@import 所有样式文件        |
 | `vite.config.js`      | 构建配置 + API 代理                   |
 | `dashboard.js`        | 唯一的 API 调用 + 全局 fallback 数据  |
+| `stores/dashboard.js` | Pinia store：全局 dashboard 状态管理   |
 | `SidebarNav.vue`      | 左侧导航栏                           |
 | `*Page.vue`           | 各页面组件（6 个页面）                |
 | `AgentCard.vue`       | 智能体展示卡片                       |
@@ -237,31 +241,32 @@ const routes = [
 ### 5.2 数据流
 
 ```
-dashboard.js::fetchDashboard()
+services/dashboard.js::fetchDashboard()
        │
        ▼  (成功则用 API 数据，失败则用 fallback 静态数据)
        │
-   App.vue::dashboard ref
+   stores/dashboard.js::useDashboardStore()
+       │  (Pinia store: data, loading, fetch)
        │
-       ├──► provide('dashboard', dashboard)
+       ├──► App.vue (搜索栏过滤 agents)
        │
-       ├──► AgentSearchPage (inject: dashboard)
-       │       ├──► MetricCard × 4  (dashboard.metrics)
-       │       ├──► AgentCard × 6   (dashboard.agents)
-       │       ├──► TaskFeed        (dashboard.tasks)
-       │       └──► DataSources     (dashboard.sources)
+       ├──► AgentSearchPage (useDashboardStore)
+       │       ├──► MetricCard × 4  (dashboard.data.metrics)
+       │       ├──► AgentCard × 6   (dashboard.data.agents)
+       │       ├──► TaskFeed        (dashboard.data.tasks)
+       │       └──► DataSources     (dashboard.data.sources)
        │
-       └──► GraphPage (inject: dashboard)
-               └──► KnowledgeGraph  (dashboard.graph)
+       └──► GraphPage (useDashboardStore)
+               └──► KnowledgeGraph  (dashboard.data.graph)
 ```
 
 其他页面（Q&A、渔业、航线、浮标）目前 **完全使用组件内部硬编码数据**，不依赖 `dashboard` props。
 
 ### 5.3 组件通信模式
 
+- **全局状态**：Pinia store 管理共享数据（如 dashboard），任何组件可直接使用
 - **父子通信**：Props 向下传，Events（emit）向上传
-- **无全局状态**：没有 Pinia/Vuex，每个组件自己管理状态
-- **兄弟通信**：通过父组件中转（如 SidebarNav → App.vue → Page）
+- **本地状态**：UI 相关状态（搜索框、下拉菜单、折叠面板等）使用组件内 `ref`
 
 ---
 
@@ -536,9 +541,11 @@ bun run build
 # 产物在 dist/ 目录下
 ```
 
-### Q: Vue Router 是如何使用的？
+### Q: Vue Router 和 Pinia 是如何使用的？
 
-项目使用 Vue Router 4 的 hash 模式（`createWebHashHistory`），路由配置在 `src/router/index.js`。页面组件放在 `src/views/` 目录下，通过动态 `import()` 懒加载。`App.vue` 使用 `<router-view>` 渲染页面，`SidebarNav` 使用 `<router-link>` 导航。共享数据（如 dashboard）通过 `provide`/`inject` 传递。
+项目使用 Vue Router 4 的 hash 模式（`createWebHashHistory`），路由配置在 `src/router/index.js`。页面组件放在 `src/views/` 目录下，通过动态 `import()` 懒加载。`App.vue` 使用 `<router-view>` 渲染页面，`SidebarNav` 使用 `<router-link>` 导航。
+
+全局状态通过 Pinia 管理，store 定义在 `src/stores/` 目录下。目前有一个 dashboard store，管理仪表盘数据的获取和缓存。组件中通过 `useDashboardStore()` 使用。
 
 ### Q: 如何添加新的 Lucide 图标？
 
