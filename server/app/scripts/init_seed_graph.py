@@ -93,12 +93,21 @@ def _generate_llm_seed() -> None:
         node_ref_by_name[stored.id] = stored.id
         print(f"  + 节点: {stored.name} ({stored.type})")
 
-    # 4. 将候选边写入图谱
+    # 4. 将候选边写入图谱（跳过引用不存在节点的边）
     for candidate in seed_result.get("edges", []):
         source_ref = candidate.get("source_ref", "")
         target_ref = candidate.get("target_ref") or candidate.get("target_name", "")
         source = node_ref_by_name.get(source_ref, source_ref)
         target = node_ref_by_name.get(target_ref, target_ref)
+
+        # 检查引用的节点是否存在，跳过悬挂边
+        existing_ids = {node.id for node in graph.nodes}
+        if source not in existing_ids:
+            print(f"  ⚠ 跳过边: source '{source_ref}' 解析为 '{source}' 但节点不存在")
+            continue
+        if target not in existing_ids:
+            print(f"  ⚠ 跳过边: target '{target_ref}' 解析为 '{target}' 但节点不存在")
+            continue
 
         edge = graph_service.build_edge(
             source=source,

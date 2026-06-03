@@ -23,7 +23,14 @@ validation_service = ValidationService()
 def get_graph() -> dict:
     """获取完整图谱。"""
     # mode="json" 会把模型转换为前端可直接消费的 dict/list/str/number。
-    return success(graph_service.get_graph().model_dump(mode="json"))
+    graph = graph_service.get_graph().model_dump(mode="json")
+    # 过滤掉引用不存在节点的悬挂边，防止前端渲染出错。
+    node_ids = {node["id"] for node in graph.get("nodes", [])}
+    graph["edges"] = [
+        edge for edge in graph.get("edges", [])
+        if edge["source"] in node_ids and edge["target"] in node_ids
+    ]
+    return success(graph)
 
 
 @router.get("/nodes/{node_id}")

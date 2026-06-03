@@ -1,6 +1,738 @@
 {
   "graph_id": "ocean_kg_demo_v1",
-  "version": 1,
-  "nodes": [],
-  "edges": []
+  "version": 44,
+  "nodes": [
+    {
+      "id": "buoy_a0ca3ecc",
+      "type": "Buoy",
+      "name": "渤海湾浮标",
+      "properties": {
+        "description": "位于渤海中部，实时监测水温、盐度、叶绿素等参数"
+      },
+      "expanded": {
+        "related_events": true
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-03T16:49:22",
+        "updated_at": "2026-06-03T16:50:09",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "buoy_f95cd0f4",
+      "type": "Buoy",
+      "name": "黄海浮标",
+      "properties": {
+        "description": "位于黄海北部，实时监测溶解氧、pH等参数"
+      },
+      "expanded": {
+        "risk_factors": true
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-03T16:49:22",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "buoy_e1991393",
+      "type": "Buoy",
+      "name": "东海浮标",
+      "properties": {
+        "description": "位于东海陆架区，实时监测海流、风速等参数"
+      },
+      "expanded": {
+        "monitoring_buoys": true
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-03T16:49:22",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_1e04b729",
+      "type": "Observation",
+      "name": "渤海叶绿素观测站",
+      "properties": {
+        "description": "长期观测渤海叶绿素浓度，数据范围0.5-20 mg/m³"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-03T16:49:22",
+        "updated_at": "2026-06-03T16:49:22",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_49753743",
+      "type": "Observation",
+      "name": "黄海溶解氧观测站",
+      "properties": {
+        "description": "长期观测黄海溶解氧含量，数据范围4-10 mg/L"
+      },
+      "expanded": {
+        "ecological_species": true
+      },
+      "metadata": {
+        "source": "seed",
+        "parent_node": null,
+        "created_at": "2026-06-03T16:49:22",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "red_tide_event_fd16e39a",
+      "type": "RedTideEvent",
+      "name": "渤海湾赤潮事件（2018年春季）",
+      "properties": {
+        "description": "2018年4月渤海湾发生赤潮，优势种为米氏凯伦藻，面积约300平方公里。"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_a0ca3ecc",
+        "created_at": "2026-06-03T16:50:09",
+        "updated_at": "2026-06-03T16:50:09",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_2d4d6655",
+      "type": "Observation",
+      "name": "渤海湾浮标叶绿素浓度峰值",
+      "properties": {
+        "description": "2018年4月监测叶绿素浓度达15 mg/m³，超过阈值。"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_a0ca3ecc",
+        "created_at": "2026-06-03T16:50:09",
+        "updated_at": "2026-06-03T16:50:09",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_b44d6cc8",
+      "type": "Observation",
+      "name": "渤海湾浮标溶解氧低值",
+      "properties": {
+        "description": "同期溶解氧降至4.5 mg/L，处于低氧状态。"
+      },
+      "expanded": {
+        "risk_factors": true
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_a0ca3ecc",
+        "created_at": "2026-06-03T16:50:09",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "species_e1809263",
+      "type": "Species",
+      "name": "小黄鱼",
+      "properties": {
+        "description": "黄海重要经济鱼类，对溶解氧敏感"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "species_3ca6b942",
+      "type": "Species",
+      "name": "带鱼",
+      "properties": {
+        "description": "黄海主要捕捞对象，适宜溶解氧范围6-9 mg/L"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "fishery_area_876fc070",
+      "type": "FisheryArea",
+      "name": "黄海北部渔场",
+      "properties": {
+        "description": "位于黄海北部，是小黄鱼和带鱼的主要产卵场"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_5751d918",
+      "type": "RiskFactor",
+      "name": "缺氧风险",
+      "properties": {
+        "description": "溶解氧低于4 mg/L时对鱼类生存构成威胁"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_84c8b6d5",
+      "type": "Observation",
+      "name": "黄海北部溶解氧观测",
+      "properties": {
+        "description": "2026年6月3日黄海浮标监测溶解氧为7.2 mg/L，处于正常范围"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_491603da",
+      "type": "RiskFactor",
+      "name": "黄海北部溶解氧降低风险",
+      "properties": {
+        "description": "溶解氧低于4 mg/L时可能引发鱼类窒息，是重要风险因子"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "red_tide_event_fb02086f",
+      "type": "RedTideEvent",
+      "name": "黄海北部赤潮预警",
+      "properties": {
+        "description": "基于浮标叶绿素a浓度异常升高，可能触发赤潮预警"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "prevention_measure_5211a1e4",
+      "type": "PreventionMeasure",
+      "name": "黄海浮标增氧措施",
+      "properties": {
+        "description": "通过曝气装置增加水体溶解氧，减轻低氧风险"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_dfba4327",
+      "type": "RiskFactor",
+      "name": "低氧风险",
+      "properties": {
+        "description": "溶解氧低于4 mg/L时对海洋生物造成胁迫的风险，常导致鱼类窒息死亡。"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_109bdf9e",
+      "type": "RiskFactor",
+      "name": "富营养化风险",
+      "properties": {
+        "description": "水体中氮磷等营养物质过剩，导致藻类过度繁殖，耗氧加剧，是低氧的主要诱因。"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_b2d8e194",
+      "type": "Observation",
+      "name": "渤海湾表层水温升高",
+      "properties": {
+        "description": "同期表层水温较常年偏高2°C，达到26°C，加剧溶解氧降低。"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "prevention_measure_0d1c7169",
+      "type": "PreventionMeasure",
+      "name": "底层曝气增氧",
+      "properties": {
+        "description": "通过曝气装置向底层水体补充氧气，提升溶解氧浓度，缓解低氧状态。"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_876a5bb3",
+      "type": "Observation",
+      "name": "东海浮标温度观测",
+      "properties": {
+        "description": "东海浮标监测的海水温度，2023年夏季平均值为22.5°C",
+        "value": 22.5,
+        "unit": "°C"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_b8c1d7c1",
+      "type": "Observation",
+      "name": "东海浮标盐度观测",
+      "properties": {
+        "description": "东海浮标监测的海水盐度，2023年夏季平均值为32.5‰",
+        "value": 32.5,
+        "unit": "‰"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_cc90ecb9",
+      "type": "Observation",
+      "name": "东海浮标叶绿素观测",
+      "properties": {
+        "description": "东海浮标监测的叶绿素a浓度，2023年夏季平均值为2.8 mg/m³",
+        "value": 2.8,
+        "unit": "mg/m³"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_e89be514",
+      "type": "Observation",
+      "name": "东海浮标溶解氧观测",
+      "properties": {
+        "description": "东海浮标监测的溶解氧浓度，2023年夏季平均值为6.5 mg/L",
+        "value": 6.5,
+        "unit": "mg/L"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_60317bd2",
+      "source": "buoy_a0ca3ecc",
+      "target": "red_tide_event_fd16e39a",
+      "relation": "has_risk_event",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_a0ca3ecc",
+        "created_at": "2026-06-03T16:50:09",
+        "updated_at": "2026-06-03T16:50:09",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_adac635f",
+      "source": "buoy_a0ca3ecc",
+      "target": "observation_2d4d6655",
+      "relation": "indicates",
+      "weight": 0.9,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_a0ca3ecc",
+        "created_at": "2026-06-03T16:50:09",
+        "updated_at": "2026-06-03T16:50:09",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_540ad86e",
+      "source": "buoy_a0ca3ecc",
+      "target": "observation_b44d6cc8",
+      "relation": "indicates",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_a0ca3ecc",
+        "created_at": "2026-06-03T16:50:09",
+        "updated_at": "2026-06-03T16:50:09",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_d2e4fd5c",
+      "source": "observation_49753743",
+      "target": "species_e1809263",
+      "relation": "correlated_with",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_aa455054",
+      "source": "observation_49753743",
+      "target": "species_3ca6b942",
+      "relation": "correlated_with",
+      "weight": 0.6,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_8c3bd0cf",
+      "source": "observation_49753743",
+      "target": "fishery_area_876fc070",
+      "relation": "correlated_with",
+      "weight": 0.5,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_a23a91fc",
+      "source": "observation_49753743",
+      "target": "risk_factor_5751d918",
+      "relation": "correlated_with",
+      "weight": 0.9,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_49753743",
+        "created_at": "2026-06-03T16:50:45",
+        "updated_at": "2026-06-03T16:50:45",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_2243aace",
+      "source": "buoy_f95cd0f4",
+      "target": "observation_84c8b6d5",
+      "relation": "indicates",
+      "weight": 0.9,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_6c5f801f",
+      "source": "buoy_f95cd0f4",
+      "target": "risk_factor_491603da",
+      "relation": "affected_by",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_b16460a5",
+      "source": "buoy_f95cd0f4",
+      "target": "red_tide_event_fb02086f",
+      "relation": "may_trigger",
+      "weight": 0.6,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_bc1abbdf",
+      "source": "buoy_f95cd0f4",
+      "target": "prevention_measure_5211a1e4",
+      "relation": "mitigated_by",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-03T16:51:24",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_30cfc567",
+      "source": "observation_b44d6cc8",
+      "target": "risk_factor_dfba4327",
+      "relation": "indicates",
+      "weight": 0.9,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_7d98a3c9",
+      "source": "observation_b44d6cc8",
+      "target": "risk_factor_109bdf9e",
+      "relation": "indicates",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_b78707a9",
+      "source": "observation_b44d6cc8",
+      "target": "observation_b2d8e194",
+      "relation": "affected_by",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_bc903ac2",
+      "source": "observation_b44d6cc8",
+      "target": "prevention_measure_0d1c7169",
+      "relation": "mitigated_by",
+      "weight": 0.6,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_b44d6cc8",
+        "created_at": "2026-06-03T16:58:43",
+        "updated_at": "2026-06-03T16:58:43",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_b4dd4c98",
+      "source": "buoy_e1991393",
+      "target": "observation_876a5bb3",
+      "relation": "has_observation",
+      "weight": 0.95,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_14c00917",
+      "source": "buoy_e1991393",
+      "target": "observation_b8c1d7c1",
+      "relation": "has_observation",
+      "weight": 0.95,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_4dd28fac",
+      "source": "buoy_e1991393",
+      "target": "observation_cc90ecb9",
+      "relation": "has_observation",
+      "weight": 0.95,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_95105ced",
+      "source": "buoy_e1991393",
+      "target": "observation_e89be514",
+      "relation": "has_observation",
+      "weight": 0.95,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_e1991393",
+        "created_at": "2026-06-03T16:59:07",
+        "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    }
+  ]
 }

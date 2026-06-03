@@ -99,6 +99,7 @@ const loadErrorMsg = ref('')
 const selectedNode = ref(null)
 const expandOptions = ref([])
 const expanding = ref(false)
+const expandingLabel = ref('')
 const searchQuery = ref('')
 const filterRelation = ref('all')
 const cyContainerRef = ref(null)
@@ -177,6 +178,7 @@ function toElements(nodes, edges) {
       color: NODE_TYPE_COLORS[n.type] || '#3b82f6',
       nodeType: n.type,
       size: n.type === 'SeaArea' ? 70 : 46,
+      isCore: n.type === 'SeaArea',
       raw: n,
     },
   }))
@@ -319,8 +321,16 @@ function initCytoscape() {
     boxSelectionEnabled: false,
   })
 
-  // 布局完成后消除任何残余重叠
-  cy.one('layoutstop', () => resolveOverlaps())
+  // 布局完成后消除重叠并聚焦中心节点
+  // 小图布局可能极快完成，用 ready + 延迟双重保障
+  cy.ready(() => {
+    resolveOverlaps()
+    focusCenterNode()
+  })
+  cy.one('layoutstop', () => {
+    resolveOverlaps()
+    focusCenterNode()
+  })
 
   // 事件绑定
   cy.on('tap', 'node', (evt) => {
@@ -358,9 +368,6 @@ function initCytoscape() {
   cy.on('free', 'node', () => {
     resolveOverlaps()
   })
-
-  // 聚焦中心节点
-  focusCenterNode()
 }
 
 /* ── 拖拽节点排斥周围节点 ── */
@@ -430,20 +437,15 @@ function resolveOverlaps() {
 
 /* ── 聚焦中心节点 ── */
 function focusCenterNode() {
-  if (!cy || graphNodes.value.length === 0) return
+  if (!cy || cy.nodes().length === 0) return
 
-  // 优先找 SeaArea 类型作为中心节点，否则取第一个节点
-  const centerNode = graphNodes.value.find((n) => n.type === 'SeaArea') || graphNodes.value[0]
-  const cyNode = cy.getElementById(centerNode.id)
-  if (!cyNode.length) return
+  // 取第一个节点
+  const firstNode = cy.nodes()[0]
+  if (!firstNode) return
 
-  // 布局完成后动画聚焦到中心节点
-  cy.animate({
-    center: { eles: cyNode },
-    zoom: 1.2,
-    duration: 600,
-    easing: 'ease-in-out-cubic',
-  })
+  // 用 fit 聚焦到该节点及其邻居，比 animate({ center }) 更可靠
+  const neighborhood = firstNode.neighborhood().add(firstNode)
+  cy.fit(neighborhood, 60)
 }
 
 /* ── 数据加载 ── */
@@ -531,6 +533,9 @@ async function loadExpandOptions(nodeId) {
 async function handleExpand(expandType) {
   if (!selectedNode.value || expanding.value) return
   expanding.value = true
+  // 找到对应扩展选项的中文标签
+  const opt = expandOptions.value.find((o) => o.expand_type === expandType)
+  expandingLabel.value = opt?.label || expandType
 
   const result = await apiExpandNode(selectedNode.value.id, expandType)
   if (result) {
@@ -768,6 +773,27 @@ onBeforeUnmount(() => {
         <div class="graph-loading-spinner"></div>
         <span>加载图谱数据...</span>
       </div>
+
+      <!-- 扩展动画覆盖层 -->
+      <Transition name="expand-overlay">
+        <div v-if="expanding" class="expand-overlay">
+          <div class="expand-overlay-content">
+            <div class="expand-radar">
+              <div class="expand-radar-ring"></div>
+              <div class="expand-radar-ring delay-1"></div>
+              <div class="expand-radar-ring delay-2"></div>
+              <div class="expand-radar-dot"></div>
+            </div>
+            <div class="expand-text">
+              <span class="expand-title">正在调用智能体</span>
+              <span class="expand-subtitle">搜寻「{{ expandingLabel }}」相关数据中...</span>
+            </div>
+            <div class="expand-progress">
+              <div class="expand-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+      </Transition>
 
       <!-- 图例 -->
       <div v-if="settings.showLegend && !loadError" class="legend">
@@ -1022,5 +1048,144 @@ onBeforeUnmount(() => {
   background: rgba(22, 141, 255, 0.3);
   border-color: rgba(39, 151, 255, 0.6);
   color: #93c5fd;
+}
+
+/* ── 扩展动画覆盖层 ── */
+.expand-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgba(4, 14, 30, 0.88);
+  backdrop-filter: blur(6px);
+}
+
+.expand-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+/* 雷达扫描动画 */
+.expand-radar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.expand-radar-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(34, 197, 94, 0.5);
+  animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.expand-radar-ring.delay-1 {
+  animation-delay: 0.5s;
+}
+
+.expand-radar-ring.delay-2 {
+  animation-delay: 1s;
+}
+
+.expand-radar-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 20px #22c55e, 0 0 40px rgba(34, 197, 94, 0.4);
+  animation: radar-dot 2s linear infinite;
+}
+
+@keyframes radar-ping {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes radar-dot {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 文字 */
+.expand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.expand-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.04em;
+}
+
+.expand-subtitle {
+  font-size: 14px;
+  color: #60a5fa;
+  animation: text-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 进度条 */
+.expand-progress {
+  width: 240px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(75, 143, 210, 0.2);
+  overflow: hidden;
+}
+
+.expand-progress-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  animation: progress-slide 2s ease-in-out infinite;
+}
+
+@keyframes progress-slide {
+  0% { width: 0%; margin-left: 0; }
+  50% { width: 60%; margin-left: 20%; }
+  100% { width: 0%; margin-left: 100%; }
+}
+
+/* 过渡动画 */
+.expand-overlay-enter-active {
+  animation: overlay-in 0.3s ease-out;
+}
+
+.expand-overlay-leave-active {
+  animation: overlay-in 0.25s ease-in reverse;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+  }
 }
 </style>

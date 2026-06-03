@@ -7,6 +7,11 @@
 from functools import lru_cache
 from os import getenv
 
+from dotenv import load_dotenv
+
+# 加载 .env 文件，已有的环境变量不会被覆盖。
+load_dotenv()
+
 from pydantic import BaseModel
 
 
