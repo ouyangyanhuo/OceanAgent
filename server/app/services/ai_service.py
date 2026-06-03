@@ -32,10 +32,15 @@ class AIService:
                 model=self.settings.llm_model,
                 timeout=self.settings.llm_timeout,
             )
-            logger.info("AIService 已连接 LLM: %s / %s", self.settings.llm_base_url, self.settings.llm_model)
+            msg = f"[AIService] ✅ 真实 LLM 模式: {self.settings.llm_base_url} / {self.settings.llm_model}"
+            print(msg)
+            logger.info(msg)
         else:
             self.llm_client = None
-            logger.info("AIService 运行在 mock 模式（未配置 LLM_API_KEY）")
+            reason = "LLM_PROVIDER=mock" if self.settings.llm_provider == "mock" else "LLM_API_KEY 未设置"
+            msg = f"[AIService] ⚠️  Mock 模式 ({reason})"
+            print(msg)
+            logger.info(msg)
 
     # ── 公开接口 ──────────────────────────────────────────────
 

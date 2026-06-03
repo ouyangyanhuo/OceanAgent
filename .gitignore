@@ -13,7 +13,7 @@ client/dist/
 .codex/
 .claude/
 .agents/
-
+.env
 CLAUDE.md
 dev-doc/
 dev.md
