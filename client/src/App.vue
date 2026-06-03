@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Bell, CircleHelp, FileText, Plus, Search, Sparkles } from 'lucide-vue-next'
 import SidebarNav from './components/SidebarNav.vue'
+import StatusBar from './components/StatusBar.vue'
 import { useDashboardStore } from './stores/dashboard'
 
 const dashboard = useDashboardStore()
@@ -69,12 +70,7 @@ function onSearchBlur() {
 
 const searchPlaceholder = computed(() => {
   const path = route.path
-  if (path === '/qa') return '搜索生态知识 / 数据源 / 关系节点'
-  if (path === '/fishery') return '搜索渔场 / 鱼种 / 评估指标'
-  if (path === '/route') return '搜索航线 / 港口 / 气象海况'
-  if (path === '/buoy') return '搜索浮标 / 传感器 / 异常记录'
-  if (path === '/graph') return '搜索关系节点 / 数据源 / 图谱实体'
-  return '搜索页面 / 智能体'
+  return '搜索页面 / 知识 /智能体'
 })
 
 onMounted(() => {
@@ -153,13 +149,7 @@ onMounted(() => {
       <main class="workspace min-w-0">
         <router-view />
 
-        <footer class="statusbar">
-          <span>系统状态 <b class="dot"></b> 运行正常</span>
-          <span>数据更新 <strong>2 分钟前</strong></span>
-          <span>服务负载 <i><em style="width:42%"></em></i> 42%</span>
-          <span>存储使用 <i><em style="width:68%"></em></i> 68%</span>
-          <span>当前时间 <strong>2025-05-24&nbsp;&nbsp;10:30:45</strong></span>
-        </footer>
+        <StatusBar />
       </main>
     </div>
   </div>

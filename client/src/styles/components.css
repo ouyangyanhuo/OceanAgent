@@ -190,17 +190,53 @@ p {
 
 .agent-card {
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.5s cubic-bezier(0.32, 0.72, 0, 1), border-color 0.3s ease;
 }
 
 .agent-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  border-color: rgba(60, 154, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(60, 154, 255, 0.15);
+  border-color: rgba(60, 154, 255, 0.4);
+}
+
+.agent-card:hover .agent-glow {
+  opacity: 1;
+}
+
+.agent-card:hover .agent-icon {
+  transform: scale(1.05);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.agent-card:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 0.1s;
 }
 
 .agent-card.called {
   border-color: rgba(34, 221, 120, 0.35);
+}
+
+.agent-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(60, 154, 255, 0.08), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.agent-icon {
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.agent-status {
+  color: #2dff91;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .toast-container {
@@ -1093,6 +1129,10 @@ p {
 .statusbar span:first-child {
   border-left: 0;
   padding-left: 0;
+}
+
+.statusbar span:last-child {
+  margin-left: auto;
 }
 
 .statusbar strong {

@@ -21,18 +21,22 @@ function handleInvoke(e) {
 <template>
   <article class="agent-card" :class="[`tone-${agent.tone}`, { called }]" @click="handleInvoke">
     <div class="agent-icon">
-      <component :is="icons[agent.name.length % icons.length]" :size="30" />
+      <component :is="icons[agent.name.length % icons.length]" :size="28" />
     </div>
     <div class="agent-body">
       <div class="agent-title">
         <h2>{{ agent.name }}</h2>
-        <span>{{ agent.status }}</span>
+        <span class="agent-status">{{ agent.status }}</span>
       </div>
       <p>{{ agent.description }}</p>
       <div class="agent-footer">
         <div class="tags"><span v-for="tag in agent.tags" :key="tag">{{ tag }}</span></div>
-        <button :class="{ 'btn-called': called }">{{ called ? '已调用' : '调用' }}</button>
+        <button :class="{ 'btn-called': called }" @click.stop="handleInvoke">
+          {{ called ? '已调用' : '调用' }}
+        </button>
       </div>
     </div>
+    <!-- Hover glow effect -->
+    <div class="agent-glow"></div>
   </article>
 </template>

@@ -53,8 +53,41 @@
 }
 
 .agent-grid.expanded {
-  grid-template-columns: repeat(3, minmax(230px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   align-items: stretch;
+}
+
+.agent-search-panel .agent-card {
+  min-height: 200px;
+  padding: 24px 20px;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.agent-search-panel .agent-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.agent-search-panel .agent-title h2 {
+  font-size: 18px;
+}
+
+.agent-search-panel .agent-body p {
+  min-height: 50px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.agent-search-panel .agent-footer {
+  margin-top: auto;
+}
+
+.agent-search-panel .tags span {
+  font-size: 13px;
+  padding: 5px 10px;
 }
 
 .agent-card {

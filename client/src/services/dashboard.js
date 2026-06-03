@@ -6,8 +6,6 @@ export const fallbackDashboard = {
     { label: '关系边数', value: '201,856', trend: '9.8%', tone: 'violet', sparkline: [24, 27, 25, 34, 31, 45, 36, 41, 49, 35, 52, 42] },
   ],
   agents: [
-    { name: '海流分析智能体', description: '基于多源数据的海流动力分析与趋势预测智能体', tags: ['海洋监测', '海流分析'], tone: 'blue', status: '在线' },
-    { name: '赤潮预警智能体', description: '赤潮监测、识别与预测的专业智能体', tags: ['生态分析', '灾害预警'], tone: 'rose', status: '在线' },
     { name: '渔场评估智能体', description: '渔场环境评估与渔获量预测智能体', tags: ['渔业分析', '资源评估'], tone: 'teal', status: '在线' },
     { name: '航线优化智能体', description: '基于气象海况的航线规划与优化智能体', tags: ['航运预测', '航线优化'], tone: 'violet', status: '在线' },
     { name: '海洋生态问答智能体', description: '海洋生态知识问答与解读智能体', tags: ['生态分析', '知识问答'], tone: 'cyan', status: '在线' },

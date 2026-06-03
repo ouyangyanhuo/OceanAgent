@@ -69,7 +69,7 @@ button {
   flex-direction: column;
   width: 216px;
   flex-shrink: 0;
-  transition: width 0.3s ease;
+  transition: width 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .sidebar.collapsed {
@@ -79,9 +79,9 @@ button {
 .sidebar .toggle-btn {
   margin-top: auto;
   width: 100%;
-  height: 48px;
+  height: 44px;
   border-radius: 0;
-  border-top: 1px solid rgba(39, 151, 255, 0.15);
+  border-top: 1px solid rgba(39, 151, 255, 0.12);
 }
 
 .brand {
@@ -156,27 +156,27 @@ button {
 .sidebar .toggle-btn {
   margin-top: auto;
   width: 100%;
-  height: 48px;
+  height: 44px;
   border-radius: 0;
-  border-top: 1px solid rgba(39, 151, 255, 0.15);
+  border-top: 1px solid rgba(39, 151, 255, 0.12);
   border-bottom: none;
-  color: #8cb9d5;
-  background: rgba(4, 18, 35, 0.5);
+  color: #6a9cc0;
+  background: rgba(4, 18, 35, 0.4);
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.3s ease, background 0.3s ease;
 }
 
 .sidebar .toggle-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: #a8d8ff;
+  background: rgba(0, 166, 255, 0.08);
 }
 
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   padding: 12px 8px;
   flex: 1;
 }
@@ -184,11 +184,11 @@ button {
 .sidebar nav button,
 .sidebar nav a {
   position: relative;
-  height: 52px;
-  padding: 0 20px;
+  height: 48px;
+  padding: 0 18px;
   border: 0;
-  border-radius: 8px;
-  color: #c5d8f0;
+  border-radius: 10px;
+  color: #8bacc8;
   background: transparent;
   display: flex;
   align-items: center;
@@ -196,6 +196,13 @@ button {
   overflow: hidden;
   white-space: nowrap;
   text-decoration: none;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+
+.sidebar nav button:hover,
+.sidebar nav a:hover {
+  color: #d0e8ff;
+  background: rgba(0, 166, 255, 0.06);
 }
 
 .sidebar.collapsed nav button,
@@ -213,20 +220,19 @@ button {
 .sidebar button.active,
 .sidebar a.active {
   color: #fff;
-  background: linear-gradient(90deg, rgba(0, 166, 255, 0.55), rgba(0, 166, 255, 0.08));
-  box-shadow: inset 4px 0 0 #13ddff;
+  background: linear-gradient(90deg, rgba(0, 166, 255, 0.18), transparent);
 }
 
-.sidebar button.active::after,
-.sidebar a.active::after {
-  content: "";
+.sidebar .active-indicator {
   position: absolute;
-  right: 0;
-  width: 5px;
-  height: 40px;
-  border-radius: 8px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  border-radius: 0 3px 3px 0;
   background: #13ddff;
-  box-shadow: 0 0 16px #13ddff;
+  box-shadow: 0 0 12px rgba(19, 221, 255, 0.5);
 }
 
 .radar-art {
@@ -278,22 +284,29 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
-  padding: 0 20px 0 0;
+  padding: 0 24px 0 0;
   background: rgba(4, 17, 35, 0.95);
   min-height: 64px;
   flex-shrink: 0;
 }
 
 .global-search {
-  height: 48px;
+  height: 42px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 18px;
-  border: 1px solid rgba(35, 137, 255, 0.5);
-  border-radius: 8px;
+  gap: 10px;
+  padding: 0 16px;
+  border: 1px solid rgba(35, 137, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(5, 22, 43, 0.7);
+  color: #7ab0d8;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.global-search:focus-within {
+  border-color: rgba(35, 137, 255, 0.5);
   background: rgba(5, 22, 43, 0.9);
-  color: #9ec8e7;
+  box-shadow: 0 0 0 3px rgba(35, 137, 255, 0.1);
 }
 
 .global-search input,
@@ -304,53 +317,76 @@ button {
   outline: 0;
   background: transparent;
   color: #dff7ff;
+  font-size: 13px;
+}
+
+.global-search input::placeholder {
+  color: rgba(122, 176, 216, 0.5);
 }
 
 .top-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 15px;
+  gap: 8px;
   min-width: 0;
 }
 
 .icon-button {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: 0;
-  color: #d5eaff;
+  border-radius: 8px;
+  color: #8bacc8;
   background: transparent;
   display: grid;
   place-items: center;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+
+.icon-button:hover {
+  color: #d0e8ff;
+  background: rgba(0, 166, 255, 0.08);
 }
 
 .icon-button.alert span {
   position: absolute;
-  top: 3px;
-  right: 0;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 12px;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 10px;
   background: #ff3d54;
   color: #fff;
-  font-size: 11px;
-  line-height: 20px;
+  font-size: 10px;
+  line-height: 18px;
+  box-shadow: 0 0 8px rgba(255, 61, 84, 0.4);
 }
 
 .user-chip {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #e6f7ff;
+  color: #c5d8f0;
   white-space: nowrap;
+  padding: 4px 12px 4px 4px;
+  border-radius: 24px;
+  background: rgba(0, 166, 255, 0.06);
+  border: 1px solid rgba(0, 166, 255, 0.1);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.user-chip:hover {
+  background: rgba(0, 166, 255, 0.1);
+  border-color: rgba(0, 166, 255, 0.2);
 }
 
 .avatar {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1px solid #73d9ff;
+  border: 1px solid rgba(115, 217, 255, 0.3);
   background:
     radial-gradient(circle at 52% 38%, #b5eaff 0 10%, transparent 11%),
     linear-gradient(150deg, #7cd8ff, #164c91 55%, #10213d);
@@ -359,20 +395,34 @@ button {
 .primary-action,
 .agent-footer button {
   min-height: 36px;
-  border: 1px solid rgba(83, 171, 255, 0.8);
+  border: 1px solid rgba(83, 171, 255, 0.6);
   border-radius: 8px;
   color: #fff;
   background: linear-gradient(135deg, #1488ff, #0952f5);
-  box-shadow: 0 0 18px rgba(16, 118, 255, 0.32);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.primary-action:hover,
+.agent-footer button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(16, 118, 255, 0.4);
+  border-color: rgba(83, 171, 255, 0.8);
+}
+
+.primary-action:active,
+.agent-footer button:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 0.1s;
 }
 
 .primary-action {
-  height: 48px;
+  height: 38px;
   padding: 0 18px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 13px;
   white-space: nowrap;
 }
 

@@ -12,7 +12,6 @@ const sourceIcons = [RadioTower, Ship, Satellite, Cloud, Waves]
   <section class="panel compact-panel">
     <header class="panel-header">
       <h2><RadioTower :size="20" />海域数据接入</h2>
-      <button>查看更多 ›</button>
     </header>
     <div class="source-grid">
       <article v-for="(source, index) in sources" :key="source.name" :class="`tone-${source.tone}`">
@@ -24,6 +23,5 @@ const sourceIcons = [RadioTower, Ship, Satellite, Cloud, Waves]
         <b>{{ source.count }}</b>
       </article>
     </div>
-    <a class="access-link">接入管理 ›</a>
   </section>
 </template>

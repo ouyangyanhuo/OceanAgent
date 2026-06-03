@@ -10,7 +10,6 @@ defineProps({
   <section class="panel compact-panel">
     <header class="panel-header">
       <h2><ClipboardList :size="20" />任务动态</h2>
-      <button>查看更多 ›</button>
     </header>
     <div class="timeline">
       <article v-for="task in tasks" :key="task.time + task.title" :class="`tone-${task.tone}`">
