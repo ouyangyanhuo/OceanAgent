@@ -357,6 +357,49 @@ onMounted(() => {
               </article>
             </div>
           </section>
+
+          <section class="panel detail-table compact">
+            <header class="panel-header"><h2>航线方案对比</h2></header>
+            <table>
+              <thead>
+                <tr>
+                  <th>方案</th><th>航程</th><th>时间</th><th>燃油</th><th>节油率</th><th>风险</th><th>评分</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(row, index) in plans"
+                  :key="row[0]"
+                  :class="{ 'optimal-row': index === 0 }"
+                  style="cursor:pointer"
+                >
+                  <td>
+                    <span v-if="index === 0" class="optimal-tag">★ {{ row[0] }}</span>
+                    <span v-else>{{ row[0] }}</span>
+                  </td>
+                  <td>{{ row[1] }} <small class="unit">km</small></td>
+                  <td>{{ row[2] }} <small class="unit">h</small></td>
+                  <td>{{ row[3] }} <small class="unit">吨</small></td>
+                  <td>
+                    <span v-if="index === 0" class="highlight-value">{{ row[4] }}</span>
+                    <span v-else>{{ row[4] }}</span>
+                  </td>
+                  <td><span :class="['risk-badge', 'risk-' + row[5]]">{{ row[5] }}</span></td>
+                  <td>
+                    <span v-if="index === 0" class="star-rating best">{{ row[6] }}</span>
+                    <span v-else>{{ row[6] }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="panel qa-advice-panel">
+            <header class="panel-header"><h2>智能优化建议</h2></header>
+            <article><Navigation :size="18" /><span>推荐当前推荐航线 A1，综合能效与风险表现最佳。</span></article>
+            <article><AlertTriangle :size="18" /><span>关注强风大浪区域，建议巡航阶段保持安全距离。</span></article>
+            <article><Fuel :size="18" /><span>优化航速可进一步节油，预计节省燃油 2.3 吨。</span></article>
+          </section>
         </div>
       </div>
 
@@ -409,42 +452,6 @@ onMounted(() => {
         </section>
 
         <section class="panel detail-table compact">
-          <header class="panel-header"><h2>航线方案对比</h2></header>
-          <table>
-            <thead>
-              <tr>
-                <th>方案</th><th>航程</th><th>时间</th><th>燃油</th><th>节油率</th><th>风险</th><th>评分</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(row, index) in plans"
-                :key="row[0]"
-                :class="{ 'optimal-row': index === 0 }"
-                style="cursor:pointer"
-              >
-                <td>
-                  <span v-if="index === 0" class="optimal-tag">★ {{ row[0] }}</span>
-                  <span v-else>{{ row[0] }}</span>
-                </td>
-                <td>{{ row[1] }} <small class="unit">km</small></td>
-                <td>{{ row[2] }} <small class="unit">h</small></td>
-                <td>{{ row[3] }} <small class="unit">吨</small></td>
-                <td>
-                  <span v-if="index === 0" class="highlight-value">{{ row[4] }}</span>
-                  <span v-else>{{ row[4] }}</span>
-                </td>
-                <td><span :class="['risk-badge', 'risk-' + row[5]]">{{ row[5] }}</span></td>
-                <td>
-                  <span v-if="index === 0" class="star-rating best">{{ row[6] }}</span>
-                  <span v-else>{{ row[6] }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <section class="panel detail-table compact">
           <header class="panel-header"><h2>航段风险列表</h2></header>
           <table>
             <tbody>
@@ -457,13 +464,6 @@ onMounted(() => {
               </tr>
             </tbody>
           </table>
-        </section>
-
-        <section class="panel qa-advice-panel">
-          <header class="panel-header"><h2>智能优化建议</h2></header>
-          <article><Navigation :size="18" /><span>推荐当前推荐航线 A1，综合能效与风险表现最佳。</span></article>
-          <article><AlertTriangle :size="18" /><span>关注强风大浪区域，建议巡航阶段保持安全距离。</span></article>
-          <article><Fuel :size="18" /><span>优化航速可进一步节油，预计节省燃油 2.3 吨。</span></article>
         </section>
       </aside>
     </div>
@@ -559,14 +559,16 @@ onMounted(() => {
 <style scoped>
 /* ── 航线主页特定样式 ── */
 
-.route-main-area {
-  display: grid;
+.route-main-area.route-main-area {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
-.route-aside {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
+.route-aside.route-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .metric-item-hover {
