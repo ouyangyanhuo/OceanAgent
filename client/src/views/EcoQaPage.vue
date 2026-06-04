@@ -1,8 +1,12 @@
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
-import { Bot, Leaf, MessageSquare, Search, Send, Settings } from 'lucide-vue-next'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { Bot, Leaf, LoaderCircle, MessageSquare, Search, Send, Settings, Trash2 } from 'lucide-vue-next'
+import { marked } from 'marked'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
+
+// marked 配置：启用 GFM，禁止 HTML 注入
+marked.setOptions({ gfm: true, breaks: true })
 
 const metrics = [
   { label: '今日问答量', value: '2,184', trend: '18.7%', tone: 'blue', sparkline: [25, 24, 31, 28, 37, 33, 44, 32, 38, 40, 36, 48] },
@@ -25,11 +29,13 @@ const defaultMessages = [
 const messages = ref([...defaultMessages])
 const inputText = ref('')
 const isTyping = ref(false)
+const thinkingPhase = ref('')       // 'keyword' | 'search' | 'think' | ''
+const statusMessage = ref('')
 const messagesEl = ref(null)
 const showConfig = ref(false)
 const relatedNodes = ref([])
 const relatedEdges = ref([])
-const streamError = ref('')
+let abortController = null          // 用于取消进行中的请求
 
 const modelInfo = ref([
   { name: '海洋生态问答智能体', version: 'v2.3', online: true, desc: '面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体，支持多轮对话与上下文理解', tokens: '128K' },
@@ -56,6 +62,16 @@ const donutSegments = [
   }
 })
 
+/** 将 markdown 文本渲染为安全 HTML */
+function renderMarkdown(text) {
+  if (!text) return ''
+  try {
+    return marked.parse(text)
+  } catch {
+    return text
+  }
+}
+
 function scrollToBottom() {
   nextTick(() => {
     if (messagesEl.value) {
@@ -66,9 +82,8 @@ function scrollToBottom() {
 
 /**
  * 解析 SSE 文本流，按 event/data 分发回调。
- * 返回 Promise，在流结束或出错时 resolve。
  */
-async function consumeSSE(reader, onContent, onDone) {
+async function consumeSSE(reader, { onStatus, onContent, onDone }) {
   const decoder = new TextDecoder()
   let buffer = ''
   let currentEvent = ''
@@ -88,7 +103,9 @@ async function consumeSSE(reader, onContent, onDone) {
         const dataStr = line.slice(6)
         try {
           const data = JSON.parse(dataStr)
-          if (currentEvent === 'content') {
+          if (currentEvent === 'status') {
+            onStatus(data)
+          } else if (currentEvent === 'content') {
             onContent(data.text || '')
           } else if (currentEvent === 'done') {
             onDone(data)
@@ -111,12 +128,16 @@ async function sendMessage() {
   scrollToBottom()
 
   isTyping.value = true
-  streamError.value = ''
+  thinkingPhase.value = 'keyword'
+  statusMessage.value = '正在提取关键词...'
   relatedNodes.value = []
   relatedEdges.value = []
 
+  // 创建新的 AbortController
+  abortController = new AbortController()
+
   // 添加空的 bot 消息占位，后续流式填充
-  const botMsg = { role: 'bot', text: '' }
+  const botMsg = { role: 'bot', text: '', streaming: false }
   messages.value.push(botMsg)
   scrollToBottom()
 
@@ -125,6 +146,7 @@ async function sendMessage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: text }),
+      signal: abortController.signal,
     })
 
     if (!resp.ok) {
@@ -133,30 +155,46 @@ async function sendMessage() {
 
     const reader = resp.body.getReader()
 
-    await consumeSSE(
-      reader,
-      // onContent: 流式追加文本
-      (chunk) => {
+    await consumeSSE(reader, {
+      onStatus(data) {
+        thinkingPhase.value = data.phase || 'think'
+        statusMessage.value = data.message || ''
+        scrollToBottom()
+      },
+      onContent(chunk) {
+        // 收到第一个内容块时，结束"思考中"状态
+        if (!botMsg.streaming) {
+          botMsg.streaming = true
+          thinkingPhase.value = ''
+          statusMessage.value = ''
+        }
         botMsg.text += chunk
         scrollToBottom()
       },
-      // onDone: 接收图谱检索结果
-      (data) => {
+      onDone(data) {
         if (data.related_nodes) relatedNodes.value = data.related_nodes
         if (data.related_edges) relatedEdges.value = data.related_edges
       },
-    )
+    })
 
     // 流结束但没有收到任何内容时的兜底
     if (!botMsg.text) {
       botMsg.text = '未能获取到回答，请稍后重试。'
     }
   } catch (err) {
-    console.error('QA 流式请求失败:', err)
-    streamError.value = err.message
-    botMsg.text = botMsg.text || '请求失败，请检查网络或后端服务是否正常运行。'
+    if (err.name === 'AbortError') {
+      // 用户主动取消，不显示错误
+      botMsg.text = botMsg.text || '已取消。'
+    } else {
+      console.error('QA 流式请求失败:', err)
+      botMsg.text = botMsg.text || '⚠️ 请求失败，请检查网络或后端服务是否正常运行。'
+    }
   } finally {
+    botMsg.streaming = false
     isTyping.value = false
+    thinkingPhase.value = ''
+    statusMessage.value = ''
+    abortController = null
     scrollToBottom()
   }
 }
@@ -174,12 +212,17 @@ function fillPrompt(text) {
 }
 
 function clearMessages() {
-  messages.value = []
+  // 如果正在流式输出，先取消请求
+  if (abortController) {
+    abortController.abort()
+  }
+  isTyping.value = false
+  thinkingPhase.value = ''
+  statusMessage.value = ''
   relatedNodes.value = []
   relatedEdges.value = []
-  nextTick(() => {
-    messages.value = [...defaultMessages]
-  })
+  messages.value = []
+  scrollToBottom()
 }
 
 onMounted(() => {
@@ -206,6 +249,12 @@ onMounted(() => {
   }, '-=0.3')
 
   scrollToBottom()
+})
+
+onUnmounted(() => {
+  if (abortController) {
+    abortController.abort()
+  }
 })
 </script>
 
@@ -236,16 +285,24 @@ onMounted(() => {
 
         <!-- Chat panel -->
         <section class="panel chat-panel">
-          <header class="panel-header"><h2>生态问答对话</h2><button @click="clearMessages">清空对话</button></header>
+          <header class="panel-header">
+            <h2>生态问答对话</h2>
+            <button class="clear-btn" @click="clearMessages"><Trash2 :size="14" /> 清空对话</button>
+          </header>
           <div ref="messagesEl" class="messages">
-            <article v-for="(message, index) in messages" :key="index" :class="message.role">
-              <span><component :is="message.role === 'user' ? Leaf : Bot" :size="18" /></span>
-              <p v-if="message.text">{{ message.text }}</p>
-              <p v-else><i class="typing-dots"><b></b><b></b><b></b></i></p>
-            </article>
-            <article v-if="isTyping && !messages.some(m => m.role === 'bot' && !m.text)" class="bot typing-indicator">
-              <span><Bot :size="18" /></span>
-              <p><i class="typing-dots"><b></b><b></b><b></b></i></p>
+            <article v-for="(message, index) in messages" :key="index" :class="[message.role, { streaming: message.streaming }]">
+              <span class="msg-avatar"><component :is="message.role === 'user' ? Leaf : Bot" :size="18" /></span>
+              <!-- 用户消息：纯文本 -->
+              <p v-if="message.role === 'user'" class="msg-body">{{ message.text }}</p>
+              <!-- Bot 消息：有内容时渲染 Markdown -->
+              <div v-else-if="message.text" class="msg-body md-content" v-html="renderMarkdown(message.text)"></div>
+              <!-- Bot 消息：无内容且正在思考 -->
+              <div v-else class="msg-body thinking-body">
+                <div class="thinking-indicator">
+                  <LoaderCircle :size="16" class="spin" />
+                  <span>{{ statusMessage || 'AI 思考中...' }}</span>
+                </div>
+              </div>
             </article>
           </div>
           <div class="prompt-chips">

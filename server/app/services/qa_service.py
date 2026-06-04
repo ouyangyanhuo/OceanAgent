@@ -47,14 +47,17 @@ class QaService:
         """生态问答主流程：关键词提取 → 图谱检索 → 流式回答。
 
         Yields SSE 格式的字符串，每条以 "data: " 开头，末尾 \\n\\n。
+        - status 事件：阶段状态（keyword / search / think）
         - content 事件：回答文本增量
         - done 事件：包含 related_nodes / related_edges 的结束标记
         """
         # ① 关键词提取
+        yield self._sse_event("status", {"phase": "keyword", "message": "正在提取关键词..."})
         keywords = self._extract_keywords(query)
         logger.info("[QaService] 提取关键词: %s", keywords)
 
         # ② 图谱检索
+        yield self._sse_event("status", {"phase": "search", "message": "正在检索知识图谱..."})
         graph_context = self.graph_service.search_by_keywords(keywords)
         related_nodes = [n.model_dump(mode="json") if hasattr(n, "model_dump") else n for n in graph_context["nodes"]]
         related_edges = [e.model_dump(mode="json") if hasattr(e, "model_dump") else e for e in graph_context["edges"]]
@@ -63,6 +66,7 @@ class QaService:
                      len(matched_nodes), len(related_nodes), len(related_edges))
 
         # ③ 构建上下文并流式生成回答
+        yield self._sse_event("status", {"phase": "think", "message": "AI 正在思考..."})
         if self.llm_client:
             yield from self._real_stream_answer(query, related_nodes, related_edges)
         else:
