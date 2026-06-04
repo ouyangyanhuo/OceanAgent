@@ -1,5 +1,7 @@
 <script setup>
-import { Bot, Brain, Cloud, Database, Flame, Leaf, MessageSquare, Send, Settings, Share2 } from 'lucide-vue-next'
+import { nextTick, onMounted, ref } from 'vue'
+import { Bot, Leaf, MessageSquare, Send, Settings } from 'lucide-vue-next'
+import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 
 const metrics = [
@@ -9,7 +11,7 @@ const metrics = [
   { label: '热点生态主题', value: '海草床、珊瑚礁、红树林', trend: '5个', tone: 'rose', sparkline: [18, 20, 26, 22, 31, 25, 34, 30, 39, 35, 44, 41] },
 ]
 
-const messages = [
+const defaultMessages = [
   ['user', '什么是海草床？它对海洋生态系统有哪些作用？'],
   ['bot', '海草床是由海草植物在浅海海底形成的重要生态系统。它具有重要的生态功能：提供栖息与繁殖场所、固定沉积物改善水质、吸收和储存碳、支撑渔业资源并促进生物多样性。'],
   ['user', '中国沿海有哪些典型的海草床分布区域？'],
@@ -20,128 +22,311 @@ const messages = [
   ['bot', '近岸生态修复应优先关注水体营养盐、溶解氧、透明度、底质类型、生境连通性、关键物种恢复情况和人为扰动强度。对海草床、红树林和珊瑚礁等不同生态系统，还需要分别跟踪覆盖度、幼苗成活率、白化率和群落结构变化。'],
 ]
 
-const cards = [
-  ['珊瑚礁生态系统', '生命热区', '提供栖息地、食物和护岸屏障，是高价值海洋生态服务。', '98%', '126'],
-  ['海草床生态系统', '生态系统', '高生产力的浅海生态系统，具有固碳、净化水质和保护海岸功能。', '95%', '98'],
-  ['红树林生态系统', '生态系统', '分布在热带与亚热带海岸，具有防波护岸和碳汇功能。', '97%', '110'],
-  ['赤潮事件', '灾害风险', '由藻类异常增殖引发，可能导致缺氧、鱼类死亡和生态灾害。', '93%', '76'],
+const botReplies = [
+  '这是一个很好的海洋生态问题。根据知识库中的文献和监测数据分析，海洋生态系统是一个复杂的相互关联的系统，需要从多维度进行综合评估。',
+  '根据最新的海洋监测数据和学术研究表明，该领域近年来取得了显著进展。建议参考国家海洋科学数据中心的最新报告获取详细信息。',
+  '从生态学角度分析，这一问题涉及多个关键因素：水文条件、营养盐循环、生物群落结构以及人类活动影响。综合来看，需要采取多层次的保护与修复策略。',
+  '基于当前的海洋生态知识图谱，这个问题可以从以下几个方面来理解：生态系统服务功能、生物多样性保护、环境监测技术和政策法规框架。',
 ]
 
-const records = [
-  ['2025-05-24 10:21', '海草床退化的主要原因？', '海草床', '知识库+文献', '0.95'],
-  ['2025-05-24 10:18', '赤潮预警的技术手段有哪些？', '赤潮', '监测+模型', '0.93'],
-  ['2025-05-24 10:13', '珊瑚礁保护措施？', '珊瑚礁', '知识库+文献', '0.94'],
-  ['2025-05-24 10:07', '近岸生态修复有哪些策略？', '生态修复', '知识库+案例', '0.91'],
-]
+const messages = ref([...defaultMessages])
+const inputText = ref('')
+const isTyping = ref(false)
+const messagesEl = ref(null)
+const hoveredSeg = ref(-1)
+const showConfig = ref(false)
+
+const modelInfo = ref([
+  { name: '海洋生态问答智能体', version: 'v2.3', online: true, desc: '面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体，支持多轮对话与上下文理解', tokens: '128K' },
+])
+
+function toggleModel(model) {
+  model.online = !model.online
+}
+
+const circumference = 2 * Math.PI * 50 // r=50
+
+const donutSegments = [
+  { label: '90%以上', count: '28,764', percent: 50.7, color: '#1173ff' },
+  { label: '70%-90%', count: '16,218', percent: 28.6, color: '#20d6ff' },
+  { label: '50%-70%', count: '7,842', percent: 13.8, color: '#28e78f' },
+  { label: '30%-50%', count: '2,964', percent: 5.2, color: '#f5a623' },
+].map((seg, i, arr) => {
+  const offset = arr.slice(0, i).reduce((s, p) => s + p.percent, 0)
+  const len = (seg.percent / 100) * circumference
+  return {
+    ...seg,
+    dasharray: `${len} ${circumference - len}`,
+    dashoffset: circumference * (1 - offset / 100),
+  }
+})
+
+function scrollToBottom() {
+  nextTick(() => {
+    if (messagesEl.value) {
+      messagesEl.value.scrollTop = messagesEl.value.scrollHeight
+    }
+  })
+}
+
+function sendMessage() {
+  const text = inputText.value.trim()
+  if (!text || isTyping.value) return
+
+  messages.value.push(['user', text])
+  inputText.value = ''
+  scrollToBottom()
+
+  // Simulate bot typing
+  isTyping.value = true
+  const reply = botReplies[Math.floor(Math.random() * botReplies.length)]
+  const delay = 800 + Math.random() * 1200
+
+  setTimeout(() => {
+    messages.value.push(['bot', reply])
+    isTyping.value = false
+    scrollToBottom()
+  }, delay)
+}
+
+function onKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault()
+    sendMessage()
+  }
+}
+
+function fillPrompt(text) {
+  inputText.value = text
+  document.querySelector('.chat-input input')?.focus()
+}
+
+function clearMessages() {
+  messages.value = []
+  nextTick(() => {
+    messages.value = [...defaultMessages]
+  })
+}
+
+onMounted(() => {
+  const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+
+  // Hero entrance
+  tl.from('.qa-hero', { y: -20, opacity: 0, duration: 0.5 })
+
+  // Metric cards stagger in
+  tl.from('.qa-metrics .metric-card', {
+    y: 30, opacity: 0, duration: 0.5, stagger: 0.1,
+  }, '-=0.2')
+
+  // Metric numbers count up
+  tl.add(() => {
+    document.querySelectorAll('.qa-metrics .metric-card strong').forEach(el => {
+      const text = el.textContent.trim()
+      const numMatch = text.match(/^[\d,.]+/)
+      if (!numMatch) return
+      const target = parseFloat(numMatch[0].replace(/,/g, ''))
+      const suffix = text.slice(numMatch[0].length)
+      const obj = { val: 0 }
+      gsap.to(obj, {
+        val: target,
+        duration: 1.5,
+        ease: 'power2.out',
+        onUpdate() {
+          const formatted = target >= 1000
+            ? Math.round(obj.val).toLocaleString()
+            : obj.val.toFixed(1)
+          el.textContent = formatted + suffix
+        },
+      })
+    })
+  }, '-=0.8')
+
+  // Chat panel slide in
+  tl.from('.chat-panel', {
+    x: -30, opacity: 0, duration: 0.5,
+  }, '-=0.3')
+
+  // Sidebar panels stagger in
+  tl.from('.qa-sidebar .panel', {
+    x: 30, opacity: 0, duration: 0.4, stagger: 0.12,
+  }, '-=0.3')
+
+  // Data source list items stagger
+  tl.from('.side-feed-panel li', {
+    x: 20, opacity: 0, duration: 0.3, stagger: 0.06,
+  }, '-=0.2')
+
+  // Record table rows stagger
+  tl.from('.record-panel tbody tr', {
+    y: 12, opacity: 0, duration: 0.3, stagger: 0.06,
+  }, '-=0.2')
+
+  // Distribution donut segments draw in
+  tl.from('.donut-segment', {
+    strokeDashoffset: circumference,
+    duration: 1,
+    stagger: 0.15,
+    ease: 'power2.out',
+  }, '-=0.3')
+
+  // Distribution list items stagger
+  tl.from('.distribution-panel li', {
+    x: 16, opacity: 0, duration: 0.3, stagger: 0.08,
+  }, '-=0.3')
+
+  scrollToBottom()
+})
 </script>
 
 <template>
   <section class="page qa-page min-w-0">
-    <div class="qa-hero min-w-0">
-      <div class="agent-orb"><MessageSquare :size="34" /></div>
-      <div>
-        <h1>海洋生态问答智能体 <span>在线</span></h1>
-        <p>面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体</p>
+    <!-- 上方区域：标题和指标卡片 -->
+    <div class="qa-header min-w-0">
+      <div class="qa-hero min-w-0">
+        <div class="agent-orb"><MessageSquare :size="34" /></div>
+        <div>
+          <h1>海洋生态问答智能体 <span>在线</span></h1>
+          <p>面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体</p>
+        </div>
+        <div class="page-actions">
+          <button @click="showConfig = true"><Settings :size="17" />对话配置</button>
+        </div>
       </div>
-      <div class="page-actions">
-        <button><Bot :size="17" />智能问答</button>
-        <button><Database :size="17" />知识卡片</button>
-        <button><Settings :size="17" />对话配置</button>
-        <button><Share2 :size="17" />分享</button>
+
+      <div class="metrics-grid qa-metrics min-w-0">
+        <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
       </div>
     </div>
 
-    <div class="metrics-grid qa-metrics min-w-0">
-      <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
-    </div>
-
-    <div class="qa-grid min-w-0">
+    <!-- 下方区域：聊天对话和信息面板 -->
+    <div class="qa-content min-w-0">
+      <!-- 左侧：聊天对话区域（核心） -->
       <section class="panel chat-panel">
-        <header class="panel-header"><h2>生态问答对话</h2><button>清空对话</button></header>
-        <div class="messages">
+        <header class="panel-header"><h2>生态问答对话</h2><button @click="clearMessages">清空对话</button></header>
+        <div ref="messagesEl" class="messages">
           <article v-for="(message, index) in messages" :key="index" :class="message[0]">
             <span><component :is="message[0] === 'user' ? Leaf : Bot" :size="18" /></span>
             <p>{{ message[1] }}</p>
           </article>
+          <article v-if="isTyping" class="bot typing-indicator">
+            <span><Bot :size="18" /></span>
+            <p><i class="typing-dots"><b></b><b></b><b></b></i></p>
+          </article>
         </div>
         <div class="prompt-chips">
-          <button>海洋生物多样性现状如何？</button>
-          <button>珊瑚礁白化的原因及影响？</button>
-          <button>红树林生态价值有哪些？</button>
+          <button @click="fillPrompt('海洋生物多样性现状如何？')">海洋生物多样性现状如何？</button>
+          <button @click="fillPrompt('珊瑚礁白化的原因及影响？')">珊瑚礁白化的原因及影响？</button>
+          <button @click="fillPrompt('红树林生态价值有哪些？')">红树林生态价值有哪些？</button>
         </div>
         <label class="chat-input">
-          <input placeholder="输入你的问题，Shift + Enter 换行，Enter 发送" />
-          <button><Send :size="18" /></button>
+          <input
+            v-model="inputText"
+            placeholder="输入你的问题，Shift + Enter 换行，Enter 发送"
+            @keydown="onKeydown"
+          />
+          <button @click="sendMessage"><Send :size="18" /></button>
         </label>
       </section>
 
-      <section class="panel knowledge-card-panel">
-        <header class="panel-header"><h2>生态知识卡片</h2><button>查看更多 ›</button></header>
-        <article v-for="card in cards" :key="card[0]">
-          <div><Flame :size="18" /></div>
-          <strong>{{ card[0] }} <span>{{ card[1] }}</span></strong>
-          <p>{{ card[2] }}</p>
-          <small>命中 {{ card[3] }} / 关联 {{ card[4] }}</small>
-        </article>
-      </section>
+      <!-- 右侧：信息面板 -->
+      <div class="qa-sidebar">
+        <section class="panel side-feed-panel">
+          <header class="panel-header"><h2>数据来源</h2><button>更多 ›</button></header>
+          <ul>
+            <li>自然资源部海洋生态环境监测 <span>正常</span></li>
+            <li>中国海洋生物多样性数据库 <span>正常</span></li>
+            <li>国家海洋科学数据中心 <span>正常</span></li>
+            <li>卫星遥感海洋生态专题 <span>正常</span></li>
+            <li>学术文献与知识库 <span>正常</span></li>
+          </ul>
+        </section>
 
-      <section class="panel side-feed-panel">
-        <header class="panel-header"><h2>数据来源</h2><button>更多 ›</button></header>
-        <ul>
-          <li>自然资源部海洋生态环境监测 <span>正常</span></li>
-          <li>中国海洋生物多样性数据库 <span>正常</span></li>
-          <li>国家海洋科学数据中心 <span>正常</span></li>
-          <li>卫星遥感海洋生态专题 <span>正常</span></li>
-          <li>学术文献与知识库 <span>正常</span></li>
-        </ul>
-      </section>
+        <section class="panel record-panel">
+          <header class="panel-header"><h2>问答记录列表</h2><button>更多 ›</button></header>
+          <table>
+            <thead><tr><th>时间</th><th>问题</th><th>主题</th><th>来源</th><th>置信度</th></tr></thead>
+            <tbody><tr v-for="record in records" :key="record[0] + record[1]"><td>{{ record[0] }}</td><td>{{ record[1] }}</td><td>{{ record[2] }}</td><td>{{ record[3] }}</td><td>{{ record[4] }}</td></tr></tbody>
+          </table>
+        </section>
 
-      <section class="panel side-feed-panel">
-        <header class="panel-header"><h2>模型运行状态</h2><button>更多 ›</button></header>
-        <ul>
-          <li>生态问答模型-v2.3 <span>运行中</span></li>
-          <li>知识检索模型-v2.1 <span>运行中</span></li>
-          <li>关系推理模型-v1.8 <span>运行中</span></li>
-          <li>生物识别模型-v1.5 <span>运行中</span></li>
-        </ul>
-      </section>
-
-      <section class="panel record-panel">
-        <header class="panel-header"><h2>问答记录列表</h2><button>更多 ›</button></header>
-        <table>
-          <thead><tr><th>时间</th><th>问题</th><th>主题</th><th>来源</th><th>置信度</th></tr></thead>
-          <tbody><tr v-for="record in records" :key="record[0] + record[1]"><td>{{ record[0] }}</td><td>{{ record[1] }}</td><td>{{ record[2] }}</td><td>{{ record[3] }}</td><td>{{ record[4] }}</td></tr></tbody>
-        </table>
-      </section>
-
-      <section class="panel topic-panel">
-        <header class="panel-header"><h2>主题趋势分析</h2><div class="tabs"><button>7天</button><button class="active">30天</button><button>90天</button></div></header>
-        <div class="line-chart tall">
-          <svg viewBox="0 0 100 45" preserveAspectRatio="none">
-            <polyline points="0,34 8,18 16,25 24,12 32,28 40,20 48,15 56,26 64,18 72,23 80,12 88,25 100,17" />
-            <polyline class="green-line" points="0,38 8,28 16,32 24,20 32,34 40,29 48,23 56,30 64,25 72,31 80,24 88,33 100,26" />
-            <polyline class="red-line" points="0,41 8,36 16,38 24,31 32,40 40,35 48,31 56,37 64,30 72,36 80,33 88,39 100,34" />
-          </svg>
-        </div>
-      </section>
-
-      <section class="panel distribution-panel">
-        <header class="panel-header"><h2>知识命中分布</h2></header>
-        <div class="donut large">命中分布<br /><strong>56,782</strong></div>
-        <ul>
-          <li><span>90%以上</span><b>28,764</b><em>50.7%</em></li>
-          <li><span>70%-90%</span><b>16,218</b><em>28.6%</em></li>
-          <li><span>50%-70%</span><b>7,842</b><em>13.8%</em></li>
-          <li><span>30%-50%</span><b>2,964</b><em>5.2%</em></li>
-        </ul>
-      </section>
-
-      <section class="panel qa-advice-panel">
-        <header class="panel-header"><h2>智能回答建议</h2><button>更多 ›</button></header>
-        <article><Cloud :size="18" /><span>海草床相关问答量上升 18.7%，建议加强海草床保护专题内容。</span></article>
-        <article><Brain :size="18" /><span>赤潮相关问题热度较高，建议补充成因与防控案例。</span></article>
-        <article><Leaf :size="18" /><span>生态修复类问题置信度下降，建议更新修复技术动态。</span></article>
-      </section>
+        <section class="panel distribution-panel">
+          <header class="panel-header"><h2>知识命中分布</h2></header>
+          <div class="donut-row">
+            <div class="donut-chart-wrapper">
+              <svg class="donut-svg" viewBox="0 0 120 120">
+                <circle class="donut-ring" cx="60" cy="60" r="50" />
+                <circle
+                  v-for="(seg, i) in donutSegments"
+                  :key="i"
+                  class="donut-segment"
+                  :class="'seg-' + i"
+                  cx="60" cy="60"
+                  :r="50 - i * 11"
+                  :stroke="seg.color"
+                  :stroke-dasharray="seg.dasharray"
+                  :stroke-dashoffset="seg.dashoffset"
+                  :style="{ '--target-offset': seg.dashoffset }"
+                />
+              </svg>
+              <div class="donut-center">
+                <span>命中分布</span>
+                <strong>56,782</strong>
+              </div>
+            </div>
+            <ul>
+              <li v-for="(seg, i) in donutSegments" :key="i"
+                :class="{ active: hoveredSeg === i }"
+                @mouseenter="hoveredSeg = i"
+                @mouseleave="hoveredSeg = -1"
+              >
+                <i class="seg-dot" :style="{ background: seg.color }"></i>
+                <span>{{ seg.label }}</span>
+                <b>{{ seg.count }}</b>
+                <em>{{ seg.percent }}%</em>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
     </div>
+
+    <!-- 对话配置弹窗 -->
+    <Teleport to="body">
+      <div v-if="showConfig" class="config-overlay" @click.self="showConfig = false">
+        <div class="config-modal">
+          <header class="config-header">
+            <h2>对话配置</h2>
+            <button class="config-close" @click="showConfig = false">&times;</button>
+          </header>
+          <div class="config-body">
+            <div class="config-section">
+              <h3>当前接入模型</h3>
+              <div class="model-list">
+                <div v-for="model in modelInfo" :key="model.name" class="model-item">
+                  <div class="model-head">
+                    <span class="model-name">{{ model.name }}</span>
+                    <span class="model-version">{{ model.version }}</span>
+                    <button
+                      class="model-toggle"
+                      :class="{ active: model.online }"
+                      @click="toggleModel(model)"
+                      :title="model.online ? '运行中 - 点击关闭' : '已关闭 - 点击开启'"
+                    >
+                      <i></i>
+                      <span>{{ model.online ? '运行中' : '已关闭' }}</span>
+                    </button>
+                  </div>
+                  <p class="model-desc">{{ model.desc }}</p>
+                  <div class="model-meta">
+                    <span>上下文窗口：<b>{{ model.tokens }}</b></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </section>
 </template>
