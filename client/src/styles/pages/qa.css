@@ -1027,3 +1027,194 @@
   color: #8bb3d6;
   font-weight: 500;
 }
+
+/* ── 对话选择器 ── */
+.conv-header {
+  position: relative;
+}
+
+.conv-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #b9d4ea;
+  font-size: 13px;
+  transition: background 0.2s ease;
+}
+
+.conv-selector:hover {
+  background: rgba(35, 137, 255, 0.1);
+}
+
+.conv-title {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-selector .rotated {
+  transform: rotate(180deg);
+}
+
+.conv-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  min-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: rgba(8, 28, 55, 0.96);
+  border: 1px solid rgba(75, 143, 210, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+}
+
+.conv-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(75, 143, 210, 0.12);
+  font-size: 12px;
+  color: #7ab0d8;
+}
+
+.conv-new-btn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid rgba(75, 143, 210, 0.25);
+  background: rgba(35, 137, 255, 0.1);
+  color: #7ab8e8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.conv-new-btn:hover {
+  background: rgba(35, 137, 255, 0.25);
+  color: #dff7ff;
+}
+
+.conv-dropdown ul {
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+}
+
+.conv-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #b9d4ea;
+  transition: background 0.15s ease;
+}
+
+.conv-dropdown li:hover {
+  background: rgba(35, 137, 255, 0.1);
+}
+
+.conv-dropdown li.active {
+  background: rgba(35, 137, 255, 0.15);
+  color: #dff7ff;
+}
+
+.conv-item-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-item-count {
+  font-size: 11px;
+  color: #6a9ec0;
+  white-space: nowrap;
+}
+
+.conv-del-btn {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: #6a9ec0;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.conv-dropdown li:hover .conv-del-btn {
+  opacity: 1;
+}
+
+.conv-del-btn:hover {
+  background: rgba(255, 60, 60, 0.15);
+  color: #f88;
+}
+
+/* ── 空状态 ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  color: #5a8aaa;
+}
+
+.empty-icon {
+  opacity: 0.3;
+  margin-bottom: 4px;
+}
+
+.empty-title {
+  font-size: 16px;
+  color: #8bb3d6;
+  font-weight: 500;
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: #5a8aaa;
+  margin-bottom: 8px;
+}
+
+.empty-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.empty-chips button {
+  padding: 6px 16px;
+  border: 1px solid rgba(75, 143, 210, 0.2);
+  border-radius: 999px;
+  background: rgba(8, 37, 70, 0.6);
+  color: #8bb3d6;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.empty-chips button:hover {
+  background: rgba(35, 137, 255, 0.15);
+  border-color: rgba(75, 143, 210, 0.4);
+  color: #dff7ff;
+  transform: translateY(-1px);
+}

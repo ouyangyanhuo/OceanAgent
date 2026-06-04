@@ -32,13 +32,13 @@ class AIService:
                 model=self.settings.llm_model,
                 timeout=self.settings.llm_timeout,
             )
-            msg = f"[AIService] ✅ 真实 LLM 模式: {self.settings.llm_base_url} / {self.settings.llm_model}"
+            msg = f"[AIService] 真实 LLM 模式: {self.settings.llm_base_url} / {self.settings.llm_model}"
             print(msg)
             logger.info(msg)
         else:
             self.llm_client = None
             reason = "LLM_PROVIDER=mock" if self.settings.llm_provider == "mock" else "LLM_API_KEY 未设置"
-            msg = f"[AIService] ⚠️  Mock 模式 ({reason})"
+            msg = f"[AIService] Mock 模式 ({reason})"
             print(msg)
             logger.info(msg)
 

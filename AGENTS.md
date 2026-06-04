@@ -1,22 +1,26 @@
-# Agent Instructions
+# Repository Guidelines
 
-## Project Shape
+## Project Structure & Module Organization
 
 This repository contains an Ocean Agent demo with a Vue frontend in `client/` and a FastAPI backend in `server/`.
 
-The backend stores all state as JSON files under `server/app/data/`. Do not add SQL databases, graph databases, Redis, ORM layers, LangChain, LlamaIndex, CrewAI, AutoGen, WebSockets, Docker, or deployment scripts for v1 unless the user explicitly requests it.
+- `client/src/` holds Vue source: `components/`, `views/`, `services/`, `stores/`, `router/`, and shared CSS under `styles/`.
+- `server/app/` holds backend code: API routes in `api/routes/`, business logic in `services/`, Pydantic models in `models/`, core helpers in `core/`, and maintenance scripts in `scripts/`.
+- `server/app/data/` stores all backend state as JSON, including graph data, caches, snapshots, mock data, notifications, and prompt templates.
+- `dev-doc/server-dev/README.md` is the backend development manual; update it when backend architecture, prompt storage, data layout, or development commands change.
 
-## Backend Rules
+## Build, Test, and Development Commands
 
-- `server/app/main.py` is app wiring only: FastAPI setup, CORS, exception handler, router registration, startup file checks.
-- Route modules in `server/app/api/routes/` should call services and return `success(...)`; they should not read or write JSON files directly.
-- Business logic belongs in `server/app/services/`.
-- Pydantic request/response/domain models belong in `server/app/models/`.
-- Paths for JSON data belong in `server/app/core/paths.py`.
-- Prompt templates must be JSON files in `server/app/data/prompts/`; do not create txt prompt files.
-- LLM output is candidate data only. The backend owns validation, ID generation, deduplication, graph writes, expansion index updates, and snapshots.
+Frontend:
 
-## Common Commands
+```bash
+cd client
+npm run dev      # start Vite locally
+npm run build    # build production assets into dist/
+npm run preview  # preview the production build
+```
+
+Backend:
 
 ```bash
 cd server
@@ -26,7 +30,7 @@ cd server
 .Ocean/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-For dependency setup:
+For a fresh backend environment:
 
 ```bash
 cd server
@@ -34,8 +38,18 @@ python3 -m venv .venv
 uv pip install --python .venv/bin/python -r requirements.txt
 ```
 
-## Working Tree Notes
+## Coding Style & Naming Conventions
 
-The user may have unrelated frontend edits in `client/`. Do not revert or reformat them unless the request explicitly targets frontend work.
+Use the existing style in each area. Vue files use PascalCase component names such as `MetricCard.vue`; JavaScript modules use camelCase exports and concise service files. Python modules use snake_case filenames and functions, with Pydantic schemas in `server/app/models/`. Keep `server/app/main.py` limited to FastAPI wiring, CORS, exception handling, router registration, and startup checks.
 
-`dev-doc/server-dev/README.md` is the backend development manual. Keep it updated when backend architecture, prompt storage, data layout, or development commands change.
+## Testing Guidelines
+
+There is no dedicated test framework configured yet. Before submitting backend changes, run `compileall` and `validate_graph`. Before submitting frontend changes, run `npm run build`. Add focused tests only when introducing a test runner or extending an existing one.
+
+## Commit & Pull Request Guidelines
+
+Recent history uses a mix of Conventional Commit-style messages, for example `feat(graph): ...` and `refactor(QA): ...`, plus plain descriptive commits. Prefer `type(scope): summary` for new commits. Pull requests should include a short purpose statement, key changes, verification commands run, linked issues when applicable, and screenshots or screen recordings for UI changes.
+
+## Architecture & Agent-Specific Instructions
+
+Backend routes should call services and return `success(...)`; they should not read or write JSON directly. Keep business logic in `server/app/services/`, paths in `server/app/core/paths.py`, and prompt templates as JSON files under `server/app/data/prompts/`. Do not add SQL databases, graph databases, Redis, ORM layers, LangChain, LlamaIndex, CrewAI, AutoGen, WebSockets, Docker, or deployment scripts for v1 unless explicitly requested.

@@ -48,3 +48,5 @@ class QaStreamRequest(BaseModel):
     """生态问答流式请求体。"""
 
     query: str
+    history: list[dict[str, str]] = Field(default_factory=list)
+    # 对话历史，每项 {"role": "user"/"bot", "text": "..."}

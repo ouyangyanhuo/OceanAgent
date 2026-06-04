@@ -1,9 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { AlertTriangle, Bot, FileText, Fuel, Navigation, Share2, ShipWheel, Send, X, User, Loader2 } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { AlertTriangle, Bot, FileText, Forward, Fuel, LoaderCircle, Navigation, Share, Share2, ShipWheel, Send, Trash2, X, User, Loader2 } from 'lucide-vue-next'
+import { marked } from 'marked'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 import AppModal from '../components/common/AppModal.vue'
+
+marked.setOptions({ gfm: true, breaks: true })
 
 // ── 指标数据 ──
 const metrics = [
@@ -66,52 +69,108 @@ const clickedSources = ref(new Set())
 
 // ── 聊天相关 ──
 const showChatModal = ref(false)
-const chatMessages = ref([])
+const chatMessages = ref([])  // { role, text, status? }
 const chatInput = ref('')
 const isLoading = ref(false)
-const conversationId = ref('')
+let chatAbortController = null
+const chatMessagesEl = ref(null)
 
-const initChat = () => {
-  chatMessages.value = [
-    { role: 'assistant', content: '您好！我是航线优化智能体助手。请问有什么可以帮助您的？' },
-  ]
-  conversationId.value = ''
+function renderMarkdown(text) {
+  if (!text) return ''
+  try { return marked.parse(text) } catch { return text }
+}
+
+function chatScrollToBottom() {
+  nextTick(() => { if (chatMessagesEl.value) chatMessagesEl.value.scrollTop = chatMessagesEl.value.scrollHeight })
+}
+
+async function consumeSSE(reader, { onStatus, onContent, onDone }) {
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let currentEvent = ''
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
+    for (const line of lines) {
+      if (line.startsWith('event: ')) { currentEvent = line.slice(7).trim() }
+      else if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6))
+          if (currentEvent === 'status') onStatus(data)
+          else if (currentEvent === 'content') onContent(data.text || '')
+          else if (currentEvent === 'done') onDone(data)
+        } catch {}
+        currentEvent = ''
+      }
+    }
+  }
 }
 
 const openChat = () => {
   showChatModal.value = true
-  initChat()
-}
-
-const sendToCoze = async (message) => {
-  isLoading.value = true
-  try {
-    const response = await fetch('/api/coze/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, conversation_id: conversationId.value || null }),
-    })
-    const data = await response.json()
-    if (data.success) {
-      if (data.conversation_id) conversationId.value = data.conversation_id
-      chatMessages.value.push({ role: 'assistant', content: data.message })
-    } else {
-      chatMessages.value.push({ role: 'assistant', content: data.message || '抱歉，智能体暂时无法回复，请稍后再试。' })
-    }
-  } catch (error) {
-    console.error('Coze API error:', error)
-    chatMessages.value.push({ role: 'assistant', content: '抱歉，连接智能体时出现问题，请检查网络后重试。' })
-  } finally {
-    isLoading.value = false
+  if (!chatMessages.value.length) {
+    chatMessages.value = [{ role: 'bot', text: '您好！我是航线优化智能体助手。请问有什么可以帮助您的？' }]
   }
 }
 
-const sendMessage = async () => {
-  if (!chatInput.value.trim() || isLoading.value) return
-  const userMessage = chatInput.value.trim()
-  chatMessages.value.push({ role: 'user', content: userMessage })
+const sendChatMessage = async () => {
+  const text = chatInput.value.trim()
+  if (!text || isLoading.value) return
+
+  chatMessages.value.push({ role: 'user', text })
   chatInput.value = ''
-  await sendToCoze(userMessage)
+  isLoading.value = true
+  chatAbortController = new AbortController()
+
+  chatMessages.value.push({ role: 'bot', text: '', status: '正在提取关键词...' })
+  const botIdx = chatMessages.value.length - 1
+  chatScrollToBottom()
+
+  // 构建历史
+  const history = chatMessages.value
+    .slice(0, -2)
+    .filter(m => m.text)
+    .slice(-12)
+    .map(m => ({ role: m.role, text: m.text }))
+
+  try {
+    const resp = await fetch('/api/agent/qa/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: text, history }),
+      signal: chatAbortController.signal,
+    })
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+
+    const reader = resp.body.getReader()
+    const contentParts = []
+
+    await consumeSSE(reader, {
+      onStatus(data) { chatMessages.value[botIdx].status = data.message || 'AI 思考中...'; chatScrollToBottom() },
+      onContent(chunk) { contentParts.push(chunk); chatMessages.value[botIdx].status = 'AI 输出中...' },
+      onDone() {},
+    })
+
+    chatMessages.value[botIdx].text = contentParts.join('') || '未能获取到回答，请稍后重试。'
+  } catch (err) {
+    chatMessages.value[botIdx].text = err.name === 'AbortError'
+      ? (chatMessages.value[botIdx].text || '已取消。')
+      : '请求失败，请检查网络或后端服务是否正常运行。'
+  } finally {
+    chatMessages.value[botIdx].status = ''
+    isLoading.value = false
+    chatAbortController = null
+    chatScrollToBottom()
+  }
+}
+
+const clearChat = () => {
+  if (chatAbortController) chatAbortController.abort()
+  isLoading.value = false
+  chatMessages.value = []
 }
 
 // ── 数据来源交互 ──
@@ -240,6 +299,8 @@ onMounted(() => {
     y: 20, opacity: 0, duration: 0.5, stagger: 0.1,
   }, '-=0.3')
 })
+
+onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
 </script>
 
 <template>
@@ -496,10 +557,13 @@ onMounted(() => {
         <div class="modal-content chat-modal">
           <div class="modal-header">
             <h3><Bot :size="20" /> 航线优化智能体</h3>
-            <button class="modal-close" @click="showChatModal = false">&times;</button>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="modal-close" @click="clearChat" title="清空对话"><Trash2 :size="14" /></button>
+              <button class="modal-close" @click="showChatModal = false">&times;</button>
+            </div>
           </div>
           <div class="chat-body">
-            <div class="chat-messages">
+            <div ref="chatMessagesEl" class="chat-messages">
               <div
                 v-for="(msg, index) in chatMessages"
                 :key="index"
@@ -509,12 +573,13 @@ onMounted(() => {
                   <User v-if="msg.role === 'user'" :size="16" />
                   <Bot v-else :size="16" />
                 </div>
-                <div class="message-content">{{ msg.content }}</div>
-              </div>
-              <div v-if="isLoading" class="chat-message assistant">
-                <div class="message-avatar"><Bot :size="16" /></div>
-                <div class="message-content loading">
-                  <Loader2 :size="16" class="spinner" /> 思考中...
+                <!-- 用户消息 -->
+                <div v-if="msg.role === 'user'" class="message-content">{{ msg.text }}</div>
+                <!-- Bot：有文本 → Markdown -->
+                <div v-else-if="msg.text" class="message-content md-content" v-html="renderMarkdown(msg.text)"></div>
+                <!-- Bot：有状态 → 思考中 -->
+                <div v-else-if="msg.status" class="message-content loading">
+                  <LoaderCircle :size="16" class="spinner" /> {{ msg.status }}
                 </div>
               </div>
             </div>
@@ -523,10 +588,10 @@ onMounted(() => {
                 type="text"
                 v-model="chatInput"
                 placeholder="输入您的问题..."
-                @keyup.enter="sendMessage"
+                @keyup.enter="sendChatMessage"
                 :disabled="isLoading"
               />
-              <button @click="sendMessage" :disabled="isLoading || !chatInput.trim()">
+              <button @click="sendChatMessage" :disabled="isLoading || !chatInput.trim()">
                 <Send :size="18" />
               </button>
             </div>
@@ -539,16 +604,11 @@ onMounted(() => {
     <AppModal v-model:visible="showShareModal" title="分享到" width="360px">
       <div class="share-buttons">
         <button class="share-btn wechat" @click="shareToWechat">
-          <svg viewBox="0 0 24 24" width="32" height="32">
-            <path fill="#07C160" d="M8.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-            <path fill="#07C160" d="M12 2C6.48 2 2 6.03 2 11c0 2.76 1.36 5.22 3.5 6.83V20a1 1 0 0 0 1.55.83l2.22-1.33 1.73 1.5a1 1 0 0 0 1.55-.71l1.6-3.2 2.9 1.63a1 1 0 0 0 1.35-.19c.37.21.8.19 1.15-.05l.8-.6V20a1 1 0 0 0 1.55.83l2.22-1.33 1.73 1.5a1 1 0 0 0 1.55-.71V17.83C21.64 16.22 23 13.76 23 11c0-4.97-4.48-9-11-9z"/>
-          </svg>
+          <Share :size="20" />
           <span>微信</span>
         </button>
         <button class="share-btn qq" @click="shareToQQ">
-          <svg viewBox="0 0 24 24" width="32" height="32">
-            <path fill="#12B7F5" d="M12.003 2c-2.265 0-6.29 1.307-6.29 7.325 0 1.62.465 3.645 1.488 5.74L5.32 17.21c-.21.44-.29.93-.22 1.42.18 1.33 1.41 2.37 2.78 2.37 1.18 0 2.22-.73 2.74-1.82l1.91 1.35c.27.19.59.29.92.29h.02c.41-.02.8-.14 1.14-.34l2.19-1.33c.21-.13.38-.32.51-.54.13.22.32.4.55.53l2.19 1.33c.34.2.73.32 1.14.34h.02c.33 0 .65-.1.92-.29l1.91-1.35c.52 1.09 1.56 1.82 2.74 1.82 1.37 0 2.6-1.04 2.78-2.37.07-.49-.01-.98-.22-1.42l-1.88-2.14c1.02-2.095 1.49-4.12 1.49-5.74 0-6.018-4.026-7.325-6.29-7.325-1.14 0-2.23.22-3.22.64.05-.21.08-.43.08-.65 0-2.21-2.53-4-5.65-4S.003 4.79.003 7c0 .22.03.44.08.65-.99-.42-2.08-.64-3.22-.64C2.52 7 0 8.79 0 11c0 3.03 2.52 5 5.65 5 .87 0 1.68-.17 2.42-.46-.15-.92-.14-2.07.04-3.33.08-.63.76-1.02 1.36-1.02.57 0 1.04.34 1.18.85.29 1.03.78 1.97 1.43 2.76.5.6 1.14 1.06 1.87 1.36-.29 1.37-.79 2.5-1.51 3.43-.56.72-1.23 1.25-2.01 1.61-.18.08-.36.15-.54.21-.17.06-.36.1-.56.13-.18.03-.39.05-.62.06-.24.02-.5.03-.79.03-.23 0-.47-.01-.7-.03-.23-.02-.44-.06-.65-.12-.21-.06-.41-.13-.6-.21-.19-.08-.38-.18-.55-.29-.17-.11-.34-.23-.5-.37-.16-.14-.31-.29-.45-.45-.14-.16-.27-.34-.39-.53-.12-.19-.22-.4-.31-.62-.09-.22-.16-.45-.21-.7-.05-.24-.08-.5-.08-.78 0-.26.02-.53.06-.8.04-.27.1-.54.18-.8.08-.26.18-.51.3-.75.12-.24.26-.47.42-.69.16-.22.34-.42.54-.61.2-.19.42-.36.66-.51.24-.15.5-.28.78-.39.28-.11.58-.2.9-.27.32-.07.66-.12 1.02-.15.36-.03.75-.05 1.16-.05s.8.02 1.16.05c.36.03.7.08 1.02.15.32.07.62.16.9.27.28.11.54.24.78.39.24.15.46.32.66.51.2.19.38.39.54.61.16.22.3.45.42.69.12.24.22.49.3.75.08.27.14.54.18.8.04.27.06.54.06.8 0 .28-.03.54-.08.78-.05.24-.12.48-.21.7-.09.22-.19.43-.31.62-.12.19-.25.37-.39.53-.14.16-.29.31-.45.45-.16.14-.33.26-.5.37-.17.11-.36.21-.55.29-.19.08-.39.15-.6.21-.21.06-.42.1-.65.12-.23.02-.47.03-.7.03-.3 0-.55-.01-.79-.03-.22-.01-.44-.03-.62-.06-.2-.03-.39-.07-.56-.13-.18-.06-.36-.13-.54-.21-.78-.36-1.45-.89-2.01-1.61-.72-.93-1.22-2.06-1.51-3.43.73-.3 1.37-.76 1.87-1.36.65-.79 1.14-1.73 1.43-2.76.14-.51.61-.85 1.18-.85.6 0 1.28.39 1.36 1.02.18 1.26.19 2.41.04 3.33.74.29 1.55.46 2.42.46 3.13 0 5.65-1.97 5.65-5 0-2.21-2.52-4-5.65-4z"/>
-          </svg>
+          <Forward :size="20" />
           <span>QQ</span>
         </button>
       </div>
@@ -949,6 +1009,20 @@ onMounted(() => {
 .chat-input-area button:hover:not(:disabled) { background: #2563eb; }
 .chat-input-area button:disabled { background: #6b7280; cursor: not-allowed; }
 
+/* ── 聊天 Markdown 渲染 ── */
+.chat-message .md-content { overflow-wrap: break-word; word-break: break-word; }
+.chat-message .md-content p { margin: 0 0 0.5em; }
+.chat-message .md-content p:last-child { margin-bottom: 0; }
+.chat-message .md-content ul, .chat-message .md-content ol { margin: 0.3em 0; padding-left: 1.2em; }
+.chat-message .md-content li { margin: 0.15em 0; }
+.chat-message .md-content code { padding: 1px 4px; border-radius: 3px; background: rgba(35, 137, 255, 0.12); color: #8ec8ff; font-size: 0.9em; }
+.chat-message .md-content pre { margin: 0.4em 0; padding: 8px 10px; border-radius: 6px; background: rgba(5, 18, 38, 0.9); overflow-x: auto; }
+.chat-message .md-content pre code { padding: 0; background: none; color: #c8dff5; }
+.chat-message .md-content strong { color: #e8f4ff; }
+.chat-message .md-content table { border-collapse: collapse; margin: 0.4em 0; width: 100%; }
+.chat-message .md-content th, .chat-message .md-content td { padding: 4px 8px; border: 1px solid rgba(75, 143, 210, 0.25); text-align: left; font-size: 12px; }
+.chat-message .md-content th { background: rgba(35, 137, 255, 0.1); }
+
 /* ── 分享弹窗 ── */
 .share-buttons {
   display: flex;
@@ -967,15 +1041,19 @@ onMounted(() => {
   transition: transform 0.2s;
 }
 .share-btn:hover { transform: scale(1.1); }
-.share-btn svg {
-  width: 56px; height: 56px;
-  border-radius: 12px;
+.share-btn svg,
+.share-btn :deep(svg) {
+  width: 20px; height: 20px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
   padding: 12px;
+  box-sizing: content-box;
 }
 .share-btn span { font-size: 13px; color: #b9d4ea; }
-.share-btn.wechat:hover svg { background: rgba(7, 193, 96, 0.2); }
-.share-btn.qq:hover svg { background: rgba(18, 183, 245, 0.2); }
+.share-btn.wechat:hover svg,
+.share-btn.wechat:hover :deep(svg) { background: rgba(7, 193, 96, 0.2); color: #07C160; }
+.share-btn.qq:hover svg,
+.share-btn.qq:hover :deep(svg) { background: rgba(18, 183, 245, 0.2); color: #12B7F5; }
 
 /* ── 滚动条 ── */
 .agent-search-page::-webkit-scrollbar { width: 8px; }

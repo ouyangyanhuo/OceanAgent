@@ -50,7 +50,7 @@ def qa_stream(request: QaStreamRequest) -> StreamingResponse:
     - event: done     → data: {"related_nodes": [...], "related_edges": [...]}  (结束标记)
     """
     return StreamingResponse(
-        qa_service.stream_answer(request.query),
+        qa_service.stream_answer(request.query, history=request.history),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",

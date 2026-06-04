@@ -36,14 +36,14 @@ class QaService:
                 model=self.settings.llm_model,
                 timeout=self.settings.llm_timeout,
             )
-            logger.info("[QaService] ✅ 真实 LLM 模式: %s / %s", self.settings.llm_base_url, self.settings.llm_model)
+            logger.info("[QaService] 真实 LLM 模式: %s / %s", self.settings.llm_base_url, self.settings.llm_model)
         else:
             self.llm_client = None
-            logger.info("[QaService] ⚠️  Mock 模式")
+            logger.info("[QaService] Mock 模式")
 
     # ── 公开接口 ──────────────────────────────────────────────
 
-    def stream_answer(self, query: str) -> Generator[str, None, None]:
+    def stream_answer(self, query: str, history: list[dict[str, str]] | None = None) -> Generator[str, None, None]:
         """生态问答主流程：关键词提取 → 图谱检索 → 流式回答。
 
         Yields SSE 格式的字符串，每条以 "data: " 开头，末尾 \\n\\n。
@@ -68,7 +68,7 @@ class QaService:
         # ③ 构建上下文并流式生成回答
         yield self._sse_event("status", {"phase": "think", "message": "AI 正在思考..."})
         if self.llm_client:
-            yield from self._real_stream_answer(query, related_nodes, related_edges)
+            yield from self._real_stream_answer(query, related_nodes, related_edges, history)
         else:
             yield from self._mock_stream_answer(query, related_nodes, related_edges)
 
@@ -103,10 +103,22 @@ class QaService:
 
     # ── 流式回答生成 ──────────────────────────────────────────
 
-    def _build_context(self, query: str, related_nodes: list, related_edges: list) -> dict[str, Any]:
+    def _build_context(
+        self, query: str, related_nodes: list, related_edges: list,
+        history: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
         """构建 LLM 回答所需的上下文。"""
-        # 取第一个匹配节点作为主节点，没有则用空字典。
         node = related_nodes[0] if related_nodes else {}
+
+        # 格式化对话历史
+        history_text = ""
+        if history:
+            lines = []
+            for turn in history[-12:]:  # 最多保留最近 12 条
+                role = "用户" if turn.get("role") == "user" else "助手"
+                lines.append(f"{role}：{turn.get('text', '')}")
+            history_text = "对话历史：\n" + "\n".join(lines) + "\n"
+
         return {
             "agent_type": "ecological_qa",
             "query": query,
@@ -116,13 +128,15 @@ class QaService:
             "related_edges": related_edges,
             "observations": self.mock_ocean_service.get_observations(),
             "fishery_areas": self.mock_ocean_service.get_fishery_areas(),
+            "history": history_text,
         }
 
     def _real_stream_answer(
         self, query: str, related_nodes: list, related_edges: list,
+        history: list[dict[str, str]] | None = None,
     ) -> Generator[str, None, None]:
         """调用真实 LLM 流式接口生成回答。"""
-        context = self._build_context(query, related_nodes, related_edges)
+        context = self._build_context(query, related_nodes, related_edges, history)
         prompt = self.prompt_service.render_agent_prompt("ecological_qa", context)
 
         try:
@@ -133,7 +147,7 @@ class QaService:
                 yield self._sse_event("content", {"text": chunk})
         except Exception:
             logger.error("LLM 流式回答生成失败", exc_info=True)
-            yield self._sse_event("content", {"text": "\n\n⚠️ LLM 回答生成失败，请检查配置后重试。"})
+            yield self._sse_event("content", {"text": "\n\n大模型回答生成失败，请检查配置后重试。"})
 
         # 流结束，发送 related_nodes 和 related_edges
         yield self._sse_event("done", {
