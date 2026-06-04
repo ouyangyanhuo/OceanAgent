@@ -83,3 +83,35 @@ class ExpandNodeResponse(BaseModel):
     new_edges: list[GraphEdge] = Field(default_factory=list)
     from_cache: bool = False
     summary: str | None = None
+
+
+class CreateSeedNodeRequest(BaseModel):
+    """新建种子节点请求。"""
+
+    description: str
+
+
+class CreateSeedNodeResponse(BaseModel):
+    """新建种子节点响应。"""
+
+    seed_node: GraphNode
+    new_nodes: list[GraphNode] = Field(default_factory=list)
+    new_edges: list[GraphEdge] = Field(default_factory=list)
+    summary: str | None = None
+
+
+class ConnectNodesRequest(BaseModel):
+    """节点连接请求。"""
+
+    source_node_id: str
+    target_node_id: str
+
+
+class ConnectNodesResponse(BaseModel):
+    """节点连接响应。"""
+
+    source_node: GraphNode
+    target_node: GraphNode
+    bridge_node: GraphNode
+    new_edges: list[GraphEdge] = Field(default_factory=list)
+    summary: str | None = None

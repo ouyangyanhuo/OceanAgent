@@ -866,7 +866,61 @@ async function exportGraph(format) {
   }
 }
 
-defineExpose({ exportGraph })
+/* ── 合并新数据到图谱 ── */
+function mergeNewData(newNodes, newEdges) {
+  const existingNodeIds = new Set(graphNodes.value.map((n) => n.id))
+  const filteredNodes = (newNodes || []).filter((n) => !existingNodeIds.has(n.id))
+  graphNodes.value.push(...filteredNodes)
+
+  const existingEdgeIds = new Set(graphEdges.value.map((e) => e.id))
+  const filteredEdges = (newEdges || []).filter((e) => !existingEdgeIds.has(e.id))
+  graphEdges.value.push(...filteredEdges)
+
+  if (cy) {
+    const elements = toElements(filteredNodes, filteredEdges)
+    if (elements.length) {
+      cy.add(elements)
+      const layout = cy.layout({
+        name: 'cose',
+        animate: settings.value.animateLayout,
+        animationDuration: 600,
+        randomize: false,
+        nodeRepulsion: () => 60000,
+        idealEdgeLength: () => 180,
+        edgeElasticity: () => 80,
+        gravity: 0.08,
+        numIter: 800,
+        initialTemp: 200,
+        coolingFactor: 0.95,
+        minTemp: 1.0,
+        padding: 60,
+      })
+      layout.one('layoutstop', () => {
+        resolveOverlaps()
+        resolveEdgeOverlaps()
+      })
+      layout.run()
+    }
+  }
+}
+
+/* ── 外部控制加载动画 ── */
+function setExpanding(label) {
+  expanding.value = true
+  expandingLabel.value = label
+}
+
+function clearExpanding() {
+  expanding.value = false
+}
+
+defineExpose({
+  exportGraph,
+  mergeNewData,
+  getNodes: () => graphNodes.value,
+  setExpanding,
+  clearExpanding,
+})
 </script>
 
 <template>

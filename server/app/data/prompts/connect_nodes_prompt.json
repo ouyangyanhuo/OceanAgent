@@ -1,0 +1,5 @@
+{
+  "name": "connect_nodes_prompt",
+  "description": "节点连接 prompt，分析两个节点之间的关系，生成中间节点和关联边。",
+  "template": "你是一个海洋知识图谱关系分析器。用户希望在两个已有节点之间建立连接关系。\n\n你需要：\n1. 分析这两个节点之间可能存在的海洋领域关联\n2. 生成一个中间节点，作为这两个节点之间的桥梁\n3. 生成两条边，分别连接中间节点到两个已有节点\n\n⚠ 数据真实性要求：\n- 中间节点必须是真实的海洋领域概念，不能编造。\n- 关系必须有科学依据。\n- 数值必须符合真实范围。\n\n严格要求：\n1. 只输出一个 JSON 对象，不要输出任何 Markdown 标记、代码块或解释文字。\n2. 不要生成 id 字段，id 由后端生成。\n3. 节点 name 必须是中文，简洁明确。\n4. 节点 properties 必须是对象，包含 description 字段。\n5. relation 必须来自允许关系类型列表。\n6. weight 必须是 0 到 1 之间的小数。\n7. 中间节点的类型应能合理桥接两个已有节点。\n\n源节点：\n{{source_node}}\n\n目标节点：\n{{target_node}}\n\n允许生成的节点类型：{{allowed_node_types}}\n允许生成的关系类型：{{allowed_relations}}\n\n请输出以下格式的 JSON：\n{\"bridge_node\": {\"type\": \"...\", \"name\": \"...\", \"properties\": {...}}, \"edges\": [{\"source_ref\": \"source_node_id\", \"target_name\": \"bridge_node_name\", \"relation\": \"...\", \"weight\": 0.5, \"properties\": {...}}, {\"source_ref\": \"bridge_node_name\", \"target_ref\": \"target_node_id\", \"relation\": \"...\", \"weight\": 0.5, \"properties\": {...}}], \"summary\": \"简要描述两个节点之间的关系\"}"
+}

@@ -58,3 +58,33 @@ export async function expandNode(nodeId, expandType, forceRefresh = false) {
     return null
   }
 }
+
+export async function createSeedNode(description) {
+  try {
+    const res = await fetch('/api/graph/create-seed-node', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description }),
+    })
+    if (!res.ok) throw new Error(`Create seed node failed: ${res.status}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function connectNodes(sourceNodeId, targetNodeId) {
+  try {
+    const res = await fetch('/api/graph/connect-nodes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source_node_id: sourceNodeId, target_node_id: targetNodeId }),
+    })
+    if (!res.ok) throw new Error(`Connect nodes failed: ${res.status}`)
+    const json = await res.json()
+    return json.data ?? null
+  } catch {
+    return null
+  }
+}

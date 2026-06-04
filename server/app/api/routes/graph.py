@@ -6,9 +6,10 @@
 from fastapi import APIRouter, Query
 
 from app.core.response import success
-from app.models.graph import ExpandNodeRequest
+from app.models.graph import ConnectNodesRequest, CreateSeedNodeRequest, ExpandNodeRequest
 from app.services.expansion_service import ExpansionService
 from app.services.graph_service import GraphService
+from app.services.node_operations_service import NodeOperationsService
 from app.services.validation_service import ValidationService
 
 router = APIRouter(prefix="/graph", tags=["graph"])
@@ -17,6 +18,7 @@ router = APIRouter(prefix="/graph", tags=["graph"])
 graph_service = GraphService()
 expansion_service = ExpansionService()
 validation_service = ValidationService()
+node_ops_service = NodeOperationsService()
 
 
 @router.get("")
@@ -72,7 +74,7 @@ def get_expand_options(node_id: str) -> dict:
                     "expand_type": expand_type,
                     # label 供前端直接展示；缺失时用 expand_type 兜底。
                     "label": rule.get("label", expand_type),
-                    # expanded 用于前端控制“已扩展/可扩展”状态。
+                    # expanded 用于前端控制"已扩展/可扩展"状态。
                     "expanded": node.expanded.get(expand_type, False),
                 }
                 for expand_type, rule in rules.items()
@@ -94,4 +96,18 @@ def expand_node(request: ExpandNodeRequest) -> dict:
         request.expand_type,
         force_refresh=request.force_refresh,
     )
+    return success(response.model_dump(mode="json"))
+
+
+@router.post("/create-seed-node")
+def create_seed_node(request: CreateSeedNodeRequest) -> dict:
+    """新建种子节点。"""
+    response = node_ops_service.create_seed_node(request.description)
+    return success(response.model_dump(mode="json"))
+
+
+@router.post("/connect-nodes")
+def connect_nodes(request: ConnectNodesRequest) -> dict:
+    """连接两个节点。"""
+    response = node_ops_service.connect_nodes(request.source_node_id, request.target_node_id)
     return success(response.model_dump(mode="json"))

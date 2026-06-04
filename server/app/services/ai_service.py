@@ -56,6 +56,18 @@ class AIService:
             return self._real_graph_expansion(context)
         return self._mock_graph_expansion(context)
 
+    def generate_seed_node(self, context: dict[str, Any]) -> dict[str, Any]:
+        """根据用户描述生成种子节点。"""
+        if self.llm_client:
+            return self._real_seed_node(context)
+        return self._mock_seed_node(context)
+
+    def generate_node_connection(self, context: dict[str, Any]) -> dict[str, Any]:
+        """分析两个节点之间的关系，生成中间节点。"""
+        if self.llm_client:
+            return self._real_node_connection(context)
+        return self._mock_node_connection(context)
+
     def generate_agent_answer(self, context: dict[str, Any]) -> str:
         """生成智能体回答文本。"""
         if self.llm_client:
@@ -73,12 +85,12 @@ class AIService:
     def _real_graph_seed(self, topic: str) -> dict[str, Any]:
         """通过 LLM 生成种子图谱候选数据。"""
         prompt = self.prompt_service.render_graph_expand_prompt({
-            "current_node": {"name": topic, "type": "SeaArea"},
+            "current_node": {"name": topic, "type": "Observation"},
             "neighbors": {"nodes": [], "edges": []},
             "existing_edges": [],
             "expand_type": "seed",
-            "allowed_node_types": ["SeaArea", "Buoy", "Observation", "RiskFactor", "CurrentField"],
-            "allowed_relations": ["located_in", "monitored_by", "has_observation"],
+            "allowed_node_types": ["Buoy", "Observation", "RiskFactor", "RedTideEvent", "Species", "FisheryArea", "PreventionMeasure"],
+            "allowed_relations": ["has_observation", "has_risk_event", "affected_by", "indicates", "may_trigger", "mitigated_by", "correlated_with"],
             "max_nodes": 5,
             "max_edges": 5,
         })
@@ -97,6 +109,28 @@ class AIService:
         # 确保返回结构包含必要字段
         if "nodes" not in result or "edges" not in result:
             raise LLMError("LLM 扩展结果缺少 nodes 或 edges 字段", code="LLM_INVALID_STRUCTURE")
+        return result
+
+    def _real_seed_node(self, context: dict[str, Any]) -> dict[str, Any]:
+        """通过 LLM 生成种子节点。"""
+        prompt = self.prompt_service.render_create_seed_node_prompt(context)
+        result = self.llm_client.chat_json(
+            user_prompt=prompt,
+            temperature=self.settings.graph_expand_temperature,
+        )
+        if "seed_node" not in result:
+            raise LLMError("LLM 种子节点结果缺少 seed_node 字段", code="LLM_INVALID_STRUCTURE")
+        return result
+
+    def _real_node_connection(self, context: dict[str, Any]) -> dict[str, Any]:
+        """通过 LLM 分析节点关系并生成中间节点。"""
+        prompt = self.prompt_service.render_connect_nodes_prompt(context)
+        result = self.llm_client.chat_json(
+            user_prompt=prompt,
+            temperature=self.settings.graph_expand_temperature,
+        )
+        if "bridge_node" not in result or "edges" not in result:
+            raise LLMError("LLM 节点连接结果缺少 bridge_node 或 edges 字段", code="LLM_INVALID_STRUCTURE")
         return result
 
     def _real_agent_answer(self, context: dict[str, Any]) -> str:
@@ -123,9 +157,9 @@ class AIService:
         return {
             "nodes": [
                 {
-                    "type": "SeaArea",
-                    "name": topic,
-                    "properties": {"description": f"{topic} 的种子海域节点。"},
+                    "type": "Observation",
+                    "name": f"{topic}观测站",
+                    "properties": {"description": f"{topic} 的种子观测节点。"},
                 }
             ],
             "edges": [],
@@ -255,6 +289,64 @@ class AIService:
                 }
             ],
             "summary": "补充了相关风险事件。",
+        }
+
+    def _mock_seed_node(self, context: dict[str, Any]) -> dict[str, Any]:
+        """返回 mock 种子节点数据。"""
+        desc = context.get("description", "新节点")
+        return {
+            "seed_node": {
+                "type": "Observation",
+                "name": f"{desc}观测站",
+                "properties": {"description": f"针对「{desc}」的海洋观测节点。"},
+            },
+            "nodes": [
+                {
+                    "type": "Buoy",
+                    "name": f"{desc}监测浮标",
+                    "properties": {"description": f"用于监测「{desc}」相关数据的浮标。"},
+                }
+            ],
+            "edges": [
+                {
+                    "source_ref": "seed_node",
+                    "target_name": f"{desc}监测浮标",
+                    "relation": "monitored_by",
+                    "weight": 0.8,
+                    "properties": {},
+                }
+            ],
+            "summary": f"已创建「{desc}」种子节点及关联浮标。",
+        }
+
+    def _mock_node_connection(self, context: dict[str, Any]) -> dict[str, Any]:
+        """返回 mock 节点连接数据。"""
+        src_name = context.get("source_node", {}).get("name", "源节点")
+        tgt_name = context.get("target_node", {}).get("name", "目标节点")
+        bridge_name = f"{src_name}-{tgt_name}关联分析"
+        return {
+            "bridge_node": {
+                "type": "Observation",
+                "name": bridge_name,
+                "properties": {"description": f"分析「{src_name}」与「{tgt_name}」之间的关联关系。"},
+            },
+            "edges": [
+                {
+                    "source_ref": context.get("source_node", {}).get("id", ""),
+                    "target_name": bridge_name,
+                    "relation": "correlated_with",
+                    "weight": 0.7,
+                    "properties": {},
+                },
+                {
+                    "source_ref": bridge_name,
+                    "target_ref": context.get("target_node", {}).get("id", ""),
+                    "relation": "correlated_with",
+                    "weight": 0.7,
+                    "properties": {},
+                },
+            ],
+            "summary": f"已建立「{src_name}」与「{tgt_name}」之间的关联。",
         }
 
     def _mock_agent_answer(self, context: dict[str, Any]) -> str:

@@ -1,0 +1,5 @@
+{
+  "name": "create_seed_node_prompt",
+  "description": "新建种子节点 prompt，根据用户输入的内容生成对应的种子节点和关联节点。",
+  "template": "你是一个海洋知识图谱生成器。用户希望在图谱中添加一个新的种子节点。\n\n⚠ 数据真实性要求（最重要）：\n- 所有节点和属性必须基于真实的海洋观测数据或科学事实，不能编造虚构内容。\n- 物种必须是中国海域真实存在的物种。\n- 数值必须符合真实范围：温度 5-30°C，盐度 28-35‰，叶绿素 0.5-20 mg/m³，溶解氧 4-10 mg/L。\n- 浮标编号、观测站点必须是合理的命名。\n\n严格要求：\n1. 只输出一个 JSON 对象，不要输出任何 Markdown 标记、代码块或解释文字。\n2. 不要生成 id 字段，id 由后端生成。\n3. 节点 name 必须是中文，简洁明确。\n4. 节点 properties 必须是对象，包含 description 字段。\n5. weight 必须是 0 到 1 之间的小数。\n6. 必须生成 1 个核心种子节点（作为用户描述内容的主体），以及 0-3 个相关联的辅助节点。\n7. 核心种子节点必须有边连接到至少一个辅助节点。\n\n用户输入的内容：\n{{description}}\n\n已有图谱节点（避免重复）：\n{{existing_nodes}}\n\n允许生成的节点类型：{{allowed_node_types}}\n允许生成的关系类型：{{allowed_relations}}\n\n请输出以下格式的 JSON：\n{\"seed_node\": {\"type\": \"...\", \"name\": \"...\", \"properties\": {...}}, \"nodes\": [{\"type\": \"...\", \"name\": \"...\", \"properties\": {...}}], \"edges\": [{\"source_ref\": \"seed_node 或 新节点name\", \"target_name\": \"新节点name\", \"relation\": \"...\", \"weight\": 0.5, \"properties\": {...}}], \"summary\": \"简要描述本次创建内容\"}"
+}

@@ -44,6 +44,14 @@ class PromptService:
         """渲染图谱扩展 prompt。"""
         return self.render(self.load_prompt("graph_expand_prompt"), context)
 
+    def render_create_seed_node_prompt(self, context: dict[str, Any]) -> str:
+        """渲染新建种子节点 prompt。"""
+        return self.render(self.load_prompt("create_seed_node_prompt"), context)
+
+    def render_connect_nodes_prompt(self, context: dict[str, Any]) -> str:
+        """渲染节点连接 prompt。"""
+        return self.render(self.load_prompt("connect_nodes_prompt"), context)
+
     def render_agent_prompt(self, agent_type: str, context: dict[str, Any]) -> str:
         """按智能体类型渲染对应 prompt。"""
         # agent_type 到 prompt 文件名的映射放在这里，避免前端需要知道文件命名。
