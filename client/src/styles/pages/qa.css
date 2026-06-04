@@ -381,6 +381,26 @@
   text-align: right;
 }
 
+/* ── 图谱命中节点列表 ── */
+.side-feed-panel li .node-type-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  background: rgba(35, 137, 255, 0.15);
+  color: #5ba8f5;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.side-feed-panel li .node-name {
+  color: #cde4f7;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── 问答记录 ── */
 .record-panel {
   min-height: 200px;

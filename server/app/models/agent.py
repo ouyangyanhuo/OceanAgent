@@ -42,3 +42,9 @@ class AgentRunResponse(BaseModel):
     related_edges: list[dict[str, Any]] = Field(default_factory=list)
     used_cache: bool = False
     steps: list[AgentStep] = Field(default_factory=list)
+
+
+class QaStreamRequest(BaseModel):
+    """生态问答流式请求体。"""
+
+    query: str

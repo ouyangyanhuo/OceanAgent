@@ -136,19 +136,13 @@ onMounted(() => {
           <div class="page-hero-meta">
             <span class="meta-badge"><RadioTower :size="14" /> 浮标监测</span>
           </div>
-          <div class="page-actions">
-            <button><Bot :size="17" />智能问答</button>
-            <button><FileText :size="17" />诊断报告</button>
-            <button><Settings :size="17" />诊断配置</button>
-            <button><Share2 :size="17" />分享</button>
-          </div>
         </div>
 
         <!-- 主内容区 -->
         <div class="buoy-main-area">
           <!-- 浮标分布与状态 -->
           <section class="panel ocean-map buoy-map">
-            <header class="panel-header"><h2>浮标分布与状态</h2><div class="tabs"><button>全部海域</button></div></header>
+            <header class="panel-header"><h2>浮标分布与状态</h2><div class="tabs"></div></header>
             <div class="map-surface buoy-surface" @click="activeBuoy = null">
               <div class="hainan-island-sm">
                 <span class="city-sm c-hk">海口</span>

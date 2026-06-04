@@ -134,6 +134,50 @@ class GraphService:
         neighbor_nodes = [node_by_id[node_id] for node_id in visited if node_id in node_by_id]
         return {"nodes": neighbor_nodes, "edges": neighbor_edges}
 
+    def search_by_keywords(self, keywords: list[str]) -> dict[str, Any]:
+        """根据关键词搜索图谱节点。
+
+        在节点的 name 和 properties.description 中做子串匹配（不区分大小写）。
+        返回匹配节点及其一跳邻居，用于构建 QA 上下文。
+        """
+        graph = self.load_graph()
+        if not keywords or not graph.nodes:
+            return {"nodes": [], "edges": [], "matched_nodes": []}
+
+        # 将关键词统一小写，用于不区分大小写的匹配。
+        kw_lower = [kw.lower() for kw in keywords]
+
+        matched: list[GraphNode] = []
+        for node in graph.nodes:
+            name_lower = node.name.lower()
+            desc_lower = (node.properties.get("description") or "").lower()
+            for kw in kw_lower:
+                if kw in name_lower or kw in desc_lower:
+                    matched.append(node)
+                    break
+
+        if not matched:
+            return {"nodes": [], "edges": [], "matched_nodes": []}
+
+        # 收集匹配节点的 ID 集合，用于扩展邻居。
+        matched_ids = {node.id for node in matched}
+
+        # 构建 id -> node 索引。
+        node_by_id = {node.id: node for node in graph.nodes}
+
+        # 从匹配节点出发，收集一跳邻居。
+        visited = set(matched_ids)
+        related_edges: list[GraphEdge] = []
+        for edge in graph.edges:
+            if edge.source in matched_ids or edge.target in matched_ids:
+                related_edges.append(edge)
+                other = edge.target if edge.source in matched_ids else edge.source
+                if other not in visited:
+                    visited.add(other)
+
+        all_nodes = [node_by_id[nid] for nid in visited if nid in node_by_id]
+        return {"nodes": all_nodes, "edges": related_edges, "matched_nodes": [n.model_dump(mode="json") for n in matched]}
+
     def add_node(self, graph: GraphData, node: GraphNode) -> GraphNode:
         """向图谱添加节点。
 

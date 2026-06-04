@@ -70,3 +70,7 @@ class PromptService:
     def render_report_prompt(self, context: dict[str, Any]) -> str:
         """渲染报告生成 prompt。"""
         return self.render(self.load_prompt("report_prompt"), context)
+
+    def render_keyword_prompt(self, context: dict[str, Any]) -> str:
+        """渲染关键词提取 prompt。"""
+        return self.render(self.load_prompt("ecological_qa_keyword_prompt"), context)

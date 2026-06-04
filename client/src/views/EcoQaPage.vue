@@ -12,21 +12,14 @@ const metrics = [
 ]
 
 const defaultMessages = [
-  ['user', '什么是海草床？它对海洋生态系统有哪些作用？'],
-  ['bot', '海草床是由海草植物在浅海海底形成的重要生态系统。它具有重要的生态功能：提供栖息与繁殖场所、固定沉积物改善水质、吸收和储存碳、支撑渔业资源并促进生物多样性。'],
-  ['user', '中国沿海有哪些典型的海草床分布区域？'],
-  ['bot', '中国海草床主要分布在广东沿江、福建厦门、海南三亚、广西北海、浙江舟山等沿海海域。其中海南的海草床面积较大，种类丰富，以海菖蒲、卵叶喜盐草等常见。'],
-  ['user', '赤潮发生的原因有哪些？如何预警？'],
-  ['bot', '赤潮通常由营养盐富集、水温升高、海流静稳、光照充足等因素引发。预警应结合遥感监测、浮标温盐、水质检测与历史数据建模进行综合评估。'],
-  ['user', '如果要做近岸生态修复，应该优先关注哪些指标？'],
-  ['bot', '近岸生态修复应优先关注水体营养盐、溶解氧、透明度、底质类型、生境连通性、关键物种恢复情况和人为扰动强度。对海草床、红树林和珊瑚礁等不同生态系统，还需要分别跟踪覆盖度、幼苗成活率、白化率和群落结构变化。'],
-]
-
-const botReplies = [
-  '这是一个很好的海洋生态问题。根据知识库中的文献和监测数据分析，海洋生态系统是一个复杂的相互关联的系统，需要从多维度进行综合评估。',
-  '根据最新的海洋监测数据和学术研究表明，该领域近年来取得了显著进展。建议参考国家海洋科学数据中心的最新报告获取详细信息。',
-  '从生态学角度分析，这一问题涉及多个关键因素：水文条件、营养盐循环、生物群落结构以及人类活动影响。综合来看，需要采取多层次的保护与修复策略。',
-  '基于当前的海洋生态知识图谱，这个问题可以从以下几个方面来理解：生态系统服务功能、生物多样性保护、环境监测技术和政策法规框架。',
+  { role: 'user', text: '什么是海草床？它对海洋生态系统有哪些作用？' },
+  { role: 'bot', text: '海草床是由海草植物在浅海海底形成的重要生态系统。它具有重要的生态功能：提供栖息与繁殖场所、固定沉积物改善水质、吸收和储存碳、支撑渔业资源并促进生物多样性。' },
+  { role: 'user', text: '中国沿海有哪些典型的海草床分布区域？' },
+  { role: 'bot', text: '中国海草床主要分布在广东沿江、福建厦门、海南三亚、广西北海、浙江舟山等沿海海域。其中海南的海草床面积较大，种类丰富，以海菖蒲、卵叶喜盐草等常见。' },
+  { role: 'user', text: '赤潮发生的原因有哪些？如何预警？' },
+  { role: 'bot', text: '赤潮通常由营养盐富集、水温升高、海流静稳、光照充足等因素引发。预警应结合遥感监测、浮标温盐、水质检测与历史数据建模进行综合评估。' },
+  { role: 'user', text: '如果要做近岸生态修复，应该优先关注哪些指标？' },
+  { role: 'bot', text: '近岸生态修复应优先关注水体营养盐、溶解氧、透明度、底质类型、生境连通性、关键物种恢复情况和人为扰动强度。对海草床、红树林和珊瑚礁等不同生态系统，还需要分别跟踪覆盖度、幼苗成活率、白化率和群落结构变化。' },
 ]
 
 const messages = ref([...defaultMessages])
@@ -34,6 +27,9 @@ const inputText = ref('')
 const isTyping = ref(false)
 const messagesEl = ref(null)
 const showConfig = ref(false)
+const relatedNodes = ref([])
+const relatedEdges = ref([])
+const streamError = ref('')
 
 const modelInfo = ref([
   { name: '海洋生态问答智能体', version: 'v2.3', online: true, desc: '面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体，支持多轮对话与上下文理解', tokens: '128K' },
@@ -68,23 +64,101 @@ function scrollToBottom() {
   })
 }
 
-function sendMessage() {
+/**
+ * 解析 SSE 文本流，按 event/data 分发回调。
+ * 返回 Promise，在流结束或出错时 resolve。
+ */
+async function consumeSSE(reader, onContent, onDone) {
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let currentEvent = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
+
+    for (const line of lines) {
+      if (line.startsWith('event: ')) {
+        currentEvent = line.slice(7).trim()
+      } else if (line.startsWith('data: ')) {
+        const dataStr = line.slice(6)
+        try {
+          const data = JSON.parse(dataStr)
+          if (currentEvent === 'content') {
+            onContent(data.text || '')
+          } else if (currentEvent === 'done') {
+            onDone(data)
+          }
+        } catch {
+          // 忽略解析失败的行
+        }
+        currentEvent = ''
+      }
+    }
+  }
+}
+
+async function sendMessage() {
   const text = inputText.value.trim()
   if (!text || isTyping.value) return
 
-  messages.value.push(['user', text])
+  messages.value.push({ role: 'user', text })
   inputText.value = ''
   scrollToBottom()
 
   isTyping.value = true
-  const reply = botReplies[Math.floor(Math.random() * botReplies.length)]
-  const delay = 800 + Math.random() * 1200
+  streamError.value = ''
+  relatedNodes.value = []
+  relatedEdges.value = []
 
-  setTimeout(() => {
-    messages.value.push(['bot', reply])
+  // 添加空的 bot 消息占位，后续流式填充
+  const botMsg = { role: 'bot', text: '' }
+  messages.value.push(botMsg)
+  scrollToBottom()
+
+  try {
+    const resp = await fetch('/api/agent/qa/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: text }),
+    })
+
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}`)
+    }
+
+    const reader = resp.body.getReader()
+
+    await consumeSSE(
+      reader,
+      // onContent: 流式追加文本
+      (chunk) => {
+        botMsg.text += chunk
+        scrollToBottom()
+      },
+      // onDone: 接收图谱检索结果
+      (data) => {
+        if (data.related_nodes) relatedNodes.value = data.related_nodes
+        if (data.related_edges) relatedEdges.value = data.related_edges
+      },
+    )
+
+    // 流结束但没有收到任何内容时的兜底
+    if (!botMsg.text) {
+      botMsg.text = '未能获取到回答，请稍后重试。'
+    }
+  } catch (err) {
+    console.error('QA 流式请求失败:', err)
+    streamError.value = err.message
+    botMsg.text = botMsg.text || '请求失败，请检查网络或后端服务是否正常运行。'
+  } finally {
     isTyping.value = false
     scrollToBottom()
-  }, delay)
+  }
 }
 
 function onKeydown(e) {
@@ -101,6 +175,8 @@ function fillPrompt(text) {
 
 function clearMessages() {
   messages.value = []
+  relatedNodes.value = []
+  relatedEdges.value = []
   nextTick(() => {
     messages.value = [...defaultMessages]
   })
@@ -162,11 +238,12 @@ onMounted(() => {
         <section class="panel chat-panel">
           <header class="panel-header"><h2>生态问答对话</h2><button @click="clearMessages">清空对话</button></header>
           <div ref="messagesEl" class="messages">
-            <article v-for="(message, index) in messages" :key="index" :class="message[0]">
-              <span><component :is="message[0] === 'user' ? Leaf : Bot" :size="18" /></span>
-              <p>{{ message[1] }}</p>
+            <article v-for="(message, index) in messages" :key="index" :class="message.role">
+              <span><component :is="message.role === 'user' ? Leaf : Bot" :size="18" /></span>
+              <p v-if="message.text">{{ message.text }}</p>
+              <p v-else><i class="typing-dots"><b></b><b></b><b></b></i></p>
             </article>
-            <article v-if="isTyping" class="bot typing-indicator">
+            <article v-if="isTyping && !messages.some(m => m.role === 'bot' && !m.text)" class="bot typing-indicator">
               <span><Bot :size="18" /></span>
               <p><i class="typing-dots"><b></b><b></b><b></b></i></p>
             </article>
@@ -189,6 +266,15 @@ onMounted(() => {
 
       <!-- Sidebar -->
       <aside class="agent-search-aside qa-aside min-w-0">
+        <section v-if="relatedNodes.length" class="panel side-feed-panel">
+          <header class="panel-header"><h2>图谱命中节点</h2></header>
+          <ul>
+            <li v-for="node in relatedNodes" :key="node.id">
+              <span class="node-type-tag">{{ node.type }}</span>
+              <span class="node-name">{{ node.name }}</span>
+            </li>
+          </ul>
+        </section>
         <section class="panel side-feed-panel">
           <header class="panel-header"><h2>数据来源</h2></header>
           <ul>

@@ -1,11 +1,12 @@
 """OpenAI 兼容 LLM 客户端。
 
 使用 httpx 调用 OpenAI 兼容的 /chat/completions 接口。
-支持 JSON 和纯文本两种输出模式，带重试和超时处理。
+支持 JSON、纯文本和流式三种输出模式，带重试和超时处理。
 """
 
 import json
 import logging
+from collections.abc import Generator
 from typing import Any
 
 import httpx
@@ -96,6 +97,66 @@ class LLMClient:
         if not raw:
             raise LLMError("LLM 返回空内容", code="LLM_EMPTY_RESPONSE")
         return raw
+
+    def chat_text_stream(
+        self,
+        user_prompt: str,
+        system_prompt: str = _DEFAULT_SYSTEM,
+        temperature: float = 0.5,
+    ) -> Generator[str, None, None]:
+        """调用 chat/completions 流式接口，逐块 yield content 文本。
+
+        使用 stream=True 参数，OpenAI 兼容接口会返回 SSE 格式的增量内容。
+        每行格式为 data: {json}，最后一个 data: [DONE] 标记结束。
+        """
+        body: dict[str, Any] = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "temperature": temperature,
+            "stream": True,
+        }
+        url = f"{self.base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            with httpx.Client(timeout=self.timeout) as client:
+                with client.stream("POST", url, json=body, headers=headers) as resp:
+                    resp.raise_for_status()
+                    for line in resp.iter_lines():
+                        if not line or not line.startswith("data: "):
+                            continue
+                        data_str = line[6:]  # 去掉 "data: " 前缀
+                        if data_str.strip() == "[DONE]":
+                            break
+                        try:
+                            chunk = json.loads(data_str)
+                            delta = chunk.get("choices", [{}])[0].get("delta", {})
+                            content = delta.get("content", "")
+                            if content:
+                                yield content
+                        except (json.JSONDecodeError, IndexError, KeyError):
+                            continue
+        except httpx.TimeoutException:
+            raise LLMError(
+                f"LLM 流式请求超时 ({self.timeout}s)",
+                code="LLM_TIMEOUT",
+            )
+        except httpx.HTTPStatusError as exc:
+            raise LLMError(
+                f"LLM HTTP 错误: {exc.response.status_code} - {exc.response.text[:300]}",
+                code="LLM_HTTP_ERROR",
+            )
+        except httpx.RequestError as exc:
+            raise LLMError(
+                f"LLM 请求失败: {exc}",
+                code="LLM_REQUEST_ERROR",
+            )
 
     def _call_completions(self, body: dict[str, Any]) -> str:
         """发送 HTTP 请求到 /chat/completions 并返回 content 文本。"""

@@ -4,15 +4,18 @@
 """
 
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 
 from app.core.response import success
-from app.models.agent import AgentRunRequest
+from app.models.agent import AgentRunRequest, QaStreamRequest
 from app.services.agent_service import AgentService
+from app.services.qa_service import QaService
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 
 # AgentService 当前不保存请求级状态，可以作为模块级实例复用。
 agent_service = AgentService()
+qa_service = QaService()
 
 
 @router.get("/list")
@@ -36,3 +39,21 @@ def run_agent(request: AgentRunRequest) -> dict:
         params=request.params,
     )
     return success(response.model_dump(mode="json"))
+
+
+@router.post("/qa/stream")
+def qa_stream(request: QaStreamRequest) -> StreamingResponse:
+    """生态问答流式端点。
+
+    返回 SSE (text/event-stream) 格式：
+    - event: content  → data: {"text": "..."}   (回答文本增量)
+    - event: done     → data: {"related_nodes": [...], "related_edges": [...]}  (结束标记)
+    """
+    return StreamingResponse(
+        qa_service.stream_answer(request.query),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
