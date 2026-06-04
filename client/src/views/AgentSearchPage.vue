@@ -10,17 +10,7 @@ import { useDashboardStore } from '../stores/dashboard'
 
 const dashboard = useDashboardStore()
 
-const toasts = ref([])
-let toastId = 0
 const pageRef = ref(null)
-
-function handleInvoke(agent) {
-  const id = ++toastId
-  toasts.value.push({ id, name: agent.name })
-  setTimeout(() => {
-    toasts.value = toasts.value.filter(t => t.id !== id)
-  }, 3000)
-}
 
 onMounted(() => {
   if (!pageRef.value) return
@@ -94,7 +84,7 @@ onMounted(() => {
         <!-- Agent grid -->
         <section class="panel agent-search-panel">
           <div class="agent-grid expanded">
-            <AgentCard v-for="agent in dashboard.data.agents" :key="agent.name" :agent="agent" @invoke="handleInvoke" />
+            <AgentCard v-for="agent in dashboard.data.agents" :key="agent.name" :agent="agent" />
           </div>
         </section>
       </div>
@@ -106,13 +96,5 @@ onMounted(() => {
       </aside>
     </div>
 
-    <!-- Toast -->
-    <div class="toast-container">
-      <TransitionGroup name="toast">
-        <div v-for="toast in toasts" :key="toast.id" class="toast">
-          ✓ 已成功调用「{{ toast.name }}」
-        </div>
-      </TransitionGroup>
-    </div>
   </section>
 </template>

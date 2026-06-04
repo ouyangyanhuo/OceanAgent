@@ -61,22 +61,23 @@
 
 .agent-search-panel .agent-card {
   min-height: 200px;
-  padding: 24px 20px;
-  flex-direction: column;
-  gap: 14px;
+}
+
+.agent-search-panel .agent-core {
+  padding: 24px;
 }
 
 .agent-search-panel .agent-icon {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  aspect-ratio: 1;
 }
 
-.agent-search-panel .agent-title h2 {
-  font-size: 18px;
+.agent-search-panel .agent-meta h2 {
+  font-size: 17px;
 }
 
-.agent-search-panel .agent-body p {
-  min-height: 50px;
+.agent-search-panel .agent-desc {
+  min-height: 48px;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -86,8 +87,8 @@
 }
 
 .agent-search-panel .tags span {
-  font-size: 13px;
-  padding: 5px 10px;
+  font-size: 12px;
+  padding: 4px 10px;
 }
 
 .agent-card {
@@ -96,7 +97,7 @@
   align-items: start;
 }
 
-.agent-body p,
+.agent-desc,
 .timeline p,
 .messages p,
 .knowledge-card-panel p,

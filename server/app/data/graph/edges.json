@@ -412,5 +412,113 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_e7df279e",
+    "source": "species_42584e13",
+    "target": "red_tide_event_f1374af3",
+    "relation": "correlated_with",
+    "weight": 0.9,
+    "properties": {
+      "description": "东海原甲藻是2020年东海赤潮事件的主要藻种，两者高度相关"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_42584e13",
+      "created_at": "2026-06-04T08:21:24",
+      "updated_at": "2026-06-04T08:21:24",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_4bd43a22",
+    "source": "species_42584e13",
+    "target": "observation_d9b0bfd0",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "东海原甲藻大量繁殖导致叶绿素浓度异常升高"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_42584e13",
+      "created_at": "2026-06-04T08:21:24",
+      "updated_at": "2026-06-04T08:21:24",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_d63afc50",
+    "source": "red_tide_event_f1374af3",
+    "target": "species_32d00d03",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "中肋骨条藻是东海常见赤潮藻种，在2020年东海赤潮事件中大量繁殖"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_34f030fc",
+    "source": "red_tide_event_f1374af3",
+    "target": "species_5f741bf3",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "夜光藻是常见赤潮生物，在2020年东海赤潮事件中有一定出现"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_b5c365f5",
+    "source": "red_tide_event_f1374af3",
+    "target": "fishery_area_07b11cdf",
+    "relation": "affected_by",
+    "weight": 0.9,
+    "properties": {
+      "description": "2020年东海赤潮事件对东海渔场的渔业生产造成直接影响，导致捕捞量下降"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_2823f367",
+    "source": "red_tide_event_f1374af3",
+    "target": "species_17bc0d61",
+    "relation": "correlated_with",
+    "weight": 0.75,
+    "properties": {
+      "description": "红色裸甲藻在2020年东海赤潮事件中作为次要藻种被检出"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

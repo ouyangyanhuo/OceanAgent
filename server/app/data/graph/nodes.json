@@ -59,12 +59,14 @@
     "properties": {
       "description": "中国近海常见赤潮藻种，能产生溶血毒素，对海洋生物造成危害"
     },
-    "expanded": {},
+    "expanded": {
+      "related_events": true
+    },
     "metadata": {
       "source": "seed",
       "parent_node": null,
       "created_at": "2026-06-04T05:49:17",
-      "updated_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T08:21:24",
       "version": 1,
       "locked": true
     }
@@ -322,6 +324,110 @@
       "parent_node": "risk_factor_aa90f2bd",
       "created_at": "2026-06-04T05:56:23",
       "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_f1374af3",
+    "type": "RedTideEvent",
+    "name": "2020年东海赤潮事件",
+    "properties": {
+      "description": "2020年5月在浙江舟山海域发生的大规模赤潮，面积约300平方公里，主要藻种为东海原甲藻，对当地渔业造成影响"
+    },
+    "expanded": {
+      "ecological_species": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_42584e13",
+      "created_at": "2026-06-04T08:21:24",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_d9b0bfd0",
+    "type": "Observation",
+    "name": "2020年东海浮标C01叶绿素异常",
+    "properties": {
+      "description": "2020年5月东海浮标C01监测到叶绿素浓度达15 mg/m³，溶解氧降至5 mg/L，指示藻类大量繁殖"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_42584e13",
+      "created_at": "2026-06-04T08:21:24",
+      "updated_at": "2026-06-04T08:21:24",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_32d00d03",
+    "type": "Species",
+    "name": "中肋骨条藻",
+    "properties": {
+      "description": "中国近海常见赤潮藻种，硅藻类，适宜水温15-25℃，盐度25-35‰，在富营养化水体中易爆发"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_5f741bf3",
+    "type": "Species",
+    "name": "夜光藻",
+    "properties": {
+      "description": "甲藻类赤潮生物，能发出蓝色荧光，常见于中国近海，适宜水温18-22℃，盐度28-34‰"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "fishery_area_07b11cdf",
+    "type": "FisheryArea",
+    "name": "东海渔场",
+    "properties": {
+      "description": "中国四大渔场之一，位于东海大陆架，主要渔业资源包括带鱼、小黄鱼、鲳鱼等，受赤潮影响严重"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_17bc0d61",
+    "type": "Species",
+    "name": "红色裸甲藻",
+    "properties": {
+      "description": "甲藻类赤潮藻种，能产生毒素，适宜水温20-28℃，盐度28-35‰，常见于东海和南海"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f1374af3",
+      "created_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T08:21:56",
       "version": 1,
       "locked": true
     }

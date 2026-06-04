@@ -34,5 +34,41 @@
     "summary": "为东海夏季富营养化风险因子扩展了三个相关节点：赤潮藻种米氏凯伦藻、长江口渔场以及海水温度升高风险因子，并建立了相应关系。",
     "created_at": "2026-06-04T05:56:23",
     "updated_at": "2026-06-04T05:56:23"
+  },
+  "species_42584e13:related_events": {
+    "node_id": "species_42584e13",
+    "expand_type": "related_events",
+    "expanded": true,
+    "generated_node_ids": [
+      "red_tide_event_f1374af3",
+      "observation_d9b0bfd0"
+    ],
+    "generated_edge_ids": [
+      "edge_e7df279e",
+      "edge_4bd43a22"
+    ],
+    "summary": "为当前物种节点‘东海原甲藻’扩展了相关的2020年东海赤潮事件和东海浮标C01叶绿素异常观测，并建立correlated_with关系，反映该藻种与赤潮事件及监测指标的关联。",
+    "created_at": "2026-06-04T08:21:24",
+    "updated_at": "2026-06-04T08:21:24"
+  },
+  "red_tide_event_f1374af3:ecological_species": {
+    "node_id": "red_tide_event_f1374af3",
+    "expand_type": "ecological_species",
+    "expanded": true,
+    "generated_node_ids": [
+      "species_32d00d03",
+      "species_5f741bf3",
+      "fishery_area_07b11cdf",
+      "species_17bc0d61"
+    ],
+    "generated_edge_ids": [
+      "edge_d63afc50",
+      "edge_34f030fc",
+      "edge_b5c365f5",
+      "edge_2823f367"
+    ],
+    "summary": "为2020年东海赤潮事件扩展了三个相关物种（中肋骨条藻、夜光藻、红色裸甲藻）和一个渔场（东海渔场），并建立了相关性或受影响关系。",
+    "created_at": "2026-06-04T08:21:56",
+    "updated_at": "2026-06-04T08:21:56"
   }
 }

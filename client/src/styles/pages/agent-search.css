@@ -132,4 +132,11 @@
   background: transparent;
   box-shadow: none;
   padding: 0;
+  height: calc(90vh - 340px);
+  min-height: 300px;
+}
+
+.agent-search-panel .agent-grid {
+  height: 100%;
+  overflow-y: auto;
 }

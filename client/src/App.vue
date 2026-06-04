@@ -166,17 +166,18 @@ onMounted(() => {
 
 .search-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: rgba(4, 17, 35, 0.98);
-  border: 1px solid rgba(35, 137, 255, 0.3);
-  border-radius: 10px;
+  background: rgba(4, 17, 35, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(60, 154, 255, 0.15);
+  border-radius: 14px;
   padding: 6px;
   z-index: 100;
   max-height: 360px;
   overflow-y: auto;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(60, 154, 255, 0.06);
 }
 
 .search-group {
@@ -188,12 +189,12 @@ onMounted(() => {
 }
 
 .search-group-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(158, 200, 231, 0.5);
-  padding: 6px 10px 2px;
+  letter-spacing: 0.08em;
+  color: rgba(158, 200, 231, 0.4);
+  padding: 8px 12px 4px;
 }
 
 .search-item {
@@ -201,24 +202,24 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 8px 10px;
+  padding: 9px 12px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 10px;
   background: transparent;
   color: #dff7ff;
-  font-size: 14px;
+  font-size: 13px;
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .search-item:hover {
-  background: rgba(35, 137, 255, 0.12);
+  background: rgba(60, 154, 255, 0.1);
 }
 
 .search-item svg {
   flex-shrink: 0;
-  color: rgba(158, 200, 231, 0.6);
+  color: rgba(158, 200, 231, 0.5);
 }
 
 .search-item-text {
@@ -235,17 +236,17 @@ onMounted(() => {
 }
 
 .search-item-text small {
-  font-size: 12px;
-  color: rgba(158, 200, 231, 0.45);
+  font-size: 11px;
+  color: rgba(158, 200, 231, 0.4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .search-empty {
-  padding: 16px;
+  padding: 20px;
   text-align: center;
-  color: rgba(158, 200, 231, 0.4);
+  color: rgba(158, 200, 231, 0.35);
   font-size: 13px;
 }
 </style>

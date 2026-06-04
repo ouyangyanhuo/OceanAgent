@@ -227,27 +227,27 @@
   }
 
   .topbar {
-    min-height: 60px;
-    gap: 12px;
-    padding: 0 24px;
+    min-height: 58px;
+    gap: 14px;
+    padding: 0 20px;
   }
 
   .brand strong {
-    font-size: 18px;
+    font-size: 15px;
   }
 
   .brand span {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .global-search {
-    height: 38px;
+    height: 36px;
     padding: 0 14px;
     font-size: 13px;
   }
 
   .top-actions {
-    gap: 10px;
+    gap: 4px;
   }
 
   .icon-button {
@@ -256,19 +256,19 @@
   }
 
   .avatar {
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
   }
 
   .user-chip {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .primary-action {
-    height: 38px;
-    min-height: 38px;
+    height: 32px;
+    min-height: 32px;
     padding: 0 14px;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .content-grid,
@@ -430,24 +430,24 @@
 
   .agent-card {
     min-height: 128px;
-    height: auto;
-    padding: 12px 10px;
-    grid-template-columns: 40px minmax(0, 1fr);
-    gap: 9px;
+  }
+
+  .agent-core {
+    padding: 14px;
+    gap: 10px;
   }
 
   .agent-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    aspect-ratio: 1;
   }
 
-  .agent-title h2 {
+  .agent-meta h2 {
     font-size: 14px;
   }
 
-  .agent-body p {
-    min-height: 35px;
-    margin-top: 5px;
+  .agent-desc {
+    min-height: 32px;
     font-size: 11px;
   }
 
@@ -797,16 +797,13 @@ input {
 
 .agent-card {
   flex: 1 1 218px;
-  display: flex;
-  gap: 11px;
 }
 
-.agent-title {
+.agent-meta {
   min-width: 0;
-  flex-wrap: wrap;
 }
 
-.agent-title h2,
+.agent-meta h2,
 .panel-header h2,
 .graph-header h2,
 .page-title-row h1,
@@ -821,9 +818,6 @@ input {
   flex-wrap: wrap;
 }
 
-.agent-footer button {
-  min-width: 52px;
-}
 
 .pager {
   flex-wrap: wrap;
