@@ -520,5 +520,77 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_11c8311d",
+    "source": "fishery_area_196d437c",
+    "target": "buoy_3c395b71",
+    "relation": "monitored_by",
+    "weight": 0.9,
+    "properties": {
+      "description": "舟山渔场由该浮标进行环境监测。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_743ee130",
+    "source": "fishery_area_196d437c",
+    "target": "buoy_e574e982",
+    "relation": "monitored_by",
+    "weight": 0.8,
+    "properties": {
+      "description": "舟山渔场由该辅助浮标进行环境监测。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_a89882b0",
+    "source": "fishery_area_196d437c",
+    "target": "observation_fb328366",
+    "relation": "observed_by",
+    "weight": 0.85,
+    "properties": {
+      "description": "浮标监测到的叶绿素数据反映渔场环境状态。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_375e5005",
+    "source": "fishery_area_196d437c",
+    "target": "observation_0f31b5ce",
+    "relation": "observed_by",
+    "weight": 0.75,
+    "properties": {
+      "description": "溶解氧数据指示渔场水体健康状况。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

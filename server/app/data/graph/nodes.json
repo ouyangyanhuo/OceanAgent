@@ -78,12 +78,14 @@
     "properties": {
       "description": "中国最大渔场，位于东海北部，受赤潮影响显著"
     },
-    "expanded": {},
+    "expanded": {
+      "monitoring_buoys": true
+    },
     "metadata": {
       "source": "seed",
       "parent_node": null,
       "created_at": "2026-06-04T05:49:17",
-      "updated_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T12:07:02",
       "version": 1,
       "locked": true
     }
@@ -428,6 +430,74 @@
       "parent_node": "red_tide_event_f1374af3",
       "created_at": "2026-06-04T08:21:56",
       "updated_at": "2026-06-04T08:21:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_3c395b71",
+    "type": "Buoy",
+    "name": "舟山渔场浮标01",
+    "properties": {
+      "description": "位于舟山渔场中心区域的监测浮标，实时监测水温、盐度、叶绿素等参数。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_e574e982",
+    "type": "Buoy",
+    "name": "舟山渔场浮标02",
+    "properties": {
+      "description": "位于舟山渔场东部边缘的辅助监测浮标，主要监测溶解氧和营养盐。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_fb328366",
+    "type": "Observation",
+    "name": "叶绿素浓度观测",
+    "properties": {
+      "description": "舟山渔场浮标01监测到的叶绿素a浓度异常，数值范围0.5-20 mg/m³。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_0f31b5ce",
+    "type": "Observation",
+    "name": "溶解氧观测",
+    "properties": {
+      "description": "舟山渔场浮标02监测的溶解氧浓度，数值范围4-10 mg/L。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T12:07:02",
       "version": 1,
       "locked": true
     }

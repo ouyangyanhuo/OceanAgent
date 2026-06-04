@@ -1,6 +1,6 @@
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
-import { Bot, Leaf, MessageSquare, Send, Settings } from 'lucide-vue-next'
+import { Bot, Leaf, MessageSquare, Search, Send, Settings } from 'lucide-vue-next'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 
@@ -33,7 +33,6 @@ const messages = ref([...defaultMessages])
 const inputText = ref('')
 const isTyping = ref(false)
 const messagesEl = ref(null)
-const hoveredSeg = ref(-1)
 const showConfig = ref(false)
 
 const modelInfo = ref([
@@ -77,7 +76,6 @@ function sendMessage() {
   inputText.value = ''
   scrollToBottom()
 
-  // Simulate bot typing
   isTyping.value = true
   const reply = botReplies[Math.floor(Math.random() * botReplies.length)]
   const delay = 800 + Math.random() * 1200
@@ -111,36 +109,15 @@ function clearMessages() {
 onMounted(() => {
   const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
 
-  // Hero entrance
-  tl.from('.qa-hero', { y: -20, opacity: 0, duration: 0.5 })
-
   // Metric cards stagger in
   tl.from('.qa-metrics .metric-card', {
-    y: 30, opacity: 0, duration: 0.5, stagger: 0.1,
-  }, '-=0.2')
+    y: 20, opacity: 0, duration: 0.6, stagger: 0.08,
+  })
 
-  // Metric numbers count up
-  tl.add(() => {
-    document.querySelectorAll('.qa-metrics .metric-card strong').forEach(el => {
-      const text = el.textContent.trim()
-      const numMatch = text.match(/^[\d,.]+/)
-      if (!numMatch) return
-      const target = parseFloat(numMatch[0].replace(/,/g, ''))
-      const suffix = text.slice(numMatch[0].length)
-      const obj = { val: 0 }
-      gsap.to(obj, {
-        val: target,
-        duration: 1.5,
-        ease: 'power2.out',
-        onUpdate() {
-          const formatted = target >= 1000
-            ? Math.round(obj.val).toLocaleString()
-            : obj.val.toFixed(1)
-          el.textContent = formatted + suffix
-        },
-      })
-    })
-  }, '-=0.8')
+  // Page hero
+  tl.from('.page-hero', {
+    y: 16, opacity: 0, duration: 0.5, ease: 'power3.out',
+  }, '-=0.3')
 
   // Chat panel slide in
   tl.from('.chat-panel', {
@@ -148,31 +125,8 @@ onMounted(() => {
   }, '-=0.3')
 
   // Sidebar panels stagger in
-  tl.from('.qa-sidebar .panel', {
-    x: 30, opacity: 0, duration: 0.4, stagger: 0.12,
-  }, '-=0.3')
-
-  // Data source list items stagger
-  tl.from('.side-feed-panel li', {
-    x: 20, opacity: 0, duration: 0.3, stagger: 0.06,
-  }, '-=0.2')
-
-  // Record table rows stagger
-  tl.from('.record-panel tbody tr', {
-    y: 12, opacity: 0, duration: 0.3, stagger: 0.06,
-  }, '-=0.2')
-
-  // Distribution donut segments draw in
-  tl.from('.donut-segment', {
-    strokeDashoffset: circumference,
-    duration: 1,
-    stagger: 0.15,
-    ease: 'power2.out',
-  }, '-=0.3')
-
-  // Distribution list items stagger
-  tl.from('.distribution-panel li', {
-    x: 16, opacity: 0, duration: 0.3, stagger: 0.08,
+  tl.from('.qa-aside > *', {
+    y: 20, opacity: 0, duration: 0.5, stagger: 0.1,
   }, '-=0.3')
 
   scrollToBottom()
@@ -180,57 +134,61 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="page qa-page min-w-0">
-    <!-- 上方区域：标题和指标卡片 -->
-    <div class="qa-header min-w-0">
-      <div class="qa-hero min-w-0">
-        <div class="agent-orb"><MessageSquare :size="34" /></div>
-        <div>
-          <h1>海洋生态问答智能体 <span>在线</span></h1>
-          <p>面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体</p>
-        </div>
-        <div class="page-actions">
-          <button @click="showConfig = true"><Settings :size="17" />对话配置</button>
-        </div>
-      </div>
-
-      <div class="metrics-grid qa-metrics min-w-0">
-        <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
-      </div>
+  <section class="page agent-search-page min-w-0">
+    <!-- Metrics -->
+    <div class="metrics-grid qa-metrics min-w-0">
+      <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
     </div>
 
-    <!-- 下方区域：聊天对话和信息面板 -->
-    <div class="qa-content min-w-0">
-      <!-- 左侧：聊天对话区域（核心） -->
-      <section class="panel chat-panel">
-        <header class="panel-header"><h2>生态问答对话</h2><button @click="clearMessages">清空对话</button></header>
-        <div ref="messagesEl" class="messages">
-          <article v-for="(message, index) in messages" :key="index" :class="message[0]">
-            <span><component :is="message[0] === 'user' ? Leaf : Bot" :size="18" /></span>
-            <p>{{ message[1] }}</p>
-          </article>
-          <article v-if="isTyping" class="bot typing-indicator">
-            <span><Bot :size="18" /></span>
-            <p><i class="typing-dots"><b></b><b></b><b></b></i></p>
-          </article>
+    <!-- Main layout -->
+    <div class="agent-search-layout min-w-0">
+      <div class="agent-search-main min-w-0">
+        <!-- Page hero -->
+        <div class="page-hero">
+          <div class="page-hero-icon"><Search :size="28" /></div>
+          <div class="page-hero-text">
+            <h1>海洋生态问答智能体</h1>
+            <p>面向海洋生态知识问答、知识检索、关系推理与科普服务的智能体</p>
+          </div>
+          <div class="page-hero-meta">
+            <span class="meta-badge"><MessageSquare :size="14" /> 多轮对话</span>
+          </div>
+          <div class="page-actions">
+            <button @click="showConfig = true"><Settings :size="17" />对话配置</button>
+          </div>
         </div>
-        <div class="prompt-chips">
-          <button @click="fillPrompt('海洋生物多样性现状如何？')">海洋生物多样性现状如何？</button>
-          <button @click="fillPrompt('珊瑚礁白化的原因及影响？')">珊瑚礁白化的原因及影响？</button>
-          <button @click="fillPrompt('红树林生态价值有哪些？')">红树林生态价值有哪些？</button>
-        </div>
-        <label class="chat-input">
-          <input
-            v-model="inputText"
-            placeholder="输入你的问题，Shift + Enter 换行，Enter 发送"
-            @keydown="onKeydown"
-          />
-          <button @click="sendMessage"><Send :size="18" /></button>
-        </label>
-      </section>
 
-      <!-- 右侧：信息面板 -->
-      <div class="qa-sidebar">
+        <!-- Chat panel -->
+        <section class="panel chat-panel">
+          <header class="panel-header"><h2>生态问答对话</h2><button @click="clearMessages">清空对话</button></header>
+          <div ref="messagesEl" class="messages">
+            <article v-for="(message, index) in messages" :key="index" :class="message[0]">
+              <span><component :is="message[0] === 'user' ? Leaf : Bot" :size="18" /></span>
+              <p>{{ message[1] }}</p>
+            </article>
+            <article v-if="isTyping" class="bot typing-indicator">
+              <span><Bot :size="18" /></span>
+              <p><i class="typing-dots"><b></b><b></b><b></b></i></p>
+            </article>
+          </div>
+          <div class="prompt-chips">
+            <button @click="fillPrompt('海洋生物多样性现状如何？')">海洋生物多样性现状如何？</button>
+            <button @click="fillPrompt('珊瑚礁白化的原因及影响？')">珊瑚礁白化的原因及影响？</button>
+            <button @click="fillPrompt('红树林生态价值有哪些？')">红树林生态价值有哪些？</button>
+          </div>
+          <label class="chat-input">
+            <input
+              v-model="inputText"
+              placeholder="输入你的问题，Shift + Enter 换行，Enter 发送"
+              @keydown="onKeydown"
+            />
+            <button @click="sendMessage"><Send :size="18" /></button>
+          </label>
+        </section>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="agent-search-aside qa-aside min-w-0">
         <section class="panel side-feed-panel">
           <header class="panel-header"><h2>数据来源</h2><button>更多 ›</button></header>
           <ul>
@@ -240,14 +198,6 @@ onMounted(() => {
             <li>卫星遥感海洋生态专题 <span>正常</span></li>
             <li>学术文献与知识库 <span>正常</span></li>
           </ul>
-        </section>
-
-        <section class="panel record-panel">
-          <header class="panel-header"><h2>问答记录列表</h2><button>更多 ›</button></header>
-          <table>
-            <thead><tr><th>时间</th><th>问题</th><th>主题</th><th>来源</th><th>置信度</th></tr></thead>
-            <tbody><tr v-for="record in records" :key="record[0] + record[1]"><td>{{ record[0] }}</td><td>{{ record[1] }}</td><td>{{ record[2] }}</td><td>{{ record[3] }}</td><td>{{ record[4] }}</td></tr></tbody>
-          </table>
         </section>
 
         <section class="panel distribution-panel">
@@ -266,7 +216,6 @@ onMounted(() => {
                   :stroke="seg.color"
                   :stroke-dasharray="seg.dasharray"
                   :stroke-dashoffset="seg.dashoffset"
-                  :style="{ '--target-offset': seg.dashoffset }"
                 />
               </svg>
               <div class="donut-center">
@@ -275,11 +224,7 @@ onMounted(() => {
               </div>
             </div>
             <ul>
-              <li v-for="(seg, i) in donutSegments" :key="i"
-                :class="{ active: hoveredSeg === i }"
-                @mouseenter="hoveredSeg = i"
-                @mouseleave="hoveredSeg = -1"
-              >
+              <li v-for="(seg, i) in donutSegments" :key="i">
                 <i class="seg-dot" :style="{ background: seg.color }"></i>
                 <span>{{ seg.label }}</span>
                 <b>{{ seg.count }}</b>
@@ -288,7 +233,7 @@ onMounted(() => {
             </ul>
           </div>
         </section>
-      </div>
+      </aside>
     </div>
 
     <!-- 对话配置弹窗 -->

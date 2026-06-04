@@ -535,6 +535,11 @@
   white-space: nowrap;
 }
 
+/* ── 侧边栏数据来源间距 ── */
+.qa-aside .side-feed-panel:first-child {
+  margin-top: 14px;
+}
+
 /* ── 智能建议 ── */
 .qa-advice-panel {
   padding: 12px;

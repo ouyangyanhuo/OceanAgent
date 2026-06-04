@@ -70,5 +70,25 @@
     "summary": "为2020年东海赤潮事件扩展了三个相关物种（中肋骨条藻、夜光藻、红色裸甲藻）和一个渔场（东海渔场），并建立了相关性或受影响关系。",
     "created_at": "2026-06-04T08:21:56",
     "updated_at": "2026-06-04T08:21:56"
+  },
+  "fishery_area_196d437c:monitoring_buoys": {
+    "node_id": "fishery_area_196d437c",
+    "expand_type": "monitoring_buoys",
+    "expanded": true,
+    "generated_node_ids": [
+      "buoy_3c395b71",
+      "buoy_e574e982",
+      "observation_fb328366",
+      "observation_0f31b5ce"
+    ],
+    "generated_edge_ids": [
+      "edge_11c8311d",
+      "edge_743ee130",
+      "edge_a89882b0",
+      "edge_375e5005"
+    ],
+    "summary": "为舟山渔场扩展了两个监测浮标（舟山渔场浮标01和02）及其相关观测（叶绿素浓度和溶解氧），建立了渔场被浮标监测和观测的关系。",
+    "created_at": "2026-06-04T12:07:02",
+    "updated_at": "2026-06-04T12:07:02"
   }
 }

@@ -151,8 +151,11 @@
     grid-template-rows: auto;
   }
 
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
   .agent-grid,
-  .metrics-grid,
   .source-grid,
   .resource-grid,
   .flow-steps {
@@ -302,7 +305,8 @@
   .task-metrics,
   .qa-metrics,
   .detail-metrics,
-  .graph-metrics {
+  .graph-metrics,
+  .route-metrics {
     gap: 8px;
   }
 
@@ -766,14 +770,14 @@ input {
 .agent-search-metrics,
 .graph-metrics,
 .qa-metrics,
-.detail-metrics {
-  display: flex;
-  flex-wrap: wrap;
+.detail-metrics,
+.route-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
 
 .metric-card {
-  flex: 1 1 188px;
   display: flex;
   flex-direction: column;
 }
@@ -1050,6 +1054,10 @@ td {
   .graph-metrics,
   .qa-metrics,
   .detail-metrics,
+  .route-metrics {
+    grid-template-columns: 1fr;
+  }
+
   .agent-grid,
   .agent-grid.expanded,
   .source-grid,
