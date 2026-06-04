@@ -110,7 +110,7 @@ onMounted(() => {
   const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
 
   // Metric cards stagger in
-  tl.from('.qa-metrics .metric-card', {
+  tl.from('.agent-search-metrics .metric-card', {
     y: 20, opacity: 0, duration: 0.6, stagger: 0.08,
   })
 
@@ -136,7 +136,7 @@ onMounted(() => {
 <template>
   <section class="page agent-search-page min-w-0">
     <!-- Metrics -->
-    <div class="metrics-grid qa-metrics min-w-0">
+    <div class="metrics-grid agent-search-metrics min-w-0">
       <MetricCard v-for="metric in metrics" :key="metric.label" :metric="metric" />
     </div>
 

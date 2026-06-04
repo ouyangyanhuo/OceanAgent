@@ -385,10 +385,10 @@
 .route-main,
 .route-alt {
   fill: none;
-  stroke: #7cffb3;
+  stroke: #16d6ff;
   stroke-width: 1.4;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 6px #23e996);
+  filter: drop-shadow(0 0 6px #16d6ff);
 }
 
 .route-alt {
@@ -549,7 +549,7 @@
   position: absolute;
   left: 40%;
   top: 32%;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, #1289ff, #0d6bdf);
   color: white;
   padding: 4px 10px;
   border-radius: 6px;
@@ -558,7 +558,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 2px 8px rgba(18, 137, 255, 0.4);
 }
 .optimal-label .route-name {
   font-size: 14px;
@@ -570,9 +570,9 @@
 }
 
 .route-optimal {
-  stroke: #22c55e !important;
+  stroke: #16d6ff !important;
   stroke-width: 0.8 !important;
-  filter: url(#glowGreen) !important;
+  filter: url(#glowCyan) !important;
 }
 
 .route-alt-2 {
@@ -583,27 +583,27 @@
   opacity: 0.5;
 }
 
-.map-legend .green {
-  color: #22c55e !important;
+.map-legend .cyan {
+  color: #16d6ff !important;
   font-weight: bold;
 }
-.map-legend .green::before {
-  background: #22c55e !important;
+.map-legend .cyan::before {
+  background: #16d6ff !important;
 }
 
 .optimal-row {
-  background: rgba(34, 197, 94, 0.15) !important;
-  border-left: 3px solid #22c55e;
+  background: rgba(18, 137, 255, 0.12) !important;
+  border-left: 3px solid #1289ff;
 }
 .optimal-row:hover {
-  background: rgba(34, 197, 94, 0.25) !important;
+  background: rgba(18, 137, 255, 0.2) !important;
 }
 .optimal-tag {
-  color: #22c55e;
+  color: #16d6ff;
   font-weight: bold;
 }
 .highlight-value {
-  color: #22c55e;
+  color: #16d6ff;
   font-weight: bold;
 }
 .star-rating.best {
@@ -622,8 +622,8 @@
   font-weight: bold;
 }
 .risk-badge.risk-低 {
-  background: rgba(34, 197, 94, 0.2);
-  color: #4ade80;
+  background: rgba(37, 214, 200, 0.2);
+  color: #25d6c8;
 }
 .risk-badge.risk-中 {
   background: rgba(245, 158, 11, 0.2);
@@ -651,8 +651,8 @@
   color: #fbbf24;
 }
 .risk-segment.level-低 {
-  background: rgba(34, 197, 94, 0.3);
-  color: #4ade80;
+  background: rgba(37, 214, 200, 0.3);
+  color: #25d6c8;
 }
 
 .source-link {
@@ -688,21 +688,21 @@
 }
 .trend-panel .trend-line.line1 {
   fill: none;
-  stroke: #3b82f6;
+  stroke: #16d6ff;
   stroke-width: 2;
 }
 .trend-panel .trend-line.line2 {
   fill: none;
-  stroke: #22c55e;
+  stroke: #25d6c8;
   stroke-width: 2;
 }
 .trend-panel:hover .trend-line.line1 {
   stroke-width: 3;
-  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
+  filter: drop-shadow(0 0 6px rgba(22, 214, 255, 0.6));
 }
 .trend-panel:hover .trend-line.line2 {
   stroke-width: 3;
-  filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.6));
+  filter: drop-shadow(0 0 6px rgba(37, 214, 200, 0.6));
 }
 
 /* ── Generic modal styles ── */
@@ -966,5 +966,40 @@
 }
 .share-btn.qq:hover svg {
   background: rgba(18, 183, 245, 0.2);
+}
+
+/* ── Route page: blue-tinted panels (override teal glow) ── */
+.route-main .panel,
+.route-aside .panel,
+.route-metrics .metric-card {
+  background:
+    linear-gradient(180deg, rgba(9, 43, 78, 0.78), rgba(4, 22, 43, 0.88)),
+    radial-gradient(circle at 20% 0%, rgba(22, 137, 255, 0.06), transparent 28%);
+}
+
+.route-hero-icon {
+  background: linear-gradient(135deg, rgba(22, 214, 255, 0.25), rgba(22, 214, 255, 0.05));
+  color: #16d6ff;
+}
+
+.route-main .qa-advice-panel article:first-child svg { color: #1289ff; }
+.route-main .qa-advice-panel article:nth-child(2) svg { color: #ffb23e; }
+.route-main .qa-advice-panel article:nth-child(3) svg { color: #25d6c8; }
+
+.route-main .detail-table tbody tr:hover {
+  background: rgba(22, 214, 255, 0.06);
+  border-left: 2px solid rgba(22, 214, 255, 0.4);
+}
+
+.route-aside .side-feed-panel li:hover {
+  background: rgba(22, 214, 255, 0.06);
+}
+
+.route-aside .trend-panel {
+  border-top: 2px solid rgba(22, 214, 255, 0.15);
+}
+
+.route-aside .detail-table.compact {
+  border-top: 2px solid rgba(255, 107, 136, 0.12);
 }
 
