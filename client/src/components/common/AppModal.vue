@@ -49,6 +49,13 @@ function onOverlayClick(e) {
   place-items: center;
   background: rgba(2, 10, 22, 0.75);
   backdrop-filter: blur(8px);
+  opacity: 1;
+  transition: opacity 0.2s ease-out;
+}
+
+.modal-overlay.modal-enter-from,
+.modal-overlay.modal-leave-to {
+  opacity: 0;
 }
 
 .modal-container {
@@ -62,6 +69,15 @@ function onOverlayClick(e) {
   display: flex;
   flex-direction: column;
   max-height: 85vh;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-enter-from .modal-container,
+.modal-leave-to .modal-container {
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
 }
 
 .modal-header {
@@ -113,42 +129,5 @@ function onOverlayClick(e) {
   gap: 8px;
   padding: 14px 20px;
   border-top: 1px solid rgba(39, 151, 255, 0.12);
-}
-
-/* ── 动画 ── */
-.modal-enter-active {
-  animation: modal-in 0.2s ease-out;
-}
-
-.modal-leave-active {
-  animation: modal-in 0.15s ease-in reverse;
-}
-
-@keyframes modal-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.modal-enter-active .modal-container {
-  animation: modal-box-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.modal-leave-active .modal-container {
-  animation: modal-box-in 0.15s ease-in reverse;
-}
-
-@keyframes modal-box-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 </style>

@@ -38,12 +38,17 @@ const animateMetrics = () => {
   })
 }
 
+const today = new Date()
+const mm = String(today.getMonth() + 1).padStart(2, '0')
+const dd = String(today.getDate()).padStart(2, '0')
+const dateTag = `${mm}-${dd}`
+
 const ranking = [
-  ['西沙北部渔场', '94.0', '162.8', '金枪鱼、飞鱼、鲣鱼', '06-04 06:00 - 22:00'],
-  ['文昌外海渔场', '91.0', '154.6', '金枪鱼、鲐鱼、马鲛鱼', '06-04 07:00 - 23:00'],
-  ['琼州海峡渔场', '86.0', '143.2', '马鲛鱼、鲳鱼、鲷鱼', '06-04 06:30 - 21:30'],
-  ['万宁近海渔场', '84.0', '136.5', '带鱼、鲷鱼、鲐鱼', '06-04 08:00 - 22:00'],
-  ['儋州近海渔场', '81.0', '128.7', '鲳鱼、马鲛鱼、金线鱼', '06-04 07:30 - 20:30'],
+  ['西沙北部渔场', '94.0', '162.8', '金枪鱼、飞鱼、鲣鱼', `${dateTag} 06:00 - 22:00`],
+  ['文昌外海渔场', '91.0', '154.6', '金枪鱼、鲐鱼、马鲛鱼', `${dateTag} 07:00 - 23:00`],
+  ['琼州海峡渔场', '86.0', '143.2', '马鲛鱼、鲳鱼、鲷鱼', `${dateTag} 06:30 - 21:30`],
+  ['万宁近海渔场', '84.0', '136.5', '带鱼、鲷鱼、鲐鱼', `${dateTag} 08:00 - 22:00`],
+  ['儋州近海渔场', '81.0', '128.7', '鲳鱼、马鲛鱼、金线鱼', `${dateTag} 07:30 - 20:30`],
 ]
 
 const indicators = ['表层水温', '叶绿素a', '盐度', '溶解氧', '有效波高', '生物量指数']
@@ -76,25 +81,27 @@ const reportTypes = [
 const timeRanges = ['近24小时', '近3天', '近7天', '近30天', '自定义']
 
 const fullRankingData = [
-  { rank: 1, name: '西沙北部渔场', suitability: '94.0', abundance: '162.8', fish: '金枪鱼、飞鱼、鲣鱼', window: '06-07 06:00 - 22:00' },
-  { rank: 2, name: '文昌外海渔场', suitability: '91.0', abundance: '154.6', fish: '金枪鱼、鲐鱼、马鲛鱼', window: '06-07 07:00 - 23:00' },
-  { rank: 3, name: '琼州海峡渔场', suitability: '86.0', abundance: '143.2', fish: '马鲛鱼、鲳鱼、鲷鱼', window: '06-07 06:30 - 21:30' },
-  { rank: 4, name: '万宁近海渔场', suitability: '84.0', abundance: '136.5', fish: '带鱼、鲷鱼、鲐鱼', window: '06-07 08:00 - 22:00' },
-  { rank: 5, name: '儋州近海渔场', suitability: '81.0', abundance: '128.7', fish: '鲳鱼、马鲛鱼、金线鱼', window: '06-07 07:30 - 20:30' },
-  { rank: 6, name: '陵水渔场', suitability: '79.0', abundance: '119.4', fish: '石斑鱼、鲷鱼、鱿鱼', window: '06-07 08:00 - 20:00' },
-  { rank: 7, name: '三亚外海渔场', suitability: '76.0', abundance: '112.6', fish: '鱿鱼、鲭鱼、鲣鱼', window: '06-07 09:00 - 20:00' },
-  { rank: 8, name: '东方近海渔场', suitability: '72.0', abundance: '105.8', fish: '金线鱼、鲷鱼、马鲛鱼', window: '06-07 09:30 - 19:00' },
-  { rank: 9, name: '北部湾东缘渔场', suitability: '69.5', abundance: '98.4', fish: '带鱼、鲳鱼、鱿鱼', window: '06-07 10:00 - 18:30' },
-  { rank: 10, name: '南海北部近岸渔场', suitability: '66.8', abundance: '91.7', fish: '鲐鱼、鲷鱼、金线鱼', window: '06-07 10:00 - 18:00' },
+  { rank: 1, name: '西沙北部渔场', suitability: '94.0', abundance: '162.8', fish: '金枪鱼、飞鱼、鲣鱼', window: `${dateTag} 06:00 - 22:00` },
+  { rank: 2, name: '文昌外海渔场', suitability: '91.0', abundance: '154.6', fish: '金枪鱼、鲐鱼、马鲛鱼', window: `${dateTag} 07:00 - 23:00` },
+  { rank: 3, name: '琼州海峡渔场', suitability: '86.0', abundance: '143.2', fish: '马鲛鱼、鲳鱼、鲷鱼', window: `${dateTag} 06:30 - 21:30` },
+  { rank: 4, name: '万宁近海渔场', suitability: '84.0', abundance: '136.5', fish: '带鱼、鲷鱼、鲐鱼', window: `${dateTag} 08:00 - 22:00` },
+  { rank: 5, name: '儋州近海渔场', suitability: '81.0', abundance: '128.7', fish: '鲳鱼、马鲛鱼、金线鱼', window: `${dateTag} 07:30 - 20:30` },
+  { rank: 6, name: '陵水渔场', suitability: '79.0', abundance: '119.4', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 08:00 - 20:00` },
+  { rank: 7, name: '三亚外海渔场', suitability: '76.0', abundance: '112.6', fish: '鱿鱼、鲭鱼、鲣鱼', window: `${dateTag} 09:00 - 20:00` },
+  { rank: 8, name: '东方近海渔场', suitability: '72.0', abundance: '105.8', fish: '金线鱼、鲷鱼、马鲛鱼', window: `${dateTag} 09:30 - 19:00` },
+  { rank: 9, name: '北部湾东缘渔场', suitability: '69.5', abundance: '98.4', fish: '带鱼、鲳鱼、鱿鱼', window: `${dateTag} 10:00 - 18:30` },
+  { rank: 10, name: '南海北部近岸渔场', suitability: '66.8', abundance: '91.7', fish: '鲐鱼、鲷鱼、金线鱼', window: `${dateTag} 10:00 - 18:00` },
 ]
 
+const dateStr = `${today.getFullYear()}-${mm}-${dd}`
+
 const modelDetails = [
-  { name: '渔场适宜性评估模型', status: '运行中', accuracy: '94.2%', updateTime: '2024-05-24 08:00', description: '基于多源卫星数据评估渔场适宜性' },
-  { name: '资源丰度预测模型', status: '运行中', accuracy: '91.5%', updateTime: '2024-05-24 08:00', description: '结合历史渔获与海洋环境预测资源量' },
-  { name: '鱼群热点识别模型', status: '运行中', accuracy: '88.7%', updateTime: '2024-05-24 08:00', description: 'AI识别鱼群聚集区域' },
-  { name: '作业窗口研判模型', status: '运行中', accuracy: '93.1%', updateTime: '2024-05-24 08:00', description: '综合气象海浪评估作业窗口' },
-  { name: '渔情短期预测模型', status: '运行中', accuracy: '86.9%', updateTime: '2024-05-24 08:00', description: '未来3-7天渔情趋势预测' },
-  { name: '渔业资源评估模型', status: '待更新', accuracy: '79.2%', updateTime: '2024-05-23 14:00', description: '渔业资源存量评估' },
+  { name: '渔场适宜性评估模型', status: '运行中', accuracy: '94.2%', updateTime: `${dateStr} 01:00`, description: '基于多源卫星数据评估渔场适宜性' },
+  { name: '资源丰度预测模型', status: '运行中', accuracy: '91.5%', updateTime: `${dateStr} 01:08`, description: '结合历史渔获与海洋环境预测资源量' },
+  { name: '鱼群热点识别模型', status: '运行中', accuracy: '88.7%', updateTime: `${dateStr} 01:15`, description: 'AI识别鱼群聚集区域' },
+  { name: '作业窗口研判模型', status: '运行中', accuracy: '93.1%', updateTime: `${dateStr} 01:23`, description: '综合气象海浪评估作业窗口' },
+  { name: '渔情短期预测模型', status: '运行中', accuracy: '86.9%', updateTime: `${dateStr} 01:38`, description: '未来3-7天渔情趋势预测' },
+  { name: '渔业资源评估模型', status: '待更新', accuracy: '79.2%', updateTime: `${dateStr} 01:52`, description: '渔业资源存量评估' },
 ]
 
 const fishTargetDetails = [
@@ -114,7 +121,7 @@ const sourceDetails = [
   { name: '渔船AIS', status: '正常', delay: '5分钟', type: '船舶定位', coverage: '近海区域', updateFreq: '实时' },
   { name: '渔获上报', status: '正常', delay: '2小时', type: '智能终端', coverage: '渔港', updateFreq: '每日' },
   { name: '声学探测', status: '正常', delay: '4小时', type: '科学调查', coverage: '调查航次', updateFreq: '每周' },
-  { name: '历史渔情库', status: '正常', delay: '离线', type: '数据库', coverage: '2000-2024', updateFreq: '季度更新' },
+  { name: '历史渔情库', status: '正常', delay: '3小时', type: '数据库', coverage: '2000-2025', updateFreq: '季度更新' },
   { name: '气象卫星', status: '正常', delay: '1小时', type: '风云卫星', coverage: '全海域', updateFreq: '每小时' },
   { name: '海浪预报', status: '正常', delay: '6小时', type: '数值预报', coverage: '中国近海', updateFreq: '每日2次' },
 ]
