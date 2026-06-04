@@ -393,24 +393,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── 流式输出光标 ── */
-.messages article.streaming .msg-body::after {
-  content: '';
-  display: inline-block;
-  width: 2px;
-  height: 15px;
-  margin-left: 3px;
-  background: linear-gradient(180deg, rgba(100, 200, 255, 0.9), rgba(60, 150, 255, 0.4));
-  border-radius: 1px;
-  animation: cursorPulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  vertical-align: text-bottom;
-}
-
-@keyframes cursorPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.15; }
-}
-
 /* ── 清空对话按钮 ── */
 .panel-header .clear-btn {
   display: inline-flex;

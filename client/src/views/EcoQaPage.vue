@@ -29,8 +29,6 @@ const defaultMessages = [
 const messages = ref([...defaultMessages])
 const inputText = ref('')
 const isTyping = ref(false)
-const thinkingPhase = ref('')       // 'keyword' | 'search' | 'think' | ''
-const statusMessage = ref('')
 const messagesEl = ref(null)
 const showConfig = ref(false)
 const relatedNodes = ref([])
@@ -128,17 +126,13 @@ async function sendMessage() {
   scrollToBottom()
 
   isTyping.value = true
-  thinkingPhase.value = 'keyword'
-  statusMessage.value = '正在提取关键词...'
   relatedNodes.value = []
   relatedEdges.value = []
-
-  // 创建新的 AbortController
   abortController = new AbortController()
 
-  // 添加空的 bot 消息占位，后续流式填充
-  const botMsg = { role: 'bot', text: '', streaming: false }
-  messages.value.push(botMsg)
+  // 通过数组下标访问，确保操作的是 Vue Proxy 包装后的响应式对象
+  messages.value.push({ role: 'bot', text: '', status: '正在提取关键词...' })
+  const botIdx = messages.value.length - 1
   scrollToBottom()
 
   try {
@@ -149,27 +143,19 @@ async function sendMessage() {
       signal: abortController.signal,
     })
 
-    if (!resp.ok) {
-      throw new Error(`HTTP ${resp.status}`)
-    }
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
 
     const reader = resp.body.getReader()
+    const contentParts = []
 
     await consumeSSE(reader, {
       onStatus(data) {
-        thinkingPhase.value = data.phase || 'think'
-        statusMessage.value = data.message || ''
+        messages.value[botIdx].status = data.message || 'AI 思考中...'
         scrollToBottom()
       },
       onContent(chunk) {
-        // 收到第一个内容块时，结束"思考中"状态
-        if (!botMsg.streaming) {
-          botMsg.streaming = true
-          thinkingPhase.value = ''
-          statusMessage.value = ''
-        }
-        botMsg.text += chunk
-        scrollToBottom()
+        contentParts.push(chunk)
+        messages.value[botIdx].status = 'AI 输出中...'
       },
       onDone(data) {
         if (data.related_nodes) relatedNodes.value = data.related_nodes
@@ -177,23 +163,17 @@ async function sendMessage() {
       },
     })
 
-    // 流结束但没有收到任何内容时的兜底
-    if (!botMsg.text) {
-      botMsg.text = '未能获取到回答，请稍后重试。'
-    }
+    messages.value[botIdx].text = contentParts.join('') || '未能获取到回答，请稍后重试。'
   } catch (err) {
     if (err.name === 'AbortError') {
-      // 用户主动取消，不显示错误
-      botMsg.text = botMsg.text || '已取消。'
+      messages.value[botIdx].text = messages.value[botIdx].text || '已取消。'
     } else {
       console.error('QA 流式请求失败:', err)
-      botMsg.text = botMsg.text || '⚠️ 请求失败，请检查网络或后端服务是否正常运行。'
+      messages.value[botIdx].text = '⚠️ 请求失败，请检查网络或后端服务是否正常运行。'
     }
   } finally {
-    botMsg.streaming = false
+    messages.value[botIdx].status = ''
     isTyping.value = false
-    thinkingPhase.value = ''
-    statusMessage.value = ''
     abortController = null
     scrollToBottom()
   }
@@ -212,13 +192,10 @@ function fillPrompt(text) {
 }
 
 function clearMessages() {
-  // 如果正在流式输出，先取消请求
   if (abortController) {
     abortController.abort()
   }
   isTyping.value = false
-  thinkingPhase.value = ''
-  statusMessage.value = ''
   relatedNodes.value = []
   relatedEdges.value = []
   messages.value = []
@@ -290,17 +267,17 @@ onUnmounted(() => {
             <button class="clear-btn" @click="clearMessages"><Trash2 :size="14" /> 清空对话</button>
           </header>
           <div ref="messagesEl" class="messages">
-            <article v-for="(message, index) in messages" :key="index" :class="[message.role, { streaming: message.streaming }]">
+            <article v-for="(message, index) in messages" :key="index" :class="message.role">
               <span class="msg-avatar"><component :is="message.role === 'user' ? Leaf : Bot" :size="18" /></span>
               <!-- 用户消息：纯文本 -->
               <p v-if="message.role === 'user'" class="msg-body">{{ message.text }}</p>
-              <!-- Bot 消息：有内容时渲染 Markdown -->
+              <!-- Bot 消息：有文本 → 渲染 Markdown -->
               <div v-else-if="message.text" class="msg-body md-content" v-html="renderMarkdown(message.text)"></div>
-              <!-- Bot 消息：无内容且正在思考 -->
-              <div v-else class="msg-body thinking-body">
+              <!-- Bot 消息：无文本 + 有状态 → 显示状态指示器 -->
+              <div v-else-if="message.status" class="msg-body thinking-body">
                 <div class="thinking-indicator">
                   <LoaderCircle :size="16" class="spin" />
-                  <span>{{ statusMessage || 'AI 思考中...' }}</span>
+                  <span>{{ message.status }}</span>
                 </div>
               </div>
             </article>
