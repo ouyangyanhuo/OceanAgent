@@ -1,7 +1,8 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Bell, CircleHelp, FileText, Plus, Search, Sparkles } from 'lucide-vue-next'
+import { Bell, CircleHelp, FileText, MessageSquare, Search, Sparkles } from 'lucide-vue-next'
+import NotificationPanel from './components/NotificationPanel.vue'
 import SidebarNav from './components/SidebarNav.vue'
 import StatusBar from './components/StatusBar.vue'
 import { useDashboardStore } from './stores/dashboard'
@@ -9,6 +10,9 @@ import { useDashboardStore } from './stores/dashboard'
 const dashboard = useDashboardStore()
 const searchQuery = ref('')
 const showDropdown = ref(false)
+const showNotifications = ref(false)
+const unreadCount = ref(0)
+const bellRef = ref(null)
 
 const router = useRouter()
 const route = useRoute()
@@ -73,8 +77,22 @@ const searchPlaceholder = computed(() => {
   return '搜索页面 / 知识 /智能体'
 })
 
+function toggleNotifications() {
+  showNotifications.value = !showNotifications.value
+  if (showNotifications.value) showDropdown.value = false
+}
+
+function onGlobalClick() {
+  showNotifications.value = false
+}
+
 onMounted(() => {
   dashboard.fetch()
+  document.addEventListener('click', onGlobalClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onGlobalClick)
 })
 </script>
 
@@ -133,13 +151,22 @@ onMounted(() => {
         </div>
       </div>
       <div class="top-actions">
-        <button class="icon-button alert" aria-label="通知"><Bell :size="22" /><span>12</span></button>
+        <button ref="bellRef" class="icon-button alert" aria-label="通知" @click.stop="toggleNotifications">
+          <Bell :size="22" />
+          <span v-if="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+        <NotificationPanel
+          :visible="showNotifications"
+          :anchor-el="bellRef"
+          @close="showNotifications = false"
+          @update-count="unreadCount = $event"
+        />
         <button class="icon-button" aria-label="帮助"><CircleHelp :size="22" /></button>
         <div class="user-chip">
           <div class="avatar"></div>
           <span>海洋探索者</span>
         </div>
-        <button class="primary-action">新建任务 <Plus :size="18" /></button>
+        <button class="primary-action" @click="router.push('/qa')">立刻问答 <MessageSquare :size="18" /></button>
       </div>
     </header>
 

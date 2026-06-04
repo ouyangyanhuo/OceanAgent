@@ -21,6 +21,12 @@ import {
   ZoomOut,
 } from 'lucide-vue-next'
 import { fetchExpandOptions, fetchGraph, expandNode as apiExpandNode } from '../services/graph'
+import {
+  applyStableGraphLayout,
+  placeNewNodesAround,
+  repelFromNode,
+  resolveGraphConstraints,
+} from '../utils/knowledgeGraphLayout'
 
 /* ── 常量映射 ── */
 const NODE_TYPE_COLORS = {
@@ -356,7 +362,6 @@ function initCytoscape() {
           'line-dash-pattern': [6, 4],
           'line-color': 'rgba(241, 154, 252, 0.5)',
           'target-arrow-color': 'rgba(241, 154, 252, 0.5)',
-          'curve-style': 'straight',
         },
       },
       /* ── 暗淡边 ── */
@@ -368,19 +373,8 @@ function initCytoscape() {
       },
     ],
     layout: {
-      name: 'cose',
-      animate: settings.value.animateLayout,
-      animationDuration: 800,
-      randomize: true,
-      nodeRepulsion: () => 60000,
-      idealEdgeLength: () => 180,
-      edgeElasticity: () => 80,
-      gravity: 0.08,
-      numIter: 1200,
-      initialTemp: 300,
-      coolingFactor: 0.95,
-      minTemp: 1.0,
-      padding: 60,
+      name: 'preset',
+      fit: false,
     },
     minZoom: 0.2,
     maxZoom: 3,
@@ -388,17 +382,8 @@ function initCytoscape() {
     boxSelectionEnabled: false,
   })
 
-  // 布局完成后消除重叠并聚焦中心节点
-  // ready 做初步去重；layoutstop 做完整去重 + 聚焦
   cy.ready(() => {
-    resolveOverlaps()
-  })
-  cy.one('layoutstop', () => {
-    resolveOverlaps()
-    resolveEdgeOverlaps()
-    resolveEdgeCrossings()
-    // 延迟聚焦，确保节点位置已稳定
-    setTimeout(() => focusCenterNode(), 60)
+    applyStableGraphLayout(cy, { animate: settings.value.animateLayout, fit: true })
   })
 
   // 事件绑定
@@ -429,225 +414,14 @@ function initCytoscape() {
     if (repelRaf) return
     repelRaf = requestAnimationFrame(() => {
       repelRaf = null
-      repelFromNode(dragged)
+      repelFromNode(cy, dragged)
     })
   })
 
   // 松手后再做一轮全局消除残余
   cy.on('free', 'node', () => {
-    resolveOverlaps()
-    resolveEdgeOverlaps()
+    resolveGraphConstraints(cy)
   })
-}
-
-/* ── 拖拽节点排斥周围节点 ── */
-function repelFromNode(dragged) {
-  if (!cy) return
-  const pd = dragged.position()
-  const rd = Math.max(dragged.width(), dragged.height()) / 2 + 18
-
-  cy.nodes().forEach((other) => {
-    if (other.id() === dragged.id()) return
-    const po = other.position()
-    let dx = po.x - pd.x
-    let dy = po.y - pd.y
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1
-    const ro = Math.max(other.width(), other.height()) / 2 + 18
-    const minDist = rd + ro
-
-    if (dist < minDist) {
-      const push = minDist - dist + 2
-      const nx = dx / dist
-      const ny = dy / dist
-      other.position({ x: po.x + nx * push, y: po.y + ny * push })
-    }
-  })
-}
-
-/* ── 消除节点重叠 ── */
-function resolveOverlaps() {
-  if (!cy) return
-  const nodes = cy.nodes()
-  const n = nodes.length
-  if (n < 2) return
-
-  // 每个节点的有效半径（含标签间距）
-  const radiusOf = (node) => {
-    const w = node.width()
-    const h = node.height()
-    return Math.max(w, h) / 2 + 18
-  }
-
-  // 迭代推开重叠，最多 80 轮
-  for (let round = 0; round < 80; round++) {
-    let moved = false
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const a = nodes[i]
-        const b = nodes[j]
-        const pa = a.position()
-        const pb = b.position()
-        let dx = pa.x - pb.x
-        let dy = pa.y - pb.y
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1
-        const minDist = radiusOf(a) + radiusOf(b)
-        if (dist < minDist) {
-          const overlap = (minDist - dist) / 2 + 1
-          const nx = dx / dist
-          const ny = dy / dist
-          a.position({ x: pa.x + nx * overlap, y: pa.y + ny * overlap })
-          b.position({ x: pb.x - nx * overlap, y: pb.y - ny * overlap })
-          moved = true
-        }
-      }
-    }
-    if (!moved) break
-  }
-}
-
-/* ── 检测线段是否穿过矩形 ── */
-function segmentHitsRect(x1, y1, x2, y2, rx1, ry1, rx2, ry2) {
-  // 快速排除
-  const minX = Math.min(x1, x2), maxX = Math.max(x1, x2)
-  const minY = Math.min(y1, y2), maxY = Math.max(y1, y2)
-  if (maxX < rx1 || minX > rx2 || maxY < ry1 || minY > ry2) return false
-
-  const dx = x2 - x1, dy = y2 - y1
-  let tmin = 0, tmax = 1
-
-  const update = (p, d, min, max) => {
-    if (Math.abs(d) < 1e-10) return p >= min && p <= max
-    const t1 = (min - p) / d, t2 = (max - p) / d
-    const tl = Math.min(t1, t2), th = Math.max(t1, t2)
-    tmin = Math.max(tmin, tl)
-    tmax = Math.min(tmax, th)
-    return tmin <= tmax
-  }
-
-  return update(x1, dx, rx1, rx2) && update(y1, dy, ry1, ry2) && tmin > 0.02 && tmax < 0.98
-}
-
-/* ── 消除边与节点的穿越：移动节点来规避 ── */
-function resolveEdgeOverlaps() {
-  if (!cy) return
-
-  // 多轮迭代，每轮检测所有边并推开冲突节点
-  for (let round = 0; round < 20; round++) {
-    let fixed = false
-    const edges = cy.edges()
-
-    for (let i = 0; i < edges.length; i++) {
-      const edge = edges[i]
-      const srcId = edge.data('source')
-      const tgtId = edge.data('target')
-      const srcNode = cy.getElementById(srcId)
-      const tgtNode = cy.getElementById(tgtId)
-      if (!srcNode.length || !tgtNode.length) continue
-
-      const sp = srcNode.position()
-      const tp = tgtNode.position()
-
-      // 检测与哪些非端点节点碰撞
-      cy.nodes().forEach((node) => {
-        if (node.id() === srcId || node.id() === tgtId) return
-        const np = node.position()
-        const hw = node.width() / 2 + 14
-        const hh = node.height() / 2 + 14
-
-        if (!segmentHitsRect(sp.x, sp.y, tp.x, tp.y, np.x - hw, np.y - hh, np.x + hw, np.y + hh)) return
-
-        fixed = true
-
-        // 计算边的方向向量和法向量
-        const edx = tp.x - sp.x, edy = tp.y - sp.y
-        const eLen = Math.sqrt(edx * edx + edy * edy) || 1
-        // 法向量（垂直于边方向）
-        const nx = -edy / eLen, ny = edx / eLen
-
-        // 计算阻挡节点在法向量方向上的偏移量（需要推开多少才能避开）
-        // 简化：把阻挡节点沿法向量推离边
-        const dot = (np.x - sp.x) * nx + (np.y - sp.y) * ny
-        const pushDir = dot >= 0 ? 1 : -1
-        const pushDist = Math.max(hw, hh) * 0.4 + 8
-
-        // 把阻挡节点推开
-        node.position({
-          x: np.x + nx * pushDir * pushDist,
-          y: np.y + ny * pushDir * pushDist,
-        })
-      })
-    }
-    if (!fixed) break
-  }
-}
-
-/* ── 消除边-边交叉：移动共享端点附近的节点 ── */
-function resolveEdgeCrossings() {
-  if (!cy) return
-  const edges = cy.edges().toArray()
-
-  function crossProduct(ax, ay, bx, by) { return ax * by - ay * bx }
-
-  function segmentsCross(x1, y1, x2, y2, x3, y3, x4, y4) {
-    const d1x = x2 - x1, d1y = y2 - y1
-    const d2x = x4 - x3, d2y = y4 - y3
-    const denom = crossProduct(d1x, d1y, d2x, d2y)
-    if (Math.abs(denom) < 1e-10) return false
-    const t = crossProduct(x3 - x1, y3 - y1, d2x, d2y) / denom
-    const u = crossProduct(x3 - x1, y3 - y1, d1x, d1y) / denom
-    return t > 0.15 && t < 0.85 && u > 0.15 && u < 0.85
-  }
-
-  for (let round = 0; round < 10; round++) {
-    let fixed = false
-    for (let i = 0; i < edges.length; i++) {
-      for (let j = i + 1; j < edges.length; j++) {
-        const e1 = edges[i], e2 = edges[j]
-        const s1 = e1.data('source'), t1 = e1.data('target')
-        const s2 = e2.data('source'), t2 = e2.data('target')
-        // 跳过共享端点的边
-        if (s1 === s2 || s1 === t2 || t1 === s2 || t1 === t2) continue
-
-        const p1 = cy.getElementById(s1).position()
-        const p2 = cy.getElementById(t1).position()
-        const p3 = cy.getElementById(s2).position()
-        const p4 = cy.getElementById(t2).position()
-        if (!p1 || !p2 || !p3 || !p4) continue
-
-        if (segmentsCross(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)) {
-          fixed = true
-          // 移动 e1 的 target 节点，沿 e2 法向量偏移
-          const dx = p4.x - p3.x, dy = p4.y - p3.y
-          const len = Math.sqrt(dx * dx + dy * dy) || 1
-          const nx = -dy / len, ny = dx / len
-          const node = cy.getElementById(t1)
-          const np = node.position()
-          node.position({ x: np.x + nx * 20, y: np.y + ny * 20 })
-        }
-      }
-    }
-    if (!fixed) break
-  }
-}
-
-/* ── 聚焦中心节点 ── */
-function focusCenterNode() {
-  if (!cy || cy.nodes().length === 0) return
-
-  // 优先找 SeaArea 核心节点，否则取第一个
-  const coreNode = cy.nodes().filter((n) => n.data('isCore')).first()
-  const target = coreNode.length > 0 ? coreNode : cy.nodes().first()
-  if (!target || target.length === 0) return
-
-  // 取该节点及其邻居
-  const neighborhood = target.neighborhood().add(target)
-
-  // 聚焦局部或全图
-  if (neighborhood.length >= 3) {
-    cy.fit(neighborhood, 60)
-  } else {
-    cy.fit(undefined, 40)
-  }
 }
 
 /* ── 数据加载 ── */
@@ -792,28 +566,14 @@ async function handleExpand(expandType) {
           cyNode.data('raw', result.center_node)
         }
       }
-      // 重新布局
-      const expandLayout = cy.layout({
-        name: 'cose',
-        animate: settings.value.animateLayout,
-        animationDuration: 600,
-        randomize: false,
-        nodeRepulsion: () => 60000,
-        idealEdgeLength: () => 180,
-        edgeElasticity: () => 80,
-        gravity: 0.08,
-        numIter: 800,
-        initialTemp: 200,
-        coolingFactor: 0.95,
-        minTemp: 1.0,
-        padding: 60,
-      })
-      expandLayout.one('layoutstop', () => {
-        resolveOverlaps()
-        resolveEdgeOverlaps()
-        resolveEdgeCrossings()
-      })
-      expandLayout.run()
+      const newNodeIds = newNodes.map((node) => node.id)
+      if (!placeNewNodesAround(cy, selectedNode.value.id, newNodeIds, { animate: settings.value.animateLayout })) {
+        applyStableGraphLayout(cy, {
+          animate: settings.value.animateLayout,
+          fit: false,
+          focusNodeId: selectedNode.value.id,
+        })
+      }
     }
 
     // 刷新展开选项
@@ -963,26 +723,15 @@ function mergeNewData(newNodes, newEdges) {
     const elements = toElements(filteredNodes, filteredEdges)
     if (elements.length) {
       cy.add(elements)
-      const layout = cy.layout({
-        name: 'cose',
-        animate: settings.value.animateLayout,
-        animationDuration: 600,
-        randomize: false,
-        nodeRepulsion: () => 60000,
-        idealEdgeLength: () => 180,
-        edgeElasticity: () => 80,
-        gravity: 0.08,
-        numIter: 800,
-        initialTemp: 200,
-        coolingFactor: 0.95,
-        minTemp: 1.0,
-        padding: 60,
-      })
-      layout.one('layoutstop', () => {
-        resolveOverlaps()
-        resolveEdgeOverlaps()
-      })
-      layout.run()
+      const anchorId = filteredEdges[0]?.source || filteredEdges[0]?.target || selectedNode.value?.id
+      const newNodeIds = filteredNodes.map((node) => node.id)
+      if (!placeNewNodesAround(cy, anchorId, newNodeIds, { animate: settings.value.animateLayout })) {
+        applyStableGraphLayout(cy, {
+          animate: settings.value.animateLayout,
+          fit: false,
+          focusNodeId: anchorId,
+        })
+      }
     }
   }
 }

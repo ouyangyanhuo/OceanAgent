@@ -61,27 +61,26 @@ button {
 .sidebar {
   position: relative;
   height: 100%;
-  border-right: 1px solid var(--line);
-  background:
-    linear-gradient(rgba(4, 18, 35, 0.78), rgba(2, 18, 35, 0.94)),
-    radial-gradient(circle at 52% 70%, rgba(0, 166, 255, 0.22), transparent 30%);
+  border-right: 1px solid rgba(60, 154, 255, 0.06);
+  background: rgba(4, 14, 30, 0.92);
+  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   width: 216px;
   flex-shrink: 0;
-  transition: width 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: width 0.5s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .sidebar.collapsed {
-  width: 78px;
+  width: 72px;
 }
 
 .sidebar .toggle-btn {
   margin-top: auto;
   width: 100%;
-  height: 44px;
+  height: 42px;
   border-radius: 0;
-  border-top: 1px solid rgba(39, 151, 255, 0.12);
+  border-top: 1px solid rgba(60, 154, 255, 0.06);
 }
 
 .brand {
@@ -159,21 +158,21 @@ button {
 .sidebar .toggle-btn {
   margin-top: auto;
   width: 100%;
-  height: 44px;
+  height: 42px;
   border-radius: 0;
-  border-top: 1px solid rgba(39, 151, 255, 0.12);
+  border-top: 1px solid rgba(60, 154, 255, 0.06);
   border-bottom: none;
-  color: #6a9cc0;
-  background: rgba(4, 18, 35, 0.4);
+  color: #5e8faa;
+  background: transparent;
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: color 0.3s ease, background 0.3s ease;
+  transition: color 0.3s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .sidebar .toggle-btn:hover {
   color: #a8d8ff;
-  background: rgba(0, 166, 255, 0.08);
+  background: rgba(60, 154, 255, 0.06);
 }
 
 .sidebar nav {
@@ -187,25 +186,27 @@ button {
 .sidebar nav button,
 .sidebar nav a {
   position: relative;
-  height: 48px;
-  padding: 0 18px;
+  height: 42px;
+  padding: 0 14px;
   border: 0;
   border-radius: 10px;
-  color: #8bacc8;
+  color: #6e99b8;
   background: transparent;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-decoration: none;
-  transition: color 0.25s ease, background 0.25s ease;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.3s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .sidebar nav button:hover,
 .sidebar nav a:hover {
   color: #d0e8ff;
-  background: rgba(0, 166, 255, 0.06);
+  background: rgba(60, 154, 255, 0.06);
 }
 
 .sidebar.collapsed nav button,
@@ -217,13 +218,13 @@ button {
 
 .sidebar button:disabled {
   cursor: default;
-  opacity: 0.76;
+  opacity: 0.6;
 }
 
 .sidebar button.active,
 .sidebar a.active {
   color: #fff;
-  background: linear-gradient(90deg, rgba(0, 166, 255, 0.18), transparent);
+  background: rgba(60, 154, 255, 0.1);
 }
 
 .sidebar .active-indicator {
@@ -232,35 +233,35 @@ button {
   top: 50%;
   transform: translateY(-50%);
   width: 3px;
-  height: 24px;
+  height: 20px;
   border-radius: 0 3px 3px 0;
-  background: #13ddff;
-  box-shadow: 0 0 12px rgba(19, 221, 255, 0.5);
+  background: linear-gradient(180deg, #13ddff, #0891ff);
+  box-shadow: 0 0 10px rgba(19, 221, 255, 0.4);
 }
 
 .radar-art {
-  height: 280px;
+  height: 240px;
   position: relative;
   overflow: hidden;
-  border-top: 1px solid rgba(39, 151, 255, 0.15);
+  border-top: 1px solid rgba(60, 154, 255, 0.06);
 }
 
 .radar-rings {
   position: absolute;
-  inset: 38px 10px 20px;
+  inset: 32px 10px 16px;
   background:
-    repeating-radial-gradient(circle at 62% 48%, rgba(31, 169, 255, 0.35) 0 1px, transparent 2px 16px),
-    linear-gradient(160deg, transparent 10%, rgba(0, 166, 255, 0.2) 52%, transparent 54%);
-  opacity: 0.75;
+    repeating-radial-gradient(circle at 62% 48%, rgba(31, 169, 255, 0.25) 0 1px, transparent 2px 14px),
+    linear-gradient(160deg, transparent 10%, rgba(0, 166, 255, 0.12) 52%, transparent 54%);
+  opacity: 0.6;
 }
 
 .ship {
   position: absolute;
   left: 42px;
-  bottom: 92px;
+  bottom: 80px;
   color: #55dcff;
-  font-size: 42px;
-  text-shadow: 0 0 18px #12bfff;
+  font-size: 36px;
+  text-shadow: 0 0 14px rgba(18, 191, 255, 0.6);
 }
 
 .collapse-button {

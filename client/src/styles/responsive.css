@@ -1,6 +1,6 @@
 @media (max-width: 1320px) {
   .sidebar {
-    width: 78px;
+    width: 72px;
   }
 
   .sidebar nav button span,
@@ -81,15 +81,15 @@
     flex-direction: row;
     overflow-x: auto;
     border-right: none;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid rgba(60, 154, 255, 0.06);
   }
 
   .sidebar .toggle-btn {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     margin-top: 0;
     border-top: none;
-    border-right: 1px solid rgba(39, 151, 255, 0.15);
+    border-right: 1px solid rgba(60, 154, 255, 0.06);
   }
 
   .sidebar nav {
@@ -100,8 +100,8 @@
 
   .sidebar nav button,
   .sidebar nav a {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
   }
 
@@ -188,7 +188,7 @@
   }
 
   .statusbar {
-    padding: 14px;
+    padding: 12px 14px;
   }
 
   .statusbar span {
@@ -205,10 +205,10 @@
 
   .sidebar nav button,
   .sidebar nav a {
-    height: 48px;
-    padding: 0 16px;
-    gap: 12px;
-    font-size: 14px;
+    height: 40px;
+    padding: 0 14px;
+    gap: 11px;
+    font-size: 13px;
   }
 
   .sidebar.collapsed nav button,
@@ -218,12 +218,12 @@
   }
 
   .radar-art {
-    height: 235px;
+    height: 200px;
   }
 
   .ship {
-    bottom: 64px;
-    font-size: 34px;
+    bottom: 60px;
+    font-size: 30px;
   }
 
   .topbar {
@@ -602,23 +602,18 @@
   }
 
   .statusbar {
-    grid-template-columns: 150px 170px 1fr 1fr 260px;
-    gap: 10px;
-    padding: 0 18px;
-    font-size: 12px;
+    gap: 12px;
+    padding: 0 16px;
+    font-size: 11px;
+    min-height: 38px;
   }
 
   .statusbar span {
-    padding-left: 16px;
-  }
-
-  .statusbar strong {
-    margin-left: 12px;
+    padding-left: 14px;
   }
 
   .statusbar i {
-    width: 96px;
-    margin: 0 10px;
+    width: 64px;
   }
 }
 
@@ -940,7 +935,7 @@ td {
 .statusbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
+  gap: 14px;
   overflow-x: auto;
 }
 

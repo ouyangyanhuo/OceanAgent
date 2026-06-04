@@ -39,6 +39,9 @@ AI_CACHE_FILE = CACHE_DIR / "ai_cache.json"
 REPORT_CACHE_FILE = CACHE_DIR / "report_cache.json"
 AGENT_CACHE_FILE = CACHE_DIR / "agent_cache.json"
 
+# 通知数据文件。
+NOTIFICATION_FILE = DATA_DIR / "notifications.json"
+
 
 def ensure_data_dirs() -> None:
     """确保所有数据子目录存在。

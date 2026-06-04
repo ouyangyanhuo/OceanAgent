@@ -16,6 +16,7 @@ from app.core.paths import EXPANSION_INDEX_FILE
 from app.models.graph import ExpandNodeResponse, GraphData, GraphEdge, GraphNode
 from app.services.ai_service import AIService
 from app.services.graph_service import GraphService, now_iso
+from app.services.notification_service import NotificationService
 from app.services.snapshot_service import SnapshotService
 from app.services.validation_service import ValidationService
 
@@ -29,6 +30,7 @@ class ExpansionService:
         self.ai_service = AIService()
         self.validation_service = ValidationService()
         self.snapshot_service = SnapshotService()
+        self.notification_service = NotificationService()
 
     def expand_node(
         self,
@@ -212,6 +214,16 @@ class ExpansionService:
 
         # 创建快照放在最后；快照记录的是本次扩展完成后的图谱版本。
         self.snapshot_service.create_snapshot(graph, reason=f"expand:{node_id}:{expand_type}")
+
+        # 推送通知：图谱扩展完成
+        node_count = len(generated_nodes)
+        edge_count = len(generated_edges)
+        self.notification_service.create_notification(
+            title="图谱扩展完成",
+            message=f"节点「{center_node.name}」的 {expand_type} 扩展已完成，新增 {node_count} 个节点和 {edge_count} 条边",
+            notification_type="graph_expansion",
+            related_node_id=node_id,
+        )
 
         return ExpandNodeResponse(
             center_node=self._find_node(graph, node_id),

@@ -18,6 +18,7 @@ from app.core.paths import (
     GRAPH_EDGES_FILE,
     GRAPH_META_FILE,
     GRAPH_NODES_FILE,
+    NOTIFICATION_FILE,
     REPORT_CACHE_FILE,
     SCHEMA_RULES_FILE,
     ensure_data_dirs,
@@ -72,3 +73,6 @@ def ensure_runtime_files() -> None:
     ensure_json_file(AI_CACHE_FILE, {})
     ensure_json_file(REPORT_CACHE_FILE, {})
     ensure_json_file(AGENT_CACHE_FILE, {})
+
+    # 通知数据文件。
+    ensure_json_file(NOTIFICATION_FILE, {"notifications": [], "unread_count": 0})

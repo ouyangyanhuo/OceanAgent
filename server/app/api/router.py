@@ -5,7 +5,7 @@
 
 from fastapi import APIRouter
 
-from app.api.routes import agent, cache, dashboard, graph, health, mock_data, report
+from app.api.routes import agent, cache, dashboard, graph, health, mock_data, notification, report
 from app.core.config import get_settings
 
 # 业务 API 统一使用配置中的前缀，默认是 /api。
@@ -18,6 +18,7 @@ api_router.include_router(agent.router)
 api_router.include_router(report.router)
 api_router.include_router(mock_data.router)
 api_router.include_router(cache.router)
+api_router.include_router(notification.router)
 api_router.include_router(health.api_router)
 
 # 根路由只放无需 /api 前缀的接口，例如 /health。

@@ -14,6 +14,7 @@ from app.models.graph import (
 )
 from app.services.ai_service import AIService
 from app.services.graph_service import GraphService, now_iso
+from app.services.notification_service import NotificationService
 from app.services.snapshot_service import SnapshotService
 
 # 全局允许的节点类型和关系类型
@@ -34,6 +35,7 @@ class NodeOperationsService:
         self.graph_service = GraphService()
         self.ai_service = AIService()
         self.snapshot_service = SnapshotService()
+        self.notification_service = NotificationService()
 
     def create_seed_node(self, description: str) -> CreateSeedNodeResponse:
         """根据用户描述创建种子节点及关联节点。"""
@@ -111,6 +113,14 @@ class NodeOperationsService:
         self.graph_service.save_graph(graph)
         self.snapshot_service.create_snapshot(graph, reason=f"create_seed:{stored_seed.id}")
 
+        # 推送通知
+        self.notification_service.create_notification(
+            title="种子节点创建完成",
+            message=f"已创建种子节点「{stored_seed.name}」及 {len(generated_edges)} 条关联边",
+            notification_type="seed_node_created",
+            related_node_id=stored_seed.id,
+        )
+
         return CreateSeedNodeResponse(
             seed_node=stored_seed,
             new_nodes=[n for n in generated_nodes if n.id != stored_seed.id],
@@ -182,6 +192,14 @@ class NodeOperationsService:
         # 3. 保存
         self.graph_service.save_graph(graph)
         self.snapshot_service.create_snapshot(graph, reason=f"connect:{source_node_id}:{target_node_id}")
+
+        # 推送通知
+        self.notification_service.create_notification(
+            title="节点连接完成",
+            message=f"已通过桥梁节点「{stored_bridge.name}」连接「{source_node.name}」和「{target_node.name}」",
+            notification_type="node_connected",
+            related_node_id=stored_bridge.id,
+        )
 
         return ConnectNodesResponse(
             source_node=source_node,
