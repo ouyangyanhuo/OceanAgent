@@ -390,12 +390,14 @@
     "properties": {
       "description": "甲藻类赤潮生物，能发出蓝色荧光，常见于中国近海，适宜水温18-22℃，盐度28-34‰"
     },
-    "expanded": {},
+    "expanded": {
+      "risk_factors": true
+    },
     "metadata": {
       "source": "generated",
       "parent_node": "red_tide_event_f1374af3",
       "created_at": "2026-06-04T08:21:56",
-      "updated_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-04T15:38:15",
       "version": 1,
       "locked": true
     }
@@ -551,6 +553,74 @@
       "parent_node": "buoy_3c395b71",
       "created_at": "2026-06-04T13:24:43",
       "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_8c663ee4",
+    "type": "RiskFactor",
+    "name": "沿海工业废水排放",
+    "properties": {
+      "description": "中国沿海工业废水排放含有大量氮磷等营养物质，导致近海水体富营养化，为夜光藻等赤潮生物提供营养条件。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_ccb16a23",
+    "type": "Observation",
+    "name": "叶绿素a浓度异常升高",
+    "properties": {
+      "description": "夜光藻含有叶绿素，其大量繁殖会导致水体叶绿素a浓度显著升高，是赤潮监测的重要指标。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_acb50428",
+    "type": "RedTideEvent",
+    "name": "2022年福建沿海夜光藻赤潮",
+    "properties": {
+      "description": "2022年4月在福建宁德、福州沿海发生的大规模夜光藻赤潮，面积约150平方公里，导致养殖贝类大量死亡。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "prevention_measure_81f13f58",
+    "type": "PreventionMeasure",
+    "name": "加强养殖排水监管",
+    "properties": {
+      "description": "严格控制海水养殖尾水排放标准，减少有机污染物和营养盐入海，降低赤潮发生风险。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
       "version": 1,
       "locked": true
     }

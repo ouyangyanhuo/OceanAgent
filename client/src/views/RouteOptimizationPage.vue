@@ -847,8 +847,8 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
 /* ── 数据来源链接 ── */
 .source-link { cursor: pointer; transition: color 0.2s; }
 .source-link:hover { color: #60a5fa; }
-.source-link.clicked { color: #3b82f6 !important; }
-.source-link.clicked span { color: #3b82f6 !important; }
+.source-link.clicked { color: #6b9cc0 !important; }
+.source-link.clicked span { color: #6b9cc0 !important; }
 .more-btn {
   border: 0;
   color: #52b8ff;
@@ -923,8 +923,8 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
   align-items: center;
 }
 .modal-source-list li:hover { background: rgba(59, 130, 246, 0.15); }
-.modal-source-list li.clicked { color: #60a5fa; }
-.modal-source-list li.clicked span { color: #60a5fa; }
+.modal-source-list li.clicked { color: #6b9cc0; }
+.modal-source-list li.clicked span { color: #6b9cc0; }
 .modal-source-list li span { color: #52b8ff; }
 
 /* ── 聊天弹窗 ── */

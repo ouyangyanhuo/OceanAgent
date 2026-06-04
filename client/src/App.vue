@@ -161,7 +161,7 @@ onUnmounted(() => {
           @close="showNotifications = false"
           @update-count="unreadCount = $event"
         />
-        <button class="icon-button" aria-label="帮助"><CircleHelp :size="22" /></button>
+        
         <div class="user-chip">
           <div class="avatar"></div>
           <span>海洋探索者</span>

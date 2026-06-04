@@ -15,8 +15,8 @@ DASHBOARD_DATA = {
     "metrics": [
         {
             "label": "接入智能体",
-            "value": "128",
-            "trend": "8",
+            "value": "6",
+            "trend": "1",
             "unit": "",
             "tone": "blue",
             "sparkline": [22, 26, 25, 31, 28, 35, 29, 41, 33, 37, 35, 45],
@@ -30,7 +30,7 @@ DASHBOARD_DATA = {
             "sparkline": [18, 21, 20, 27, 24, 34, 28, 31, 38, 29, 43, 34],
         },
         {
-            "label": "知识节点",
+            "label": "总知识节点",
             "value": "56,782",
             "trend": "6.3%",
             "unit": "",
@@ -38,7 +38,7 @@ DASHBOARD_DATA = {
             "sparkline": [26, 29, 34, 30, 37, 35, 43, 39, 46, 32, 39, 42],
         },
         {
-            "label": "关系边数",
+            "label": "总关系边数",
             "value": "201,856",
             "trend": "9.8%",
             "unit": "",

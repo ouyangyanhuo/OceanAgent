@@ -664,5 +664,77 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_0f2e3825",
+    "source": "species_5f741bf3",
+    "target": "risk_factor_8c663ee4",
+    "relation": "indicates",
+    "weight": 0.7,
+    "properties": {
+      "description": "夜光藻作为富营养化指示生物，其出现通常意味着沿海工业废水排放导致营养盐过剩。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_07509393",
+    "source": "species_5f741bf3",
+    "target": "observation_ccb16a23",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "夜光藻大量繁殖直接导致叶绿素a浓度异常升高，是赤潮前兆的重要观测指标。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_ce5a6768",
+    "source": "species_5f741bf3",
+    "target": "red_tide_event_acb50428",
+    "relation": "may_trigger",
+    "weight": 0.9,
+    "properties": {
+      "description": "夜光藻作为主要藻种，其爆发性增殖直接触发了2022年福建沿海赤潮事件。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_2c5b3051",
+    "source": "species_5f741bf3",
+    "target": "prevention_measure_81f13f58",
+    "relation": "may_trigger",
+    "weight": 0.6,
+    "properties": {
+      "description": "夜光藻赤潮灾害的发生促使政府部门加强养殖排水监管，以减少营养盐输入。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_5f741bf3",
+      "created_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:38:15",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

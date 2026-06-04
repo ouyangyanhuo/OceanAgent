@@ -769,7 +769,7 @@ defineExpose({
             <span>多智能体在线</span>
             <i class="agent-dot"></i>
           </div>
-          <span v-if="!loadError" class="graph-stats">{{ graphStats }}</span>
+          <span v-if="!loadError" class="graph-stats">展示 {{ graphStats }}</span>
         </div>
       </div>
       <div class="graph-controls">
