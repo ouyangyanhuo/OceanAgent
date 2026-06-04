@@ -615,12 +615,254 @@
     "properties": {
       "description": "严格控制海水养殖尾水排放标准，减少有机污染物和营养盐入海，降低赤潮发生风险。"
     },
-    "expanded": {},
+    "expanded": {
+      "monitoring_buoys": true
+    },
     "metadata": {
       "source": "generated",
       "parent_node": "species_5f741bf3",
       "created_at": "2026-06-04T15:38:15",
-      "updated_at": "2026-06-04T15:38:15",
+      "updated_at": "2026-06-04T15:45:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_d1d03450",
+    "type": "Buoy",
+    "name": "海域A02浮标",
+    "properties": {
+      "description": "位于浙江东海沿岸的浮标，负责监测水温、盐度、叶绿素等参数，支持养殖排水监管评估。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "prevention_measure_81f13f58",
+      "created_at": "2026-06-04T15:45:31",
+      "updated_at": "2026-06-04T15:45:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_230a370e",
+    "type": "Observation",
+    "name": "海域A02观测",
+    "properties": {
+      "description": "记录海域A02浮标采集的水质数据，供养殖排水监管决策使用。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "prevention_measure_81f13f58",
+      "created_at": "2026-06-04T15:45:31",
+      "updated_at": "2026-06-04T15:45:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_2f56c548",
+    "type": "Buoy",
+    "name": "海域B01浮标",
+    "properties": {
+      "description": "部署在福建沿海的浮标，监测营养盐浓度与溶解氧，辅助评估养殖排水对赤潮风险的影响。"
+    },
+    "expanded": {
+      "risk_factors": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "prevention_measure_81f13f58",
+      "created_at": "2026-06-04T15:45:31",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_30cbe198",
+    "type": "Observation",
+    "name": "叶绿素浓度异常观测",
+    "properties": {
+      "description": "海域B01浮标在2025年7月15日测得叶绿素a浓度升至12 mg/m³，温度28°C，盐度33‰，溶解氧5 mg/L，提示潜在赤潮前兆。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_49d2b4b1",
+    "type": "RiskFactor",
+    "name": "海面温度升高",
+    "properties": {
+      "description": "海面温度升高至28°C，促进营养盐循环加速，增加赤潮发生风险。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_8d88d46b",
+    "type": "RedTideEvent",
+    "name": "2025年福建赤潮事件",
+    "properties": {
+      "description": "2025年7月中旬福建沿海发生赤潮，导致大面积鱼类死亡，影响渔业生产。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "prevention_measure_9b6812c3",
+    "type": "PreventionMeasure",
+    "name": "加强水质监测",
+    "properties": {
+      "description": "通过增设浮标和实时数据分析，及时发现异常水质并采取相应措施，降低赤潮风险。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_5d972c77",
+    "type": "Buoy",
+    "name": "东海浮标C02",
+    "properties": {
+      "description": "位于东海中部的实时监测浮标，负责收集海水温度、盐度、叶绿素等数据。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T15:48:19",
+      "updated_at": "2026-06-04T15:48:19",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_2fc4958e",
+    "type": "Observation",
+    "name": "东海浮标C02温度观测",
+    "properties": {
+      "description": "实时记录浮标所在位置海水温度为 22.5°C，符合东海夏季平均温度范围。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_5d972c77",
+      "created_at": "2026-06-04T15:48:19",
+      "updated_at": "2026-06-04T15:48:19",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_0b8a87a8",
+    "type": "RedTideEvent",
+    "name": "赤潮事件",
+    "properties": {
+      "description": "赤潮事件是由高浓度的浮游藻类（如米氏凯伦藻）导致的海水颜色异常和生态影响。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_8520b7ed",
+      "created_at": "2026-06-04T15:48:33",
+      "updated_at": "2026-06-04T15:48:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_e3bfcfd8",
+    "type": "Observation",
+    "name": "海水温度观测",
+    "properties": {
+      "description": "记录浮标测得的海水温度数据，用于评估温度升高对海洋生态的影响。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-04T15:48:45",
+      "updated_at": "2026-06-04T15:48:45",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_d2ae4160",
+    "type": "Observation",
+    "name": "东海北部叶绿素观察站",
+    "properties": {
+      "description": "位于东海北部的固定叶绿素监测站点，长期监测叶绿素a浓度变化。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T15:51:26",
+      "updated_at": "2026-06-04T15:51:26",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_e9d355b9",
+    "type": "Buoy",
+    "name": "东海北部浮标D01",
+    "properties": {
+      "description": "部署于东海北部的锚系浮标，搭载叶绿素传感器。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d2ae4160",
+      "created_at": "2026-06-04T15:51:26",
+      "updated_at": "2026-06-04T15:51:26",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_62f7cee3",
+    "type": "Observation",
+    "name": "东海北部叶绿素观测数据2025",
+    "properties": {
+      "description": "2025年东海北部叶绿素a浓度月度观测记录，显示春季峰值。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d2ae4160",
+      "created_at": "2026-06-04T15:51:26",
+      "updated_at": "2026-06-04T15:51:26",
       "version": 1,
       "locked": true
     }

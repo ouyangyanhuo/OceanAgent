@@ -736,5 +736,291 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_daa1fc01",
+    "source": "prevention_measure_81f13f58",
+    "target": "buoy_d1d03450",
+    "relation": "monitored_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "海域A02浮标实时监测养殖尾水排放对水体质量的影响。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "prevention_measure_81f13f58",
+      "created_at": "2026-06-04T15:45:31",
+      "updated_at": "2026-06-04T15:45:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_7a02572d",
+    "source": "prevention_measure_81f13f58",
+    "target": "observation_230a370e",
+    "relation": "has_observation",
+    "weight": 0.6,
+    "properties": {
+      "description": "海域A02观测记录了养殖排水监管期间的水质变化。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "prevention_measure_81f13f58",
+      "created_at": "2026-06-04T15:45:31",
+      "updated_at": "2026-06-04T15:45:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_2ceae7a1",
+    "source": "prevention_measure_81f13f58",
+    "target": "buoy_2f56c548",
+    "relation": "observed_by",
+    "weight": 0.8,
+    "properties": {
+      "description": "海域B01浮标观测到养殖排水后营养盐浓度升高，提示监管成效。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "prevention_measure_81f13f58",
+      "created_at": "2026-06-04T15:45:31",
+      "updated_at": "2026-06-04T15:45:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_4bf89abb",
+    "source": "buoy_2f56c548",
+    "target": "observation_30cbe198",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "海域B01浮标观测到叶绿素浓度异常升高。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_c3b35ccb",
+    "source": "buoy_2f56c548",
+    "target": "risk_factor_49d2b4b1",
+    "relation": "indicates",
+    "weight": 0.7,
+    "properties": {
+      "description": "浮标记录的温度升高提示潜在赤潮风险。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_153d0d9b",
+    "source": "buoy_2f56c548",
+    "target": "red_tide_event_8d88d46b",
+    "relation": "may_trigger",
+    "weight": 0.6,
+    "properties": {
+      "description": "浮标观测数据与2025年赤潮事件相关。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_bc57f37d",
+    "source": "buoy_2f56c548",
+    "target": "prevention_measure_9b6812c3",
+    "relation": "mitigated_by",
+    "weight": 0.8,
+    "properties": {
+      "description": "通过加强水质监测可及时发现并缓解赤潮风险。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_2f56c548",
+      "created_at": "2026-06-04T15:45:43",
+      "updated_at": "2026-06-04T15:45:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_68139d04",
+    "source": "buoy_5d972c77",
+    "target": "observation_2fc4958e",
+    "relation": "has_observation",
+    "weight": 0.9,
+    "properties": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_5d972c77",
+      "created_at": "2026-06-04T15:48:19",
+      "updated_at": "2026-06-04T15:48:19",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_866ce537",
+    "source": "observation_8520b7ed",
+    "target": "red_tide_event_0b8a87a8",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "浮标检测到叶绿素峰值，提示赤潮事件发生。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_0b8a87a8",
+      "created_at": "2026-06-04T15:48:33",
+      "updated_at": "2026-06-04T15:48:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_dd77f4d0",
+    "source": "red_tide_event_0b8a87a8",
+    "target": "species_4e40aaf1",
+    "relation": "affected_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "赤潮事件受米氏凯伦藻的繁殖影响。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_0b8a87a8",
+      "created_at": "2026-06-04T15:48:33",
+      "updated_at": "2026-06-04T15:48:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_ddd0e0ad",
+    "source": "buoy_4129921a",
+    "target": "observation_e3bfcfd8",
+    "relation": "has_observation",
+    "weight": 0.8,
+    "properties": {
+      "description": "浮标实时记录海水温度数据。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_e3bfcfd8",
+      "created_at": "2026-06-04T15:48:45",
+      "updated_at": "2026-06-04T15:48:45",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_6903e165",
+    "source": "observation_e3bfcfd8",
+    "target": "risk_factor_e613ae4e",
+    "relation": "indicates",
+    "weight": 0.9,
+    "properties": {
+      "description": "温度观测数据表明海水温度升高，提示可能触发赤潮事件。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_e3bfcfd8",
+      "created_at": "2026-06-04T15:48:45",
+      "updated_at": "2026-06-04T15:48:45",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_5f5c64c6",
+    "source": "species_4e40aaf1",
+    "target": "red_tide_event_0b8a87a8",
+    "relation": "has_risk_event",
+    "weight": 0.6,
+    "properties": {
+      "description": "米氏凯伦藻是赤潮事件中常见的致病藻种之一。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_0b8a87a8",
+      "created_at": "2026-06-04T15:48:56",
+      "updated_at": "2026-06-04T15:48:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_ddf449d7",
+    "source": "red_tide_event_0b8a87a8",
+    "target": "risk_factor_49d2b1",
+    "relation": "affected_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "海面温度升高促进营养盐循环，增加赤潮事件发生的可能性。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_0b8a87a8",
+      "created_at": "2026-06-04T15:48:56",
+      "updated_at": "2026-06-04T15:48:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_4bc2f8e0",
+    "source": "observation_d2ae4160",
+    "target": "buoy_e9d355b9",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "浮标与观察站相关，提供持续观测数据。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d2ae4160",
+      "created_at": "2026-06-04T15:51:26",
+      "updated_at": "2026-06-04T15:51:26",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_74ebbbc8",
+    "source": "observation_d2ae4160",
+    "target": "observation_62f7cee3",
+    "relation": "has_observation",
+    "weight": 0.9,
+    "properties": {
+      "description": "观察站记录叶绿素浓度数据。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d2ae4160",
+      "created_at": "2026-06-04T15:51:26",
+      "updated_at": "2026-06-04T15:51:26",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

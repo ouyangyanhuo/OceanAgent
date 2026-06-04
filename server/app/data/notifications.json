@@ -1,32 +1,50 @@
 {
   "notifications": [
     {
-      "id": "2a8310fff5af",
-      "type": "graph_expansion",
-      "title": "图谱扩展完成",
-      "message": "节点「夜光藻」的 risk_factors 扩展已完成，新增 4 个节点和 4 条边",
+      "id": "e5ff5fe0c764",
+      "type": "seed_node_created",
+      "title": "种子节点创建完成",
+      "message": "已创建种子节点「东海北部叶绿素观察站」及 2 条关联边",
       "read": false,
-      "created_at": "2026-06-04T23:38:15.433235",
-      "related_node_id": "species_5f741bf3"
+      "created_at": "2026-06-04T23:51:26.599000",
+      "related_node_id": "observation_d2ae4160"
     },
     {
-      "id": "72d383a50ff4",
-      "type": "graph_expansion",
-      "title": "图谱扩展完成",
-      "message": "节点「舟山渔场浮标01」的 ecological_species 扩展已完成，新增 3 个节点和 4 条边",
+      "id": "bd0fffddbd80",
+      "type": "node_connected",
+      "title": "节点连接完成",
+      "message": "已通过桥梁节点「赤潮事件」连接「米氏凯伦藻」和「海面温度升高」",
       "read": false,
-      "created_at": "2026-06-04T21:24:44.025937",
-      "related_node_id": "buoy_3c395b71"
+      "created_at": "2026-06-04T23:48:56.994102",
+      "related_node_id": "red_tide_event_0b8a87a8"
     },
     {
-      "id": "64ebe87900b3",
-      "type": "graph_expansion",
-      "title": "图谱扩展完成",
-      "message": "节点「舟山渔场」的 monitoring_buoys 扩展已完成，新增 4 个节点和 4 条边",
-      "read": true,
-      "created_at": "2026-06-04T20:07:02.801679",
-      "related_node_id": "fishery_area_196d437c"
+      "id": "51c8d1da8976",
+      "type": "node_connected",
+      "title": "节点连接完成",
+      "message": "已通过桥梁节点「海水温度观测」连接「东海浮标B01」和「海水温度升高」",
+      "read": false,
+      "created_at": "2026-06-04T23:48:45.870769",
+      "related_node_id": "observation_e3bfcfd8"
+    },
+    {
+      "id": "7bd0497b74b5",
+      "type": "node_connected",
+      "title": "节点连接完成",
+      "message": "已通过桥梁节点「赤潮事件」连接「东海浮标B01叶绿素异常」和「米氏凯伦藻」",
+      "read": false,
+      "created_at": "2026-06-04T23:48:33.774416",
+      "related_node_id": "red_tide_event_0b8a87a8"
+    },
+    {
+      "id": "30c4a7af5981",
+      "type": "seed_node_created",
+      "title": "种子节点创建完成",
+      "message": "已创建种子节点「东海浮标C02」及 1 条关联边",
+      "read": false,
+      "created_at": "2026-06-04T23:48:19.258444",
+      "related_node_id": "buoy_5d972c77"
     }
   ],
-  "unread_count": 2
+  "unread_count": 5
 }

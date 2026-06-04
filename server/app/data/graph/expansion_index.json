@@ -129,5 +129,43 @@
     "summary": "以夜光藻为中心，扩展了沿海工业废水排放（风险因子）、叶绿素a浓度异常升高（观测）、2022年福建沿海夜光藻赤潮（赤潮事件）和加强养殖排水监管（防治措施）四个节点，并建立了indicates/may_trigger关系。",
     "created_at": "2026-06-04T15:38:15",
     "updated_at": "2026-06-04T15:38:15"
+  },
+  "prevention_measure_81f13f58:monitoring_buoys": {
+    "node_id": "prevention_measure_81f13f58",
+    "expand_type": "monitoring_buoys",
+    "expanded": true,
+    "generated_node_ids": [
+      "buoy_d1d03450",
+      "observation_230a370e",
+      "buoy_2f56c548"
+    ],
+    "generated_edge_ids": [
+      "edge_daa1fc01",
+      "edge_7a02572d",
+      "edge_2ceae7a1"
+    ],
+    "summary": "为加强养殖排水监管扩展了两座海域浮标及其观测数据节点，形成监测与评估闭环。",
+    "created_at": "2026-06-04T15:45:32",
+    "updated_at": "2026-06-04T15:45:32"
+  },
+  "buoy_2f56c548:risk_factors": {
+    "node_id": "buoy_2f56c548",
+    "expand_type": "risk_factors",
+    "expanded": true,
+    "generated_node_ids": [
+      "observation_30cbe198",
+      "risk_factor_49d2b4b1",
+      "red_tide_event_8d88d46b",
+      "prevention_measure_9b6812c3"
+    ],
+    "generated_edge_ids": [
+      "edge_4bf89abb",
+      "edge_c3b35ccb",
+      "edge_153d0d9b",
+      "edge_bc57f37d"
+    ],
+    "summary": "为海域B01浮标扩展了四个新节点，分别为叶绿素浓度异常观测、海面温度升高、2025年福建赤潮事件和加强水质监测，并通过指示、可能触发和缓解关系与浮标相连。",
+    "created_at": "2026-06-04T15:45:43",
+    "updated_at": "2026-06-04T15:45:43"
   }
 }
