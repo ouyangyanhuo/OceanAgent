@@ -2,23 +2,10 @@
 import { ref } from 'vue'
 import gsap from 'gsap'
 import { onMounted } from 'vue'
-import { FileDown, Image, FileJson, Network, Plus, Link, GitFork } from 'lucide-vue-next'
+import { FileDown, Image, FileJson, Network, Plus, Link } from 'lucide-vue-next'
 import KnowledgeGraph from '../components/KnowledgeGraph.vue'
 import AppModal from '../components/common/AppModal.vue'
 import { createSeedNode, connectNodes } from '../services/graph'
-
-const NODE_TYPE_COLORS = {
-  Buoy: '#22c55e', Observation: '#06b6d4',
-  RiskFactor: '#f43f5e', RedTideEvent: '#f43f5e',
-  Species: '#14b8a6', FisheryArea: '#22c55e', PreventionMeasure: '#f59e0b',
-}
-const NODE_TYPE_LABELS = {
-  Buoy: '浮标', Observation: '观测',
-  RiskFactor: '风险因子', RedTideEvent: '赤潮事件',
-  Species: '物种', FisheryArea: '渔场', PreventionMeasure: '防治措施',
-}
-function getNodeColor(type) { return NODE_TYPE_COLORS[type] || '#3b82f6' }
-function getNodeLabel(type) { return NODE_TYPE_LABELS[type] || type }
 
 const pageRef = ref(null)
 const graphRef = ref(null)
@@ -60,62 +47,25 @@ async function handleCreateSeed() {
   seedLoading.value = false
 }
 
-// 节点连接
-const connectStep = ref(1)
-const connectSource = ref(null)
-const connectTarget = ref(null)
-const connectLoading = ref(false)
-const connectError = ref('')
-
-function getNodeList() {
-  return graphRef.value?.getNodes() || []
-}
-
-function selectConnectNode(node) {
-  if (connectStep.value === 1) {
-    connectSource.value = node
-    connectStep.value = 2
-  } else {
-    if (node.id === connectSource.value?.id) return
-    connectTarget.value = node
-  }
-}
-
-async function handleConnect() {
-  if (!connectSource.value || !connectTarget.value) return
-  connectLoading.value = true
-  connectError.value = ''
-
-  const srcName = connectSource.value.name
-  const tgtName = connectTarget.value.name
-
-  // 关闭弹窗，显示加载动画
+// 节点连接 — 在图谱上点选
+function startConnect() {
   opsMode.value = ''
-  graphRef.value?.setExpanding(`连接「${srcName}」与「${tgtName}」`)
+  graphRef.value?.enterConnectMode(async (source, target) => {
+    graphRef.value?.exitConnectMode()
+    graphRef.value?.setExpanding(`连接「${source.name}」与「${target.name}」`)
 
-  const result = await connectNodes(connectSource.value.id, connectTarget.value.id)
-  if (result) {
-    graphRef.value?.mergeNewData([result.bridge_node], result.new_edges || [])
-    resetConnect()
-  } else {
-    connectError.value = '连接失败，请检查后端服务'
-  }
-  graphRef.value?.clearExpanding()
-  connectLoading.value = false
-}
-
-function resetConnect() {
-  connectStep.value = 1
-  connectSource.value = null
-  connectTarget.value = null
-  connectError.value = ''
+    const result = await connectNodes(source.id, target.id)
+    if (result) {
+      graphRef.value?.mergeNewData([result.bridge_node], result.new_edges || [])
+    }
+    graphRef.value?.clearExpanding()
+  })
 }
 
 function openOpsMenu() {
   opsMode.value = 'menu'
   seedDesc.value = ''
   seedError.value = ''
-  resetConnect()
 }
 
 function closeOps() {
@@ -184,14 +134,14 @@ onMounted(() => {
           <div class="ops-card-icon seed"><Plus :size="22" /></div>
           <div class="ops-card-info">
             <span class="ops-card-label">新建种子节点</span>
-            <span class="ops-card-desc">输入内容，由 AI 自动生成节点和关联关系</span>
+            <span class="ops-card-desc">由 智能体集群 自动查找节点和关联关系</span>
           </div>
         </button>
-        <button class="ops-card" @click="opsMode = 'connect'">
+        <button class="ops-card" @click="startConnect">
           <div class="ops-card-icon connect"><Link :size="22" /></div>
           <div class="ops-card-info">
             <span class="ops-card-label">节点连接</span>
-            <span class="ops-card-desc">选择两个节点，AI 分析并生成关联桥梁</span>
+            <span class="ops-card-desc">在图谱上点选两个节点，智能体集群 分析关联</span>
           </div>
         </button>
       </div>
@@ -218,56 +168,6 @@ onMounted(() => {
       </template>
     </AppModal>
 
-    <!-- 节点连接弹窗 -->
-    <AppModal :visible="opsMode === 'connect'" title="节点连接" width="460px" @close="closeOps">
-      <div class="connect-form">
-        <p class="form-hint">选择两个节点，AI 将分析它们之间的关系并生成中间桥梁节点。</p>
-
-        <div class="connect-steps">
-          <div class="connect-step" :class="{ active: connectStep === 1, done: connectSource }">
-            <span class="step-num">1</span>
-            <span>选择源节点</span>
-            <span v-if="connectSource" class="step-selected">{{ connectSource.name }}</span>
-          </div>
-          <div class="connect-step" :class="{ active: connectStep === 2, done: connectTarget }">
-            <span class="step-num">2</span>
-            <span>选择目标节点</span>
-            <span v-if="connectTarget" class="step-selected">{{ connectTarget.name }}</span>
-          </div>
-        </div>
-
-        <div class="connect-node-list">
-          <button
-            v-for="node in getNodeList()"
-            :key="node.id"
-            class="connect-node-item"
-            :class="{
-              selected: connectSource?.id === node.id || connectTarget?.id === node.id,
-              disabled: connectSource?.id === node.id && connectStep === 2,
-            }"
-            :disabled="connectSource?.id === node.id && connectStep === 2"
-            @click="selectConnectNode(node)"
-          >
-            <span class="node-type-dot" :style="{ background: getNodeColor(node.type) }"></span>
-            <span class="node-name">{{ node.name }}</span>
-            <span class="node-type-label">{{ getNodeLabel(node.type) }}</span>
-          </button>
-        </div>
-
-        <div v-if="connectError" class="form-error">{{ connectError }}</div>
-      </div>
-      <template #footer>
-        <button class="btn-modal-cancel" @click="closeOps">取消</button>
-        <button
-          v-if="connectSource && connectTarget"
-          class="btn-modal-confirm"
-          :disabled="connectLoading"
-          @click="handleConnect"
-        >
-          {{ connectLoading ? '连接中...' : '建立连接' }}
-        </button>
-      </template>
-    </AppModal>
   </section>
 </template>
 
@@ -497,118 +397,4 @@ onMounted(() => {
   gap: 12px;
 }
 
-/* ── 节点连接 ── */
-.connect-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.connect-steps {
-  display: flex;
-  gap: 10px;
-}
-
-.connect-step {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(14, 51, 86, 0.3);
-  border: 1px solid rgba(39, 151, 255, 0.12);
-  font-size: 12px;
-  color: #6b8aab;
-  transition: all 0.2s;
-}
-
-.connect-step.active {
-  border-color: rgba(83, 171, 255, 0.5);
-  color: #b9d6ee;
-}
-
-.connect-step.done {
-  border-color: rgba(34, 197, 94, 0.4);
-  color: #4ade80;
-}
-
-.step-num {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(39, 151, 255, 0.2);
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.step-selected {
-  margin-left: auto;
-  font-weight: 600;
-  color: #4ade80;
-  font-size: 11px;
-}
-
-.connect-node-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-
-.connect-node-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  background: transparent;
-  color: #b9d6ee;
-  cursor: pointer;
-  font-size: 13px;
-  text-align: left;
-  transition: all 0.15s;
-}
-
-.connect-node-item:hover:not(.disabled) {
-  background: rgba(22, 141, 255, 0.1);
-  border-color: rgba(39, 151, 255, 0.2);
-}
-
-.connect-node-item.selected {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.3);
-  color: #4ade80;
-}
-
-.connect-node-item.disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.node-type-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.node-name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.node-type-label {
-  font-size: 11px;
-  color: rgba(158, 200, 231, 0.4);
-  flex-shrink: 0;
-}
 </style>

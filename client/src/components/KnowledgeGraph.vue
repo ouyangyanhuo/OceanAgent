@@ -102,6 +102,12 @@ const expandOptions = ref([])
 const expanding = ref(false)
 const expandingLabel = ref('')
 const searchQuery = ref('')
+
+/* ── 连接模式 ── */
+const connectMode = ref(false)
+const connectSource = ref(null)
+const connectTarget = ref(null)
+let connectCallback = null
 const filterRelation = ref('all')
 const cyContainerRef = ref(null)
 const canvasWrapperRef = ref(null)
@@ -287,6 +293,30 @@ function initCytoscape() {
           'shadow-blur': 24,
           'shadow-opacity': 0.6,
           'shadow-color': '#fbbf24',
+        },
+      },
+      /* ── 连接模式：源节点 ── */
+      {
+        selector: 'node.connect-source',
+        style: {
+          'border-width': 4,
+          'border-color': '#22c55e',
+          'background-opacity': 1,
+          'shadow-blur': 20,
+          'shadow-opacity': 0.6,
+          'shadow-color': '#22c55e',
+        },
+      },
+      /* ── 连接模式：目标节点 ── */
+      {
+        selector: 'node.connect-target',
+        style: {
+          'border-width': 4,
+          'border-color': '#a855f7',
+          'background-opacity': 1,
+          'shadow-blur': 20,
+          'shadow-opacity': 0.6,
+          'shadow-color': '#a855f7',
         },
       },
       /* ── 暗淡节点 ── */
@@ -681,6 +711,23 @@ watch(filterRelation, (val) => {
 
 /* ── 交互 ── */
 function onNodeClick(node) {
+  // 连接模式：点选源/目标节点
+  if (connectMode.value) {
+    if (!connectSource.value) {
+      connectSource.value = node
+      highlightConnectNodes()
+    } else if (!connectTarget.value && node.id !== connectSource.value.id) {
+      connectTarget.value = node
+      highlightConnectNodes()
+      // 两个都选好了，触发回调
+      if (connectCallback) {
+        connectCallback(connectSource.value, connectTarget.value)
+      }
+    }
+    return
+  }
+
+  // 普通模式：打开详情面板
   if (selectedNode.value?.id === node.id) {
     selectedNode.value = null
     expandOptions.value = []
@@ -866,6 +913,42 @@ async function exportGraph(format) {
   }
 }
 
+/* ── 连接模式高亮 ── */
+function highlightConnectNodes() {
+  if (!cy) return
+  cy.nodes().removeClass('connect-source connect-target')
+  if (connectSource.value) {
+    cy.getElementById(connectSource.value.id).addClass('connect-source')
+  }
+  if (connectTarget.value) {
+    cy.getElementById(connectTarget.value.id).addClass('connect-target')
+  }
+}
+
+/* ── 连接模式控制 ── */
+function enterConnectMode(callback) {
+  connectMode.value = true
+  connectSource.value = null
+  connectTarget.value = null
+  connectCallback = callback
+  // 关闭详情面板
+  selectedNode.value = null
+  expandOptions.value = []
+  // 允许拖拽模式下也能点击
+  if (cy) cy.autoungrabify(true)
+}
+
+function exitConnectMode() {
+  connectMode.value = false
+  connectSource.value = null
+  connectTarget.value = null
+  connectCallback = null
+  if (cy) {
+    cy.nodes().removeClass('connect-source connect-target')
+    cy.autoungrabify(false)
+  }
+}
+
 /* ── 合并新数据到图谱 ── */
 function mergeNewData(newNodes, newEdges) {
   const existingNodeIds = new Set(graphNodes.value.map((n) => n.id))
@@ -920,6 +1003,8 @@ defineExpose({
   getNodes: () => graphNodes.value,
   setExpanding,
   clearExpanding,
+  enterConnectMode,
+  exitConnectMode,
 })
 </script>
 
@@ -1063,6 +1148,15 @@ defineExpose({
         </div>
       </Transition>
 
+      <!-- 连接模式提示条 -->
+      <Transition name="connect-hint">
+        <div v-if="connectMode" class="connect-hint-bar">
+          <span v-if="!connectSource">请点击选择第一个节点（源节点）</span>
+          <span v-else-if="!connectTarget">请点击选择第二个节点（目标节点）</span>
+          <span v-else>已选择「{{ connectSource.name }}」→「{{ connectTarget.name }}」，正在分析关联...</span>
+        </div>
+      </Transition>
+
       <!-- 节点详情面板（放在 canvas 内，全屏时可见） -->
       <Transition name="slide">
         <div v-if="selectedNode" class="node-detail" @click.stop>
@@ -1156,6 +1250,38 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+/* ── 连接模式提示条 ── */
+.connect-hint-bar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 20px;
+  border-radius: 20px;
+  background: rgba(7, 28, 52, 0.92);
+  border: 1px solid rgba(39, 151, 255, 0.3);
+  color: #b9d6ee;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 15;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.connect-hint-enter-active {
+  animation: ch-in 0.2s ease-out;
+}
+
+.connect-hint-leave-active {
+  animation: ch-in 0.15s ease-in reverse;
+}
+
+@keyframes ch-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ── 头部两行布局 ── */

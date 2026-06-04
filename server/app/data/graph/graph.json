@@ -1,6 +1,6 @@
 {
   "graph_id": "ocean_kg_demo_v1",
-  "version": 51,
+  "version": 60,
   "nodes": [
     {
       "id": "buoy_a0ca3ecc",
@@ -480,6 +480,57 @@
         "version": 1,
         "locked": true
       }
+    },
+    {
+      "id": "risk_factor_790bfbad",
+      "type": "RiskFactor",
+      "name": "赤潮对黄海北部渔场风险",
+      "properties": {
+        "description": "赤潮事件可能对黄海北部渔场造成鱼类死亡和生态损害的风险"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "red_tide_event_fb02086f",
+        "created_at": "2026-06-04T05:36:03",
+        "updated_at": "2026-06-04T05:36:03",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_713003b2",
+      "type": "Observation",
+      "name": "溶解氧观测",
+      "properties": {
+        "description": "黄海浮标监测的溶解氧数据，低于4mg/L时指示缺氧风险"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "buoy_f95cd0f4",
+        "created_at": "2026-06-04T05:36:28",
+        "updated_at": "2026-06-04T05:36:28",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "species_ea42aa46",
+      "type": "Species",
+      "name": "浮游植物",
+      "properties": {
+        "description": "浮游植物是海洋初级生产者，叶绿素观测站监测其生物量"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_1e04b729",
+        "created_at": "2026-06-04T05:37:27",
+        "updated_at": "2026-06-04T05:37:27",
+        "version": 1,
+        "locked": true
+      }
     }
   ],
   "edges": [
@@ -847,6 +898,106 @@
         "parent_node": "observation_84c8b6d5",
         "created_at": "2026-06-04T04:45:34",
         "updated_at": "2026-06-04T04:45:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_d2010f37",
+      "source": "red_tide_event_fb02086f",
+      "target": "risk_factor_790bfbad",
+      "relation": "may_trigger",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "risk_factor_790bfbad",
+        "created_at": "2026-06-04T05:36:03",
+        "updated_at": "2026-06-04T05:36:03",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_6a65daa7",
+      "source": "risk_factor_790bfbad",
+      "target": "fishery_area_876fc070",
+      "relation": "influences",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "risk_factor_790bfbad",
+        "created_at": "2026-06-04T05:36:03",
+        "updated_at": "2026-06-04T05:36:03",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_a9ca4245",
+      "source": "buoy_f95cd0f4",
+      "target": "observation_713003b2",
+      "relation": "has_observation",
+      "weight": 0.9,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_713003b2",
+        "created_at": "2026-06-04T05:36:28",
+        "updated_at": "2026-06-04T05:36:28",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_b307705b",
+      "source": "observation_713003b2",
+      "target": "risk_factor_5751d918",
+      "relation": "indicates",
+      "weight": 0.8,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_713003b2",
+        "created_at": "2026-06-04T05:36:28",
+        "updated_at": "2026-06-04T05:36:28",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_c45e2ad9",
+      "source": "observation_1e04b729",
+      "target": "species_ea42aa46",
+      "relation": "indicates",
+      "weight": 0.8,
+      "properties": {
+        "description": "叶绿素浓度是浮游植物生物量的良好指标"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "species_ea42aa46",
+        "created_at": "2026-06-04T05:37:27",
+        "updated_at": "2026-06-04T05:37:27",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_baf3c88c",
+      "source": "species_ea42aa46",
+      "target": "species_3ca6b942",
+      "relation": "influences",
+      "weight": 0.6,
+      "properties": {
+        "description": "浮游植物通过食物链影响带鱼的饵料基础"
+      },
+      "metadata": {
+        "source": "generated",
+        "parent_node": "species_ea42aa46",
+        "created_at": "2026-06-04T05:37:27",
+        "updated_at": "2026-06-04T05:37:27",
         "version": 1,
         "locked": true
       }
