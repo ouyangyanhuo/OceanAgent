@@ -1,120 +1,38 @@
 {
-  "buoy_a0ca3ecc:related_events": {
-    "node_id": "buoy_a0ca3ecc",
+  "buoy_c582f439:related_events": {
+    "node_id": "buoy_c582f439",
     "expand_type": "related_events",
     "expanded": true,
     "generated_node_ids": [
-      "red_tide_event_fd16e39a",
-      "observation_2d4d6655",
-      "observation_b44d6cc8"
+      "red_tide_event_9994f5cb",
+      "observation_b045f6a3",
+      "observation_bc6a3014"
     ],
     "generated_edge_ids": [
-      "edge_60317bd2",
-      "edge_adac635f",
-      "edge_540ad86e"
+      "edge_c9817cf2",
+      "edge_5411e4e1",
+      "edge_d8be4f42"
     ],
-    "summary": "为渤海湾浮标扩展了2018年春季赤潮事件及其相关的叶绿素浓度峰值和溶解氧低值观测数据，反映了浮标监测与赤潮风险的关系。",
-    "created_at": "2026-06-03T16:50:09",
-    "updated_at": "2026-06-03T16:50:09"
+    "summary": "基于渤海浮标A01的观测数据，扩展了2024年渤海湾赤潮事件及相关异常观测节点，描述了浮标与赤潮事件、观测数据之间的关联。",
+    "created_at": "2026-06-04T05:49:50",
+    "updated_at": "2026-06-04T05:49:50"
   },
-  "observation_49753743:ecological_species": {
-    "node_id": "observation_49753743",
+  "risk_factor_aa90f2bd:ecological_species": {
+    "node_id": "risk_factor_aa90f2bd",
     "expand_type": "ecological_species",
     "expanded": true,
     "generated_node_ids": [
-      "species_e1809263",
-      "species_3ca6b942",
-      "fishery_area_876fc070",
-      "risk_factor_5751d918"
+      "species_4e40aaf1",
+      "fishery_area_67934c4a",
+      "risk_factor_e613ae4e"
     ],
     "generated_edge_ids": [
-      "edge_d2e4fd5c",
-      "edge_aa455054",
-      "edge_8c3bd0cf",
-      "edge_a23a91fc"
+      "edge_480a8822",
+      "edge_01f2df21",
+      "edge_42cc5cf8"
     ],
-    "summary": "基于黄海溶解氧观测站，扩展了与之相关的两个经济鱼种（小黄鱼、带鱼）、一个渔业区域（黄海北部渔场）和一个风险因子（缺氧风险），通过correlated_with关系连接。",
-    "created_at": "2026-06-03T16:50:46",
-    "updated_at": "2026-06-03T16:50:46"
-  },
-  "buoy_f95cd0f4:risk_factors": {
-    "node_id": "buoy_f95cd0f4",
-    "expand_type": "risk_factors",
-    "expanded": true,
-    "generated_node_ids": [
-      "observation_84c8b6d5",
-      "risk_factor_491603da",
-      "red_tide_event_fb02086f",
-      "prevention_measure_5211a1e4"
-    ],
-    "generated_edge_ids": [
-      "edge_2243aace",
-      "edge_6c5f801f",
-      "edge_b16460a5",
-      "edge_bc1abbdf"
-    ],
-    "summary": "为黄海浮标扩展了溶解氧观测、低溶解氧风险、赤潮预警和增氧措施四个节点及对应关系。",
-    "created_at": "2026-06-03T16:51:25",
-    "updated_at": "2026-06-03T16:51:25"
-  },
-  "observation_b44d6cc8:risk_factors": {
-    "node_id": "observation_b44d6cc8",
-    "expand_type": "risk_factors",
-    "expanded": true,
-    "generated_node_ids": [
-      "risk_factor_dfba4327",
-      "risk_factor_109bdf9e",
-      "observation_b2d8e194",
-      "prevention_measure_0d1c7169"
-    ],
-    "generated_edge_ids": [
-      "edge_30cfc567",
-      "edge_7d98a3c9",
-      "edge_b78707a9",
-      "edge_bc903ac2"
-    ],
-    "summary": "针对渤海湾浮标溶解氧低值观测，扩展了相关的风险因子（低氧风险、富营养化风险）、影响观测（水温升高）以及防治措施（底层曝气增氧），建立从观测到风险因子、影响因素和防治措施的关系。",
-    "created_at": "2026-06-03T16:58:43",
-    "updated_at": "2026-06-03T16:58:43"
-  },
-  "buoy_e1991393:monitoring_buoys": {
-    "node_id": "buoy_e1991393",
-    "expand_type": "monitoring_buoys",
-    "expanded": true,
-    "generated_node_ids": [
-      "observation_876a5bb3",
-      "observation_b8c1d7c1",
-      "observation_cc90ecb9",
-      "observation_e89be514"
-    ],
-    "generated_edge_ids": [
-      "edge_b4dd4c98",
-      "edge_14c00917",
-      "edge_4dd28fac",
-      "edge_95105ced"
-    ],
-    "summary": "为东海浮标添加了4个观测节点（温度、盐度、叶绿素、溶解氧），反映了该浮标实时监测的关键海洋参数。",
-    "created_at": "2026-06-03T16:59:07",
-    "updated_at": "2026-06-03T16:59:07"
-  },
-  "observation_84c8b6d5:risk_factors": {
-    "node_id": "observation_84c8b6d5",
-    "expand_type": "risk_factors",
-    "expanded": true,
-    "generated_node_ids": [
-      "risk_factor_109bdf9e",
-      "observation_690109e9",
-      "risk_factor_a82ddd45",
-      "prevention_measure_8209dfc6"
-    ],
-    "generated_edge_ids": [
-      "edge_f876b7ff",
-      "edge_a76f6348",
-      "edge_9e1f77e2",
-      "edge_05f949c8"
-    ],
-    "summary": "针对黄海北部溶解氧观测扩展了富营养化风险、叶绿素观测、赤潮风险和加强水质监测措施，通过indicates、affected_by和mitigated_by关系连接。",
-    "created_at": "2026-06-04T04:45:34",
-    "updated_at": "2026-06-04T04:45:34"
+    "summary": "为东海夏季富营养化风险因子扩展了三个相关节点：赤潮藻种米氏凯伦藻、长江口渔场以及海水温度升高风险因子，并建立了相应关系。",
+    "created_at": "2026-06-04T05:56:23",
+    "updated_at": "2026-06-04T05:56:23"
   }
 }

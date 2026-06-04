@@ -1,0 +1,416 @@
+[
+  {
+    "id": "edge_c9817cf2",
+    "source": "buoy_c582f439",
+    "target": "red_tide_event_9994f5cb",
+    "relation": "has_risk_event",
+    "weight": 0.9,
+    "properties": {
+      "description": "浮标监测到赤潮前兆指标变化，确认赤潮发生。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_c582f439",
+      "created_at": "2026-06-04T05:49:49",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_5411e4e1",
+    "source": "buoy_c582f439",
+    "target": "observation_b045f6a3",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "浮标直接测量到叶绿素浓度异常。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_c582f439",
+      "created_at": "2026-06-04T05:49:49",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_d8be4f42",
+    "source": "observation_b045f6a3",
+    "target": "red_tide_event_9994f5cb",
+    "relation": "correlated_with",
+    "weight": 0.85,
+    "properties": {
+      "description": "叶绿素异常是赤潮事件的典型前兆。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_c582f439",
+      "created_at": "2026-06-04T05:49:49",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_bb45033b",
+    "source": "observation_bc6a3014",
+    "target": "red_tide_event_06ad8ef2",
+    "relation": "indicates",
+    "weight": 0.9,
+    "properties": {
+      "description": "溶解氧下降指示赤潮事件"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_06ad8ef2",
+      "created_at": "2026-06-04T05:50:39",
+      "updated_at": "2026-06-04T05:50:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_48fd35b4",
+    "source": "red_tide_event_06ad8ef2",
+    "target": "buoy_c582f439",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "赤潮事件与浮标监测数据相关"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_06ad8ef2",
+      "created_at": "2026-06-04T05:50:39",
+      "updated_at": "2026-06-04T05:50:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_2476865b",
+    "source": "fishery_area_196d437c",
+    "target": "red_tide_event_6ebd8948",
+    "relation": "affected_by",
+    "weight": 0.8,
+    "properties": {
+      "description": "舟山渔场频繁受到赤潮灾害影响"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_6ebd8948",
+      "created_at": "2026-06-04T05:51:06",
+      "updated_at": "2026-06-04T05:51:06",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_a388c03a",
+    "source": "red_tide_event_6ebd8948",
+    "target": "observation_b045f6a3",
+    "relation": "has_observation",
+    "weight": 0.9,
+    "properties": {
+      "description": "渤海浮标叶绿素异常是赤潮灾害的观测指标"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_6ebd8948",
+      "created_at": "2026-06-04T05:51:06",
+      "updated_at": "2026-06-04T05:51:06",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_38a96cab",
+    "source": "species_42584e13",
+    "target": "red_tide_event_06ad8ef2",
+    "relation": "may_trigger",
+    "weight": 0.8,
+    "properties": {
+      "description": "东海原甲藻是常见赤潮藻种，其大量繁殖可触发赤潮事件"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_06ad8ef2",
+      "created_at": "2026-06-04T05:51:19",
+      "updated_at": "2026-06-04T05:51:19",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_05778af0",
+    "source": "red_tide_event_06ad8ef2",
+    "target": "buoy_c582f439",
+    "relation": "has_observation",
+    "weight": 0.9,
+    "properties": {
+      "description": "渤海浮标A01实时监测叶绿素等参数，可用于观测赤潮事件"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_06ad8ef2",
+      "created_at": "2026-06-04T05:51:19",
+      "updated_at": "2026-06-04T05:51:19",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_bcc34f97",
+    "source": "red_tide_event_1a541e1c",
+    "target": "observation_f7d77413",
+    "relation": "has_observation",
+    "weight": 0.9,
+    "properties": {
+      "description": "2018年东海赤潮事件产生了相关监测数据"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_f7d77413",
+      "created_at": "2026-06-04T05:51:39",
+      "updated_at": "2026-06-04T05:51:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_9d3af180",
+    "source": "observation_f7d77413",
+    "target": "species_42584e13",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "监测数据指示东海原甲藻为本次赤潮的主要藻种"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_f7d77413",
+      "created_at": "2026-06-04T05:51:39",
+      "updated_at": "2026-06-04T05:51:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_4a465dcc",
+    "source": "risk_factor_49ed2349",
+    "target": "species_42584e13",
+    "relation": "may_trigger",
+    "weight": 0.8,
+    "properties": {
+      "description": "陆源营养盐输入促进东海原甲藻大量繁殖"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_42584e13",
+      "created_at": "2026-06-04T05:51:56",
+      "updated_at": "2026-06-04T05:51:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_c53172ff",
+    "source": "species_42584e13",
+    "target": "red_tide_event_1a541e1c",
+    "relation": "correlated_with",
+    "weight": 0.9,
+    "properties": {
+      "description": "东海原甲藻爆发是2018年东海赤潮事件的主要特征"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_42584e13",
+      "created_at": "2026-06-04T05:51:56",
+      "updated_at": "2026-06-04T05:51:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_214d4ec6",
+    "source": "red_tide_event_981af7e4",
+    "target": "buoy_4129921a",
+    "relation": "has_observation",
+    "weight": 0.8,
+    "properties": {
+      "description": "2024年东海赤潮事件期间，东海浮标B01提供了关键观测数据。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_981af7e4",
+      "created_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-04T05:53:40",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_4cb7d505",
+    "source": "buoy_4129921a",
+    "target": "observation_8520b7ed",
+    "relation": "has_observation",
+    "weight": 0.9,
+    "properties": {
+      "description": "浮标监测到叶绿素浓度异常升高。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_981af7e4",
+      "created_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-04T05:53:40",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_5dafed8a",
+    "source": "red_tide_event_981af7e4",
+    "target": "observation_8520b7ed",
+    "relation": "indicates",
+    "weight": 0.7,
+    "properties": {
+      "description": "叶绿素异常是赤潮发生的指示信号。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_981af7e4",
+      "created_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-04T05:53:40",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_69edd4d6",
+    "source": "red_tide_event_981af7e4",
+    "target": "risk_factor_aa90f2bd",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "2024年东海赤潮事件与东海夏季富营养化相关。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:54:10",
+      "updated_at": "2026-06-04T05:54:10",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_974a22ef",
+    "source": "risk_factor_aa90f2bd",
+    "target": "red_tide_event_1a541e1c",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "东海夏季富营养化与2018年东海赤潮事件相关。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:54:10",
+      "updated_at": "2026-06-04T05:54:10",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_768bfebf",
+    "source": "red_tide_event_6ebd8948",
+    "target": "observation_2c75bd9f",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "赤潮灾害的发生与高营养盐浓度密切相关。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_2c75bd9f",
+      "created_at": "2026-06-04T05:56:01",
+      "updated_at": "2026-06-04T05:56:01",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_957afab0",
+    "source": "observation_2c75bd9f",
+    "target": "risk_factor_aa90f2bd",
+    "relation": "indicates",
+    "weight": 0.9,
+    "properties": {
+      "description": "高营养盐浓度是水体富营养化的直接指示因子。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_2c75bd9f",
+      "created_at": "2026-06-04T05:56:01",
+      "updated_at": "2026-06-04T05:56:01",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_480a8822",
+    "source": "risk_factor_aa90f2bd",
+    "target": "species_4e40aaf1",
+    "relation": "suitable_for",
+    "weight": 0.8,
+    "properties": {
+      "description": "富营养化水体为米氏凯伦藻提供充足营养，促进其大量繁殖。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:56:23",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_01f2df21",
+    "source": "risk_factor_aa90f2bd",
+    "target": "fishery_area_67934c4a",
+    "relation": "affected_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "东海夏季富营养化导致赤潮频发，影响长江口渔场的渔业生产。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:56:23",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_42cc5cf8",
+    "source": "risk_factor_aa90f2bd",
+    "target": "risk_factor_e613ae4e",
+    "relation": "correlated_with",
+    "weight": 0.9,
+    "properties": {
+      "description": "东海夏季富营养化与海水温度升高密切相关，共同增加赤潮风险。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:56:23",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  }
+]

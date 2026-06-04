@@ -1,0 +1,329 @@
+[
+  {
+    "id": "buoy_c582f439",
+    "type": "Buoy",
+    "name": "渤海浮标A01",
+    "properties": {
+      "description": "位于渤海中部，实时监测温度、盐度、叶绿素等参数"
+    },
+    "expanded": {
+      "related_events": true
+    },
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_49ed2349",
+    "type": "RiskFactor",
+    "name": "陆源营养盐输入",
+    "properties": {
+      "description": "来自河流和沿岸排放的氮磷营养盐，是赤潮的主要诱因之一"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T05:49:17",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_1a541e1c",
+    "type": "RedTideEvent",
+    "name": "2018年东海赤潮事件",
+    "properties": {
+      "description": "2018年5月在东海海域发生的大规模赤潮，主要藻种为东海原甲藻，面积约500平方公里"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T05:49:17",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_42584e13",
+    "type": "Species",
+    "name": "东海原甲藻",
+    "properties": {
+      "description": "中国近海常见赤潮藻种，能产生溶血毒素，对海洋生物造成危害"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T05:49:17",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "fishery_area_196d437c",
+    "type": "FisheryArea",
+    "name": "舟山渔场",
+    "properties": {
+      "description": "中国最大渔场，位于东海北部，受赤潮影响显著"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-04T05:49:17",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_9994f5cb",
+    "type": "RedTideEvent",
+    "name": "渤海湾赤潮事件2024",
+    "properties": {
+      "description": "2024年5月渤海湾发生的赤潮事件，主要藻种为赤潮异弯藻，最大面积约100平方公里，持续时间约两周。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_c582f439",
+      "created_at": "2026-06-04T05:49:49",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_b045f6a3",
+    "type": "Observation",
+    "name": "渤海浮标A01叶绿素异常",
+    "properties": {
+      "description": "2024年5月10日浮标监测到叶绿素浓度达18 mg/m³，远超正常范围，指示赤潮前兆。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_c582f439",
+      "created_at": "2026-06-04T05:49:49",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_bc6a3014",
+    "type": "Observation",
+    "name": "渤海浮标A01溶解氧下降",
+    "properties": {
+      "description": "2024年5月12日浮标监测到溶解氧浓度降至3.5 mg/L，低于正常下限，与赤潮导致的水体缺氧相关。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_c582f439",
+      "created_at": "2026-06-04T05:49:49",
+      "updated_at": "2026-06-04T05:49:49",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_06ad8ef2",
+    "type": "RedTideEvent",
+    "name": "渤海赤潮事件",
+    "properties": {
+      "description": "2024年5月渤海浮标A01监测到溶解氧下降，指示可能发生赤潮事件"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_bc6a3014",
+      "created_at": "2026-06-04T05:50:39",
+      "updated_at": "2026-06-04T05:50:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_6ebd8948",
+    "type": "RedTideEvent",
+    "name": "赤潮灾害",
+    "properties": {
+      "description": "海洋中微藻、原生动物或细菌在特定环境条件下暴发性增殖或聚集，引起水体变色或对海洋生物产生危害的生态异常现象。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-04T05:51:06",
+      "updated_at": "2026-06-04T05:51:06",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_f7d77413",
+    "type": "Observation",
+    "name": "2018年东海赤潮监测",
+    "properties": {
+      "description": "对2018年东海赤潮事件中东海原甲藻的监测与观测数据"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_1a541e1c",
+      "created_at": "2026-06-04T05:51:39",
+      "updated_at": "2026-06-04T05:51:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_981af7e4",
+    "type": "RedTideEvent",
+    "name": "2024年东海赤潮事件",
+    "properties": {
+      "description": "2024年夏季东海海域发生的大规模赤潮事件，主要影响浙江沿海，持续时间约两周。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "seed",
+      "parent_node": null,
+      "created_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-04T05:53:40",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "buoy_4129921a",
+    "type": "Buoy",
+    "name": "东海浮标B01",
+    "properties": {
+      "description": "部署于东海浙江近海的海洋环境监测浮标，实时监测水温、盐度、叶绿素等参数。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_981af7e4",
+      "created_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-04T05:53:40",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_8520b7ed",
+    "type": "Observation",
+    "name": "东海浮标B01叶绿素异常",
+    "properties": {
+      "description": "2024年7月东海浮标B01监测到叶绿素a浓度峰值达15 mg/m³，超过正常范围，指示赤潮发生。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_981af7e4",
+      "created_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-04T05:53:40",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_aa90f2bd",
+    "type": "RiskFactor",
+    "name": "东海夏季富营养化",
+    "properties": {
+      "description": "东海海域夏季水体富营养化现象，是赤潮暴发的重要诱因之一。"
+    },
+    "expanded": {
+      "ecological_species": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_981af7e4",
+      "created_at": "2026-06-04T05:54:10",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_2c75bd9f",
+    "type": "Observation",
+    "name": "营养盐浓度",
+    "properties": {
+      "description": "水体中氮、磷等营养盐的浓度，是衡量富营养化程度和赤潮风险的重要指标。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_6ebd8948",
+      "created_at": "2026-06-04T05:56:01",
+      "updated_at": "2026-06-04T05:56:01",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_4e40aaf1",
+    "type": "Species",
+    "name": "米氏凯伦藻",
+    "properties": {
+      "description": "一种常见的赤潮藻种，在中国东海频繁引发赤潮事件。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:56:23",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "fishery_area_67934c4a",
+    "type": "FisheryArea",
+    "name": "长江口渔场",
+    "properties": {
+      "description": "位于长江口海域的重要渔场，渔业资源丰富，易受赤潮影响。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:56:23",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_e613ae4e",
+    "type": "RiskFactor",
+    "name": "海水温度升高",
+    "properties": {
+      "description": "夏季海水温度升高是赤潮暴发的关键环境因子，与富营养化协同作用。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_aa90f2bd",
+      "created_at": "2026-06-04T05:56:23",
+      "updated_at": "2026-06-04T05:56:23",
+      "version": 1,
+      "locked": true
+    }
+  }
+]

@@ -16,7 +16,7 @@ from typing import Any
 
 from app.core.errors import NotFoundError
 from app.core.json_store import read_json, write_json
-from app.core.paths import GRAPH_FILE
+from app.core.paths import GRAPH_EDGES_FILE, GRAPH_META_FILE, GRAPH_NODES_FILE
 from app.models.graph import GraphData, GraphEdge, GraphMetadata, GraphNode
 
 
@@ -54,14 +54,22 @@ class GraphService:
     """封装 graph.json 的读写和基础查询。"""
 
     def load_graph(self) -> GraphData:
-        """读取 graph.json 并校验为 GraphData。"""
-        # read_json 的默认值只用于文件缺失兜底；正常情况下启动时已经确保文件存在。
-        return GraphData.model_validate(read_json(GRAPH_FILE, {"graph_id": "ocean_kg_demo_v1"}))
+        """从分文件存储读取图谱并组装为 GraphData。"""
+        meta = read_json(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
+        nodes_raw = read_json(GRAPH_NODES_FILE, [])
+        edges_raw = read_json(GRAPH_EDGES_FILE, [])
+        return GraphData(
+            graph_id=meta.get("graph_id", "ocean_kg_demo_v1"),
+            version=meta.get("version", 1),
+            nodes=[GraphNode.model_validate(n) for n in nodes_raw],
+            edges=[GraphEdge.model_validate(e) for e in edges_raw],
+        )
 
     def save_graph(self, graph: GraphData) -> None:
-        """保存完整图谱。"""
-        # model_dump(mode="json") 会把 Pydantic 对象转成可 JSON 序列化的基础类型。
-        write_json(GRAPH_FILE, graph.model_dump(mode="json"))
+        """将图谱分文件写入 meta.json、nodes.json、edges.json。"""
+        write_json(GRAPH_META_FILE, {"graph_id": graph.graph_id, "version": graph.version})
+        write_json(GRAPH_NODES_FILE, [n.model_dump(mode="json") for n in graph.nodes])
+        write_json(GRAPH_EDGES_FILE, [e.model_dump(mode="json") for e in graph.edges])
 
     def get_graph(self) -> GraphData:
         """返回完整图谱。"""

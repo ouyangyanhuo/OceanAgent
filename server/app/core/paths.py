@@ -19,8 +19,11 @@ CACHE_DIR = DATA_DIR / "cache"
 SNAPSHOT_DIR = DATA_DIR / "snapshots"
 PROMPT_DIR = DATA_DIR / "prompts"
 
-# 图谱事实源和图谱扩展控制文件。
-GRAPH_FILE = GRAPH_DIR / "graph.json"
+# 图谱事实源（分文件存储）和图谱扩展控制文件。
+GRAPH_FILE = GRAPH_DIR / "graph.json"  # 兼容旧文件，迁移后可删除
+GRAPH_META_FILE = GRAPH_DIR / "meta.json"
+GRAPH_NODES_FILE = GRAPH_DIR / "nodes.json"
+GRAPH_EDGES_FILE = GRAPH_DIR / "edges.json"
 EXPANSION_INDEX_FILE = GRAPH_DIR / "expansion_index.json"
 SCHEMA_RULES_FILE = GRAPH_DIR / "schema_rules.json"
 

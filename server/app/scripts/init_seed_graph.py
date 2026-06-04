@@ -12,16 +12,19 @@ import sys
 
 from app.core.config import get_settings
 from app.core.json_store import read_json, write_json
-from app.core.paths import EXPANSION_INDEX_FILE, GRAPH_FILE
+from app.core.paths import (
+    EXPANSION_INDEX_FILE,
+    GRAPH_EDGES_FILE,
+    GRAPH_META_FILE,
+    GRAPH_NODES_FILE,
+)
 
 
-# 最小图谱结构，保证 GraphData 可以成功解析。
-DEFAULT_GRAPH = {
-    "graph_id": "ocean_kg_demo_v1",
-    "version": 1,
-    "nodes": [],
-    "edges": [],
-}
+def _empty_graph_files() -> None:
+    """将图谱三个文件清空为初始状态。"""
+    write_json(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
+    write_json(GRAPH_NODES_FILE, [])
+    write_json(GRAPH_EDGES_FILE, [])
 
 
 def main() -> None:
@@ -31,17 +34,18 @@ def main() -> None:
     parser.add_argument("--llm", action="store_true", help="Use LLM to generate seed graph")
     args = parser.parse_args()
 
-    # 默认不覆盖已有 graph.json，避免误删用户已经扩展出的图谱结构。
-    if GRAPH_FILE.exists() and not args.force and not args.llm:
-        graph = read_json(GRAPH_FILE, DEFAULT_GRAPH)
-        print(f"graph.json already exists: {len(graph.get('nodes', []))} nodes")
+    # 默认不覆盖已有图谱文件，避免误删用户已经扩展出的图谱结构。
+    # 但 0 节点视为空图谱，允许重新生成。
+    nodes = read_json(GRAPH_NODES_FILE, [])
+    if len(nodes) > 0 and not args.force and not args.llm:
+        print(f"graph already exists: {len(nodes)} nodes")
         return
 
     if args.llm:
         _generate_llm_seed()
     else:
-        write_json(GRAPH_FILE, DEFAULT_GRAPH)
-        print("graph.json initialized (empty)")
+        _empty_graph_files()
+        print("graph initialized (empty)")
 
 
 def _generate_llm_seed() -> None:
@@ -65,9 +69,9 @@ def _generate_llm_seed() -> None:
     print(f"正在使用 LLM ({settings.llm_model}) 生成种子图谱...")
 
     # 1. 清空图谱和扩展索引
-    write_json(GRAPH_FILE, DEFAULT_GRAPH)
+    _empty_graph_files()
     write_json(EXPANSION_INDEX_FILE, {})
-    print("  已清空 graph.json 和 expansion_index.json")
+    print("  已清空图谱文件和 expansion_index.json")
 
     # 2. 用 LLM 生成种子候选数据
     ai_service = AIService()

@@ -15,7 +15,9 @@ from app.core.paths import (
     AGENT_CACHE_FILE,
     AI_CACHE_FILE,
     EXPANSION_INDEX_FILE,
-    GRAPH_FILE,
+    GRAPH_EDGES_FILE,
+    GRAPH_META_FILE,
+    GRAPH_NODES_FILE,
     REPORT_CACHE_FILE,
     SCHEMA_RULES_FILE,
     ensure_data_dirs,
@@ -55,8 +57,10 @@ def ensure_runtime_files() -> None:
     # 先创建目录，再创建文件；否则 ensure_json_file 写入时父目录可能不存在。
     ensure_data_dirs()
 
-    # graph.json 是图谱事实源，最小默认值必须能通过 GraphData 校验。
-    ensure_json_file(GRAPH_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1, "nodes": [], "edges": []})
+    # 图谱分文件存储：meta.json 存元信息，nodes.json 存节点，edges.json 存边。
+    ensure_json_file(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
+    ensure_json_file(GRAPH_NODES_FILE, [])
+    ensure_json_file(GRAPH_EDGES_FILE, [])
 
     # expansion_index 记录结构扩展历史，空对象表示尚未扩展任何节点。
     ensure_json_file(EXPANSION_INDEX_FILE, {})

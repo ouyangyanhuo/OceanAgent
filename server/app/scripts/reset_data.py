@@ -12,7 +12,9 @@ from app.core.paths import (
     AGENT_CACHE_FILE,
     AI_CACHE_FILE,
     EXPANSION_INDEX_FILE,
-    GRAPH_FILE,
+    GRAPH_EDGES_FILE,
+    GRAPH_META_FILE,
+    GRAPH_NODES_FILE,
     REPORT_CACHE_FILE,
 )
 
@@ -31,8 +33,10 @@ def main() -> None:
     print("✓ cache files cleared")
 
     if args.all:
-        write_json(GRAPH_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1, "nodes": [], "edges": []})
-        print("✓ graph.json cleared")
+        write_json(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
+        write_json(GRAPH_NODES_FILE, [])
+        write_json(GRAPH_EDGES_FILE, [])
+        print("✓ graph files cleared (meta.json, nodes.json, edges.json)")
 
     print("\n重置完成。重启后端后生效。")
     if not args.all:
