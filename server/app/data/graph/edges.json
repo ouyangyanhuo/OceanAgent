@@ -592,5 +592,77 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_95614fad",
+    "source": "buoy_3c395b71",
+    "target": "species_32d3814c",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "浮标监测的环境数据与大黄鱼资源量变化相关"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_5084c866",
+    "source": "buoy_3c395b71",
+    "target": "risk_factor_aa76d1dd",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "浮标监测到的叶绿素和营养盐数据指示富营养化程度"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_73e2deae",
+    "source": "risk_factor_aa76d1dd",
+    "target": "species_32d3814c",
+    "relation": "affected_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "富营养化导致赤潮频发，影响大黄鱼栖息和摄食"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_d479f828",
+    "source": "risk_factor_aa76d1dd",
+    "target": "fishery_area_3bea08e6",
+    "relation": "affected_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "富营养化污染影响产卵保护区的水质和生态平衡"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

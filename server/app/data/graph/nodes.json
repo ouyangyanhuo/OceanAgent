@@ -441,12 +441,14 @@
     "properties": {
       "description": "位于舟山渔场中心区域的监测浮标，实时监测水温、盐度、叶绿素等参数。"
     },
-    "expanded": {},
+    "expanded": {
+      "ecological_species": true
+    },
     "metadata": {
       "source": "generated",
       "parent_node": "fishery_area_196d437c",
       "created_at": "2026-06-04T12:07:02",
-      "updated_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-04T13:24:43",
       "version": 1,
       "locked": true
     }
@@ -498,6 +500,57 @@
       "parent_node": "fishery_area_196d437c",
       "created_at": "2026-06-04T12:07:02",
       "updated_at": "2026-06-04T12:07:02",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_32d3814c",
+    "type": "Species",
+    "name": "大黄鱼",
+    "properties": {
+      "description": "舟山渔场重要经济鱼种，其资源量受赤潮和水温变化影响显著"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_aa76d1dd",
+    "type": "RiskFactor",
+    "name": "舟山渔场富营养化",
+    "properties": {
+      "description": "舟山渔场夏季营养盐浓度升高，是赤潮发生的重要风险因子"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "fishery_area_3bea08e6",
+    "type": "FisheryArea",
+    "name": "舟山渔场产卵保护区",
+    "properties": {
+      "description": "舟山渔场内划定的鱼类产卵保护区域，对大黄鱼等鱼种繁殖至关重要"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_3c395b71",
+      "created_at": "2026-06-04T13:24:43",
+      "updated_at": "2026-06-04T13:24:43",
       "version": 1,
       "locked": true
     }

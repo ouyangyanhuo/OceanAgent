@@ -190,9 +190,12 @@ onMounted(() => {
       <!-- Sidebar -->
       <aside class="agent-search-aside qa-aside min-w-0">
         <section class="panel side-feed-panel">
-          <header class="panel-header"><h2>数据来源</h2><button>更多 ›</button></header>
+          <header class="panel-header"><h2>数据来源</h2></header>
           <ul>
+            <li>Copernicus Marine Service <span>正常</span></li>
+            <li>南海及邻近海区科学数据中心 <span>正常</span></li>
             <li>自然资源部海洋生态环境监测 <span>正常</span></li>
+            <li>中科院海洋科学大数据中心 <span>正常</span></li>
             <li>中国海洋生物多样性数据库 <span>正常</span></li>
             <li>国家海洋科学数据中心 <span>正常</span></li>
             <li>卫星遥感海洋生态专题 <span>正常</span></li>

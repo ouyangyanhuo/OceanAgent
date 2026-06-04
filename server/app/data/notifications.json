@@ -1,11 +1,20 @@
 {
   "notifications": [
     {
+      "id": "72d383a50ff4",
+      "type": "graph_expansion",
+      "title": "图谱扩展完成",
+      "message": "节点「舟山渔场浮标01」的 ecological_species 扩展已完成，新增 3 个节点和 4 条边",
+      "read": false,
+      "created_at": "2026-06-04T21:24:44.025937",
+      "related_node_id": "buoy_3c395b71"
+    },
+    {
       "id": "64ebe87900b3",
       "type": "graph_expansion",
       "title": "图谱扩展完成",
       "message": "节点「舟山渔场」的 monitoring_buoys 扩展已完成，新增 4 个节点和 4 条边",
-      "read": false,
+      "read": true,
       "created_at": "2026-06-04T20:07:02.801679",
       "related_node_id": "fishery_area_196d437c"
     }

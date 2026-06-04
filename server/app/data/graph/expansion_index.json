@@ -90,5 +90,24 @@
     "summary": "为舟山渔场扩展了两个监测浮标（舟山渔场浮标01和02）及其相关观测（叶绿素浓度和溶解氧），建立了渔场被浮标监测和观测的关系。",
     "created_at": "2026-06-04T12:07:02",
     "updated_at": "2026-06-04T12:07:02"
+  },
+  "buoy_3c395b71:ecological_species": {
+    "node_id": "buoy_3c395b71",
+    "expand_type": "ecological_species",
+    "expanded": true,
+    "generated_node_ids": [
+      "species_32d3814c",
+      "risk_factor_aa76d1dd",
+      "fishery_area_3bea08e6"
+    ],
+    "generated_edge_ids": [
+      "edge_95614fad",
+      "edge_5084c866",
+      "edge_73e2deae",
+      "edge_d479f828"
+    ],
+    "summary": "为舟山渔场浮标01添加了相关性物种大黄鱼、风险因子富营养化及渔场区域产卵保护区，反映了环境监测与渔业生态的关联。",
+    "created_at": "2026-06-04T13:24:43",
+    "updated_at": "2026-06-04T13:24:43"
   }
 }
