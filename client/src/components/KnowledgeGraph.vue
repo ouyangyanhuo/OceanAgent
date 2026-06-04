@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import cytoscape from 'cytoscape'
 import {
+  Bot,
   Database,
   Expand,
   Eye,
@@ -169,19 +170,37 @@ const usedNodeTypes = computed(() => {
 
 const graphStats = computed(() => `${graphNodes.value.length} 个节点 · ${graphEdges.value.length} 条关系`)
 
+/* ── 属性过滤辅助 ── */
+function hasNonDescriptionProps(node) {
+  const props = node?.properties || {}
+  return Object.keys(props).filter((k) => k !== 'description').length > 0
+}
+
+function filteredProps(node) {
+  const props = node?.properties || {}
+  const result = {}
+  for (const [k, v] of Object.entries(props)) {
+    if (k !== 'description') result[k] = v
+  }
+  return result
+}
+
 /* ── Cytoscape 初始化 ── */
 function toElements(nodes, edges) {
-  const nodeElements = nodes.map((n) => ({
-    data: {
-      id: n.id,
-      label: n.name,
-      color: NODE_TYPE_COLORS[n.type] || '#3b82f6',
-      nodeType: n.type,
-      size: n.type === 'SeaArea' ? 70 : 46,
-      isCore: n.type === 'SeaArea',
-      raw: n,
-    },
-  }))
+  const nodeElements = nodes.map((n) => {
+    const type = n.type || 'Observation'
+    return {
+      data: {
+        id: n.id,
+        label: n.name,
+        color: NODE_TYPE_COLORS[type] || '#3b82f6',
+        nodeType: type,
+        size: type === 'SeaArea' ? 70 : 46,
+        isCore: type === 'SeaArea',
+        raw: n,
+      },
+    }
+  })
   const edgeElements = edges.map((e) => ({
     data: {
       id: e.id,
@@ -208,61 +227,76 @@ function initCytoscape() {
     container: cyContainerRef.value,
     elements,
     style: [
+      /* ── 基础节点样式 ── */
       {
         selector: 'node',
         style: {
           'label': 'data(label)',
-          'background-color': 'data(color)',
+          'shape': 'ellipse',
           'width': 'data(size)',
           'height': 'data(size)',
+          'background-color': 'data(color)',
+          'background-opacity': 0.88,
           'text-valign': 'bottom',
-          'text-margin-y': 6,
+          'text-margin-y': 8,
           'font-size': 11,
           'font-weight': 600,
           'color': '#e2e8f0',
-          'border-width': 2,
+          'border-width': 2.5,
           'border-color': 'data(color)',
-          'border-opacity': 0.6,
+          'border-opacity': 0.8,
           'text-outline-width': 2,
           'text-outline-color': '#06192f',
           'text-wrap': 'wrap',
-          'text-max-width': '80px',
-          'background-opacity': 0.85,
+          'text-max-width': '90px',
           'overlay-opacity': 0,
           'transition-property': 'border-width, border-color, background-opacity',
           'transition-duration': '0.2s',
+          'shadow-color': 'data(color)',
+          'shadow-blur': 8,
+          'shadow-opacity': 0.3,
+          'shadow-offset-x': 0,
+          'shadow-offset-y': 0,
         },
       },
+      /* ── 核心节点（SeaArea）：更大 + 强发光 ── */
       {
         selector: 'node[?isCore]',
         style: {
           'width': 80,
           'height': 80,
-          'font-size': 15,
+          'font-size': 14,
           'font-weight': 700,
           'border-width': 3,
-          'background-color': '#1894ff',
-          'border-color': '#1894ff',
-          'background-opacity': 0.9,
+          'border-color': '#60a5fa',
+          'shadow-blur': 20,
+          'shadow-opacity': 0.6,
+          'background-opacity': 0.95,
         },
       },
+      /* ── 选中节点 ── */
       {
         selector: 'node:selected',
         style: {
           'border-width': 4,
-          'border-color': '#60a5fa',
+          'border-color': '#fbbf24',
           'background-opacity': 1,
-          'overlay-color': '#60a5fa',
-          'overlay-padding': 4,
-          'overlay-opacity': 0.25,
+          'overlay-color': '#fbbf24',
+          'overlay-padding': 5,
+          'overlay-opacity': 0.2,
+          'shadow-blur': 24,
+          'shadow-opacity': 0.6,
+          'shadow-color': '#fbbf24',
         },
       },
+      /* ── 暗淡节点 ── */
       {
         selector: 'node.dimmed',
         style: {
           'opacity': 0.15,
         },
       },
+      /* ── 边基础样式：直线 ── */
       {
         selector: 'edge',
         style: {
@@ -271,7 +305,7 @@ function initCytoscape() {
           'target-arrow-color': 'rgba(25, 207, 255, 0.5)',
           'target-arrow-shape': 'triangle',
           'arrow-scale': 0.8,
-          'curve-style': 'bezier',
+          'curve-style': 'straight',
           'label': 'data(label)',
           'font-size': 9,
           'color': 'rgba(180, 210, 240, 0.7)',
@@ -284,6 +318,7 @@ function initCytoscape() {
           'transition-duration': '0.2s',
         },
       },
+      /* ── 虚线边 ── */
       {
         selector: 'edge.dashed',
         style: {
@@ -291,8 +326,10 @@ function initCytoscape() {
           'line-dash-pattern': [6, 4],
           'line-color': 'rgba(241, 154, 252, 0.5)',
           'target-arrow-color': 'rgba(241, 154, 252, 0.5)',
+          'curve-style': 'straight',
         },
       },
+      /* ── 暗淡边 ── */
       {
         selector: 'edge.dimmed',
         style: {
@@ -322,14 +359,16 @@ function initCytoscape() {
   })
 
   // 布局完成后消除重叠并聚焦中心节点
-  // 小图布局可能极快完成，用 ready + 延迟双重保障
+  // ready 做初步去重；layoutstop 做完整去重 + 聚焦
   cy.ready(() => {
     resolveOverlaps()
-    focusCenterNode()
   })
   cy.one('layoutstop', () => {
     resolveOverlaps()
-    focusCenterNode()
+    resolveEdgeOverlaps()
+    resolveEdgeCrossings()
+    // 延迟聚焦，确保节点位置已稳定
+    setTimeout(() => focusCenterNode(), 60)
   })
 
   // 事件绑定
@@ -367,6 +406,7 @@ function initCytoscape() {
   // 松手后再做一轮全局消除残余
   cy.on('free', 'node', () => {
     resolveOverlaps()
+    resolveEdgeOverlaps()
   })
 }
 
@@ -435,17 +475,149 @@ function resolveOverlaps() {
   }
 }
 
+/* ── 检测线段是否穿过矩形 ── */
+function segmentHitsRect(x1, y1, x2, y2, rx1, ry1, rx2, ry2) {
+  // 快速排除
+  const minX = Math.min(x1, x2), maxX = Math.max(x1, x2)
+  const minY = Math.min(y1, y2), maxY = Math.max(y1, y2)
+  if (maxX < rx1 || minX > rx2 || maxY < ry1 || minY > ry2) return false
+
+  const dx = x2 - x1, dy = y2 - y1
+  let tmin = 0, tmax = 1
+
+  const update = (p, d, min, max) => {
+    if (Math.abs(d) < 1e-10) return p >= min && p <= max
+    const t1 = (min - p) / d, t2 = (max - p) / d
+    const tl = Math.min(t1, t2), th = Math.max(t1, t2)
+    tmin = Math.max(tmin, tl)
+    tmax = Math.min(tmax, th)
+    return tmin <= tmax
+  }
+
+  return update(x1, dx, rx1, rx2) && update(y1, dy, ry1, ry2) && tmin > 0.02 && tmax < 0.98
+}
+
+/* ── 消除边与节点的穿越：移动节点来规避 ── */
+function resolveEdgeOverlaps() {
+  if (!cy) return
+
+  // 多轮迭代，每轮检测所有边并推开冲突节点
+  for (let round = 0; round < 20; round++) {
+    let fixed = false
+    const edges = cy.edges()
+
+    for (let i = 0; i < edges.length; i++) {
+      const edge = edges[i]
+      const srcId = edge.data('source')
+      const tgtId = edge.data('target')
+      const srcNode = cy.getElementById(srcId)
+      const tgtNode = cy.getElementById(tgtId)
+      if (!srcNode.length || !tgtNode.length) continue
+
+      const sp = srcNode.position()
+      const tp = tgtNode.position()
+
+      // 检测与哪些非端点节点碰撞
+      cy.nodes().forEach((node) => {
+        if (node.id() === srcId || node.id() === tgtId) return
+        const np = node.position()
+        const hw = node.width() / 2 + 14
+        const hh = node.height() / 2 + 14
+
+        if (!segmentHitsRect(sp.x, sp.y, tp.x, tp.y, np.x - hw, np.y - hh, np.x + hw, np.y + hh)) return
+
+        fixed = true
+
+        // 计算边的方向向量和法向量
+        const edx = tp.x - sp.x, edy = tp.y - sp.y
+        const eLen = Math.sqrt(edx * edx + edy * edy) || 1
+        // 法向量（垂直于边方向）
+        const nx = -edy / eLen, ny = edx / eLen
+
+        // 计算阻挡节点在法向量方向上的偏移量（需要推开多少才能避开）
+        // 简化：把阻挡节点沿法向量推离边
+        const dot = (np.x - sp.x) * nx + (np.y - sp.y) * ny
+        const pushDir = dot >= 0 ? 1 : -1
+        const pushDist = Math.max(hw, hh) * 0.4 + 8
+
+        // 把阻挡节点推开
+        node.position({
+          x: np.x + nx * pushDir * pushDist,
+          y: np.y + ny * pushDir * pushDist,
+        })
+      })
+    }
+    if (!fixed) break
+  }
+}
+
+/* ── 消除边-边交叉：移动共享端点附近的节点 ── */
+function resolveEdgeCrossings() {
+  if (!cy) return
+  const edges = cy.edges().toArray()
+
+  function crossProduct(ax, ay, bx, by) { return ax * by - ay * bx }
+
+  function segmentsCross(x1, y1, x2, y2, x3, y3, x4, y4) {
+    const d1x = x2 - x1, d1y = y2 - y1
+    const d2x = x4 - x3, d2y = y4 - y3
+    const denom = crossProduct(d1x, d1y, d2x, d2y)
+    if (Math.abs(denom) < 1e-10) return false
+    const t = crossProduct(x3 - x1, y3 - y1, d2x, d2y) / denom
+    const u = crossProduct(x3 - x1, y3 - y1, d1x, d1y) / denom
+    return t > 0.15 && t < 0.85 && u > 0.15 && u < 0.85
+  }
+
+  for (let round = 0; round < 10; round++) {
+    let fixed = false
+    for (let i = 0; i < edges.length; i++) {
+      for (let j = i + 1; j < edges.length; j++) {
+        const e1 = edges[i], e2 = edges[j]
+        const s1 = e1.data('source'), t1 = e1.data('target')
+        const s2 = e2.data('source'), t2 = e2.data('target')
+        // 跳过共享端点的边
+        if (s1 === s2 || s1 === t2 || t1 === s2 || t1 === t2) continue
+
+        const p1 = cy.getElementById(s1).position()
+        const p2 = cy.getElementById(t1).position()
+        const p3 = cy.getElementById(s2).position()
+        const p4 = cy.getElementById(t2).position()
+        if (!p1 || !p2 || !p3 || !p4) continue
+
+        if (segmentsCross(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)) {
+          fixed = true
+          // 移动 e1 的 target 节点，沿 e2 法向量偏移
+          const dx = p4.x - p3.x, dy = p4.y - p3.y
+          const len = Math.sqrt(dx * dx + dy * dy) || 1
+          const nx = -dy / len, ny = dx / len
+          const node = cy.getElementById(t1)
+          const np = node.position()
+          node.position({ x: np.x + nx * 20, y: np.y + ny * 20 })
+        }
+      }
+    }
+    if (!fixed) break
+  }
+}
+
 /* ── 聚焦中心节点 ── */
 function focusCenterNode() {
   if (!cy || cy.nodes().length === 0) return
 
-  // 取第一个节点
-  const firstNode = cy.nodes()[0]
-  if (!firstNode) return
+  // 优先找 SeaArea 核心节点，否则取第一个
+  const coreNode = cy.nodes().filter((n) => n.data('isCore')).first()
+  const target = coreNode.length > 0 ? coreNode : cy.nodes().first()
+  if (!target || target.length === 0) return
 
-  // 用 fit 聚焦到该节点及其邻居，比 animate({ center }) 更可靠
-  const neighborhood = firstNode.neighborhood().add(firstNode)
-  cy.fit(neighborhood, 60)
+  // 取该节点及其邻居
+  const neighborhood = target.neighborhood().add(target)
+
+  // 聚焦局部或全图
+  if (neighborhood.length >= 3) {
+    cy.fit(neighborhood, 60)
+  } else {
+    cy.fit(undefined, 40)
+  }
 }
 
 /* ── 数据加载 ── */
@@ -589,7 +761,11 @@ async function handleExpand(expandType) {
         minTemp: 1.0,
         padding: 60,
       })
-      expandLayout.one('layoutstop', () => resolveOverlaps())
+      expandLayout.one('layoutstop', () => {
+        resolveOverlaps()
+        resolveEdgeOverlaps()
+        resolveEdgeCrossings()
+      })
       expandLayout.run()
     }
 
@@ -666,9 +842,16 @@ onBeforeUnmount(() => {
   <section class="panel graph-panel">
     <!-- 头部 -->
     <header class="graph-header">
-      <div class="graph-header-left">
+      <div class="graph-header-top">
         <h2>信息关系图谱</h2>
-        <span v-if="!loadError" class="graph-stats">{{ graphStats }}</span>
+        <div class="graph-header-right">
+          <div class="agent-status-pill">
+            <Bot :size="14" />
+            <span>多智能体在线</span>
+            <i class="agent-dot"></i>
+          </div>
+          <span v-if="!loadError" class="graph-stats">{{ graphStats }}</span>
+        </div>
       </div>
       <div class="graph-controls">
         <div class="graph-search">
@@ -795,6 +978,73 @@ onBeforeUnmount(() => {
         </div>
       </Transition>
 
+      <!-- 节点详情面板（放在 canvas 内，全屏时可见） -->
+      <Transition name="slide">
+        <div v-if="selectedNode" class="node-detail" @click.stop>
+          <div class="node-detail-header">
+            <div>
+              <span class="node-detail-type" :class="`tone-${NODE_TYPE_TONES[selectedNode.type] || 'blue'}`">
+                {{ NODE_TYPE_LABELS[selectedNode.type] || selectedNode.type }}
+              </span>
+              <h3>{{ selectedNode.name }}</h3>
+            </div>
+            <button class="node-detail-close" @click="closeDetail"><X :size="18" /></button>
+          </div>
+
+          <div class="node-detail-body">
+            <!-- description 独立展示 -->
+            <div v-if="selectedNode.properties?.description" class="node-detail-description">
+              <div class="desc-bar"></div>
+              <p>{{ selectedNode.properties.description }}</p>
+            </div>
+
+            <!-- 其他属性（排除 description） -->
+            <div v-if="hasNonDescriptionProps(selectedNode)" class="node-detail-section">
+              <span class="node-detail-label">属性</span>
+              <div class="node-detail-props">
+                <div
+                  v-for="(val, key) in filteredProps(selectedNode)"
+                  :key="key"
+                  class="node-detail-prop"
+                >
+                  <span class="prop-key">{{ key }}</span>
+                  <span class="prop-val">{{ val }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="node-detail-section">
+              <span class="node-detail-label">扩展方向</span>
+              <div v-if="expandOptions.length" class="expand-options">
+                <button
+                  v-for="opt in expandOptions"
+                  :key="opt.expand_type"
+                  class="expand-btn"
+                  :class="{ expanded: opt.expanded }"
+                  :disabled="opt.expanded || expanding"
+                  @click="handleExpand(opt.expand_type)"
+                >
+                  <GitFork :size="14" />
+                  <span>{{ opt.label }}</span>
+                  <span v-if="opt.expanded" class="expand-badge">已扩展</span>
+                  <span v-else-if="expanding" class="expand-badge loading">扩展中...</span>
+                </button>
+              </div>
+              <div v-else class="node-detail-empty">无可用扩展方向</div>
+            </div>
+
+            <div class="node-detail-section">
+              <span class="node-detail-label">元数据</span>
+              <div class="node-detail-meta">
+                <span>来源: {{ selectedNode.metadata?.source || '-' }}</span>
+                <span>版本: {{ selectedNode.metadata?.version || '-' }}</span>
+                <span>创建: {{ selectedNode.metadata?.created_at || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+
       <!-- 图例 -->
       <div v-if="settings.showLegend && !loadError" class="legend">
         <div class="legend-section">
@@ -811,62 +1061,6 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-
-    <!-- 节点详情面板 -->
-    <Transition name="slide">
-      <div v-if="selectedNode" class="node-detail">
-        <div class="node-detail-header">
-          <div>
-            <span class="node-detail-type" :class="`tone-${NODE_TYPE_TONES[selectedNode.type] || 'blue'}`">
-              {{ NODE_TYPE_LABELS[selectedNode.type] || selectedNode.type }}
-            </span>
-            <h3>{{ selectedNode.name }}</h3>
-          </div>
-          <button class="node-detail-close" @click="closeDetail"><X :size="18" /></button>
-        </div>
-
-        <div class="node-detail-body">
-          <div v-if="Object.keys(selectedNode.properties || {}).length" class="node-detail-section">
-            <span class="node-detail-label">属性</span>
-            <div class="node-detail-props">
-              <div v-for="(val, key) in selectedNode.properties" :key="key" class="node-detail-prop">
-                <span class="prop-key">{{ key }}</span>
-                <span class="prop-val">{{ val }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="node-detail-section">
-            <span class="node-detail-label">扩展方向</span>
-            <div v-if="expandOptions.length" class="expand-options">
-              <button
-                v-for="opt in expandOptions"
-                :key="opt.expand_type"
-                class="expand-btn"
-                :class="{ expanded: opt.expanded }"
-                :disabled="opt.expanded || expanding"
-                @click="handleExpand(opt.expand_type)"
-              >
-                <GitFork :size="14" />
-                <span>{{ opt.label }}</span>
-                <span v-if="opt.expanded" class="expand-badge">已扩展</span>
-                <span v-else-if="expanding" class="expand-badge loading">扩展中...</span>
-              </button>
-            </div>
-            <div v-else class="node-detail-empty">无可用扩展方向</div>
-          </div>
-
-          <div class="node-detail-section">
-            <span class="node-detail-label">元数据</span>
-            <div class="node-detail-meta">
-              <span>来源: {{ selectedNode.metadata?.source || '-' }}</span>
-              <span>版本: {{ selectedNode.metadata?.version || '-' }}</span>
-              <span>创建: {{ selectedNode.metadata?.created_at || '-' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Transition>
   </section>
 </template>
 
@@ -877,6 +1071,55 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+/* ── 头部两行布局 ── */
+.graph-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.graph-header-top h2 {
+  margin: 0;
+}
+
+.graph-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── 多智能体在线胶囊 ── */
+.agent-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 10px;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.agent-status-pill .agent-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+  animation: agent-pulse 2s ease-in-out infinite;
+  margin-left: 2px;
+}
+
+@keyframes agent-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* ── 设置面板 ── */

@@ -96,5 +96,25 @@
     "summary": "为东海浮标添加了4个观测节点（温度、盐度、叶绿素、溶解氧），反映了该浮标实时监测的关键海洋参数。",
     "created_at": "2026-06-03T16:59:07",
     "updated_at": "2026-06-03T16:59:07"
+  },
+  "observation_84c8b6d5:risk_factors": {
+    "node_id": "observation_84c8b6d5",
+    "expand_type": "risk_factors",
+    "expanded": true,
+    "generated_node_ids": [
+      "risk_factor_109bdf9e",
+      "observation_690109e9",
+      "risk_factor_a82ddd45",
+      "prevention_measure_8209dfc6"
+    ],
+    "generated_edge_ids": [
+      "edge_f876b7ff",
+      "edge_a76f6348",
+      "edge_9e1f77e2",
+      "edge_05f949c8"
+    ],
+    "summary": "针对黄海北部溶解氧观测扩展了富营养化风险、叶绿素观测、赤潮风险和加强水质监测措施，通过indicates、affected_by和mitigated_by关系连接。",
+    "created_at": "2026-06-04T04:45:34",
+    "updated_at": "2026-06-04T04:45:34"
   }
 }

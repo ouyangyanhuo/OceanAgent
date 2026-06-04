@@ -1,6 +1,6 @@
 {
   "graph_id": "ocean_kg_demo_v1",
-  "version": 44,
+  "version": 51,
   "nodes": [
     {
       "id": "buoy_a0ca3ecc",
@@ -223,12 +223,14 @@
       "properties": {
         "description": "2026年6月3日黄海浮标监测溶解氧为7.2 mg/L，处于正常范围"
       },
-      "expanded": {},
+      "expanded": {
+        "risk_factors": true
+      },
       "metadata": {
         "source": "generated",
         "parent_node": "buoy_f95cd0f4",
         "created_at": "2026-06-03T16:51:24",
-        "updated_at": "2026-06-03T16:51:24",
+        "updated_at": "2026-06-04T04:45:34",
         "version": 1,
         "locked": true
       }
@@ -424,6 +426,57 @@
         "parent_node": "buoy_e1991393",
         "created_at": "2026-06-03T16:59:07",
         "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "observation_690109e9",
+      "type": "Observation",
+      "name": "黄海北部叶绿素观测",
+      "properties": {
+        "description": "2026年6月3日黄海浮标监测叶绿素a浓度为3.2 mg/m³"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "risk_factor_a82ddd45",
+      "type": "RiskFactor",
+      "name": "赤潮风险",
+      "properties": {
+        "description": "叶绿素升高可能引发赤潮"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "prevention_measure_8209dfc6",
+      "type": "PreventionMeasure",
+      "name": "加强水质监测",
+      "properties": {
+        "description": "增加监测频次，实时监控溶解氧和叶绿素"
+      },
+      "expanded": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
         "version": 1,
         "locked": true
       }
@@ -730,6 +783,70 @@
         "parent_node": "buoy_e1991393",
         "created_at": "2026-06-03T16:59:07",
         "updated_at": "2026-06-03T16:59:07",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_f876b7ff",
+      "source": "observation_84c8b6d5",
+      "target": "risk_factor_109bdf9e",
+      "relation": "indicates",
+      "weight": 0.6,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_a76f6348",
+      "source": "observation_84c8b6d5",
+      "target": "observation_690109e9",
+      "relation": "affected_by",
+      "weight": 0.5,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_9e1f77e2",
+      "source": "observation_84c8b6d5",
+      "target": "risk_factor_a82ddd45",
+      "relation": "indicates",
+      "weight": 0.4,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
+        "version": 1,
+        "locked": true
+      }
+    },
+    {
+      "id": "edge_05f949c8",
+      "source": "observation_84c8b6d5",
+      "target": "prevention_measure_8209dfc6",
+      "relation": "mitigated_by",
+      "weight": 0.7,
+      "properties": {},
+      "metadata": {
+        "source": "generated",
+        "parent_node": "observation_84c8b6d5",
+        "created_at": "2026-06-04T04:45:34",
+        "updated_at": "2026-06-04T04:45:34",
         "version": 1,
         "locked": true
       }
