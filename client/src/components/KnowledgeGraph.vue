@@ -836,6 +836,37 @@ onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', onFullscreenChange)
   document.removeEventListener('click', onDocumentClick)
 })
+
+/* ── 导出 ── */
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+async function exportGraph(format) {
+  if (!cy) return
+  const ts = new Date().toISOString().slice(0, 10)
+
+  if (format === 'png') {
+    const blob = await cy.png({ output: 'blob-promise', full: true, bg: '#06192f', scale: 2 })
+    downloadBlob(blob, `ocean-graph-${ts}.png`)
+  } else if (format === 'json') {
+    const data = {
+      nodes: graphNodes.value,
+      edges: graphEdges.value,
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    downloadBlob(blob, `ocean-graph-${ts}.json`)
+  }
+}
+
+defineExpose({ exportGraph })
 </script>
 
 <template>
