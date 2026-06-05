@@ -4,17 +4,10 @@ import { Anchor, Bot, FileText, Fish, RadioTower, Settings, Share2, ShieldCheck,
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 import AppModal from '../components/common/AppModal.vue'
+import OceanCurrent from '../components/common/OceanCurrent.vue'
+import { useSatelliteMap } from '../composables/useSatelliteMap'
 
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-
-const SATELLITE_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-
-const addSatelliteBaseLayer = (mapInstance) => {
-  return L.tileLayer(SATELLITE_TILE_URL, {
-    maxZoom: 18
-  }).addTo(mapInstance)
-}
+const { L, addSatelliteBaseLayer } = useSatelliteMap()
 
 const resetZoom = () => {
   if (!fullMap) return
@@ -475,35 +468,8 @@ onMounted(() => {
           <section class="panel ocean-map fishery-map">
             <header class="panel-header"><h2>渔场适宜性分布</h2><div class="tabs"><button @click="openSuitabilityMap">适宜度综合</button></div></header>
             <div class="map-wrapper">
-              <div id="hainan-map" class="real-hainan-map"></div>
-              <div class="ocean-current-layer ocean-current-small">
-                <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
-                  <path class="current-flow strong-current" d="M10 505 C160 445,320 365,520 255 S825 150,1000 90" />
-                  <path class="current-flow delay-a" d="M0 545 C165 470,320 405,510 325 S790 245,1000 175" />
-                  <path class="current-flow delay-b" d="M70 595 C235 515,420 425,610 305 S865 180,1000 75" />
-                  <path class="current-flow coastal-current" d="M115 575 C220 485,315 385,405 292" />
-                  <path class="current-flow coastal-current delay-c" d="M175 610 C260 525,345 430,438 345" />
-                  <path class="current-flow strong-current delay-d" d="M245 610 C450 500,660 350,1000 120" />
-                  <path class="current-flow delay-e" d="M35 360 C90 315,155 255,240 180" />
-                  <path class="current-flow delay-f" d="M540 465 C640 355,760 245,875 145" />
-                  <path class="current-flow thin-current" d="M315 570 C430 500,548 430,700 320 S900 210,980 140" />
-                  <path class="current-flow thin-current delay-b" d="M20 255 C125 225,230 195,365 120" />
-                  <path class="current-flow thin-current delay-e" d="M640 585 C700 490,770 405,910 305" />
-                  <path class="current-flow thin-current delay-c" d="M470 590 C560 505,680 415,795 315" />
-                </svg>
-                <div class="ocean-particles small-particles">
-                  <span
-                    v-for="i in 70"
-                    :key="i"
-                    :style="{
-                      left: ((i * 37) % 100) + '%',
-                      top: ((i * 23) % 100) + '%',
-                      animationDelay: -((i * 0.17) % 6).toFixed(2) + 's',
-                      animationDuration: (6 + (i % 7)) + 's'
-                    }"
-                  ></span>
-                </div>
-              </div>
+              <div id="hainan-map" class="real-hainan-map leaflet-map-base"></div>
+              <OceanCurrent size="small" />
             </div>
           </section>
 
@@ -626,40 +592,7 @@ onMounted(() => {
         <div class="big-map-body">
           <div class="big-map-container">
             <div id="big-world-map"></div>
-            <div class="ocean-current-layer big-current">
-              <svg viewBox="0 0 1400 900" preserveAspectRatio="none">
-                <path class="current-flow strong-current" d="M0 710 C250 650,500 550,850 380 S1200 220,1400 100" />
-                <path class="current-flow delay-a" d="M0 620 C220 580,480 480,760 350 S1100 220,1350 80" />
-                <path class="current-flow delay-b" d="M0 520 C220 470,460 380,700 280 S1000 180,1300 60" />
-                <path class="current-flow delay-c" d="M100 800 C300 720,500 620,850 420 S1150 250,1380 120" />
-                <path class="current-flow delay-d" d="M180 850 C400 760,650 600,980 360 S1250 180,1400 80" />
-                <path class="current-flow strong-current delay-e" d="M200 720 C450 600,650 480,950 300" />
-                <path class="current-flow thin-current" d="M100 400 C250 360,420 300,620 220" />
-                <path class="current-flow thin-current delay-a" d="M300 500 C500 420,700 320,1000 180" />
-                <path class="current-flow delay-b" d="M500 850 C650 720,800 620,1000 450" />
-                <path class="current-flow delay-c" d="M650 800 C800 650,1000 500,1300 300" />
-                <path class="current-flow thin-current delay-d" d="M920 880 C1020 720,1160 580,1370 390" />
-                <path class="current-flow thin-current delay-e" d="M820 120 C1000 160,1180 190,1400 245" />
-                <path class="current-flow delay-f" d="M0 260 C210 240,430 220,650 175 S1040 105,1400 55" />
-                <path class="current-flow thin-current delay-c" d="M0 820 C180 760,330 690,520 585 S850 420,1110 260" />
-                <path class="current-flow strong-current delay-b" d="M70 900 C290 790,520 665,785 515 S1160 315,1400 210" />
-                <path class="current-flow thin-current delay-a" d="M1120 900 C1200 780,1280 650,1400 520" />
-                <path class="current-flow delay-e" d="M0 110 C170 135,340 145,540 130 S900 90,1210 20" />
-                <path class="current-flow thin-current delay-f" d="M420 900 C520 760,640 625,820 480 S1080 285,1320 130" />
-              </svg>
-              <div class="ocean-particles big-particles">
-                <span
-                  v-for="i in 150"
-                  :key="i"
-                  :style="{
-                    left: ((i * 29) % 100) + '%',
-                    top: ((i * 41) % 100) + '%',
-                    animationDelay: -((i * 0.13) % 8).toFixed(2) + 's',
-                    animationDuration: (7 + (i % 9)) + 's'
-                  }"
-                ></span>
-              </div>
-            </div>
+            <OceanCurrent size="big" />
           </div>
         </div>
       </div>
@@ -802,56 +735,10 @@ onMounted(() => {
 
 <style scoped>
 /* ── 布局 ── */
-.fishery-main-area {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.fishery-aside {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+.fishery-main-area { display: flex; flex-direction: column; gap: 16px; }
+.fishery-aside { display: flex; flex-direction: column; gap: 16px; }
 
-/* ── Leaflet 地图容器 ── */
-.map-wrapper {
-  position: relative;
-  width: 100%;
-  height: 282px;
-  overflow: hidden;
-  border-radius: 10px;
-}
-.map-wrapper .real-hainan-map {
-  height: 100%;
-}
-.real-hainan-map {
-  position: relative;
-  width: 100%;
-  height: 282px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(45, 144, 220, .45);
-}
-
-/* Leaflet 控件样式 */
-.real-hainan-map :deep(.leaflet-control-zoom a),
-#big-world-map :deep(.leaflet-control-zoom a) {
-  background: rgba(5, 28, 55, .95);
-  color: #fff;
-  border-color: rgba(86, 171, 255, .8);
-}
-.real-hainan-map :deep(.leaflet-popup-content-wrapper),
-#big-world-map :deep(.leaflet-popup-content-wrapper) {
-  background: rgba(5, 24, 48, .95);
-  color: #fff;
-  border: 1px solid rgba(48, 145, 255, .65);
-}
-.real-hainan-map :deep(.leaflet-popup-tip),
-#big-world-map :deep(.leaflet-popup-tip) {
-  background: rgba(5, 24, 48, .95);
-}
-
-/* 地图滤镜与覆盖 */
+/* ── 地图覆盖层（页面特有蓝色滤镜） ── */
 .real-hainan-map::after,
 .big-map-body::after {
   content: '';
@@ -864,156 +751,15 @@ onMounted(() => {
     linear-gradient(135deg, rgba(0, 120, 255, .28), rgba(0, 255, 180, .08));
   mix-blend-mode: screen;
 }
-.real-hainan-map :deep(.leaflet-tile),
-#big-world-map {
-  filter: saturate(1.15) brightness(0.95) contrast(1.08);
-}
-.real-hainan-map :deep(.leaflet-marker-pane),
-.real-hainan-map :deep(.leaflet-overlay-pane),
-.real-hainan-map :deep(.leaflet-popup-pane),
-.real-hainan-map :deep(.leaflet-tooltip-pane),
-#big-world-map :deep(.leaflet-marker-pane),
-#big-world-map :deep(.leaflet-overlay-pane),
-#big-world-map :deep(.leaflet-popup-pane),
-#big-world-map :deep(.leaflet-tooltip-pane),
-#big-world-map :deep(.leaflet-control-container) {
-  position: relative;
-  z-index: 600;
-}
-.real-hainan-map :deep(.leaflet-control-container) {
-  position: relative;
-  z-index: 700;
-}
 .real-hainan-map :deep(.leaflet-interactive) {
-  animation: pulseBlue 2s infinite;
+  animation: pulseGlow 2s infinite;
 }
 #big-world-map :deep(.hainan-fish-marker) {
-  animation: pulseBlue 2s infinite;
+  animation: pulseGlow 2s infinite;
 }
 #big-world-map :deep(.world-fish-marker) {
-  animation: pulseRed 2s infinite;
-}
-
-@keyframes pulseBlue {
-  0% { filter: drop-shadow(0 0 5px rgba(0, 217, 255, .75)); }
-  50% { filter: drop-shadow(0 0 18px rgba(0, 217, 255, 1)); }
-  100% { filter: drop-shadow(0 0 5px rgba(0, 217, 255, .75)); }
-}
-@keyframes pulseRed {
-  0% { filter: drop-shadow(0 0 5px rgba(255, 92, 92, .75)); }
-  50% { filter: drop-shadow(0 0 18px rgba(255, 92, 92, 1)); }
-  100% { filter: drop-shadow(0 0 5px rgba(255, 92, 92, .75)); }
-}
-
-/* ── 洋流动画 ── */
-.ocean-current-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 520;
-  pointer-events: none;
-  overflow: hidden;
-}
-.ocean-current-layer svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.current-flow {
-  fill: none;
-  stroke: #8efcff;
-  stroke-width: 3.2;
-  opacity: .86;
-  stroke-linecap: round;
-  stroke-dasharray: 14 24;
-  filter:
-    drop-shadow(0 0 8px rgba(142, 252, 255, .95))
-    drop-shadow(0 0 18px rgba(0, 180, 255, .45));
-  animation:
-    flowMove 7.5s linear infinite,
-    flowGlow 3.2s ease-in-out infinite;
-}
-.strong-current {
-  stroke: #c9ffff;
-  stroke-width: 4.4 !important;
-  opacity: .95;
-  stroke-dasharray: 18 24;
-}
-.coastal-current {
-  stroke: #00ffe0;
-  stroke-width: 3.6 !important;
-  opacity: .92;
-}
-.thin-current {
-  stroke-width: 2.1 !important;
-  opacity: .58;
-  stroke-dasharray: 8 18;
-}
-.big-current .current-flow {
-  stroke-width: 3.4;
-}
-.big-current .strong-current {
-  stroke-width: 4.8 !important;
-}
-.delay-a { animation-delay: -1s, -.4s; }
-.delay-b { animation-delay: -2s, -.8s; }
-.delay-c { animation-delay: -3s, -1.2s; }
-.delay-d { animation-delay: -4s, -1.6s; }
-.delay-e { animation-delay: -5s, -2s; }
-.delay-f { animation-delay: -6s, -2.4s; }
-
-.ocean-particles {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-.ocean-particles span {
-  position: absolute;
-  width: 3px;
-  height: 22px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(230, 255, 255, .98), rgba(0, 220, 255, .35), transparent);
-  box-shadow: 0 0 7px rgba(155, 255, 255, .9), 0 0 18px rgba(0, 180, 255, .45);
-  opacity: .78;
-  transform: rotate(58deg);
-  animation: particleMove linear infinite;
-}
-.small-particles span:nth-child(3n) { width: 2px; height: 16px; opacity: .52; }
-.small-particles span:nth-child(4n) { opacity: .95; }
-.big-particles span { width: 3px; height: 24px; }
-.big-particles span:nth-child(5n) { width: 2px; height: 15px; opacity: .48; }
-.big-particles span:nth-child(7n) { height: 30px; opacity: .92; }
-
-@keyframes flowMove {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -260; }
-}
-@keyframes flowGlow {
-  0% { opacity: .48; }
-  50% { opacity: .96; }
-  100% { opacity: .48; }
-}
-@keyframes particleMove {
-  from { transform: translateX(-40px) translateY(30px) rotate(58deg) scale(.75); }
-  to { transform: translateX(170px) translateY(-115px) rotate(58deg) scale(1.08); }
-}
-.ocean-current-layer::before {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 22% 78%, rgba(0, 255, 255, .12), transparent 22%),
-    radial-gradient(circle at 68% 30%, rgba(0, 160, 255, .14), transparent 24%),
-    radial-gradient(circle at 78% 72%, rgba(0, 255, 180, .09), transparent 28%);
-  animation: oceanBreath 5s ease-in-out infinite;
-  mix-blend-mode: screen;
-}
-@keyframes oceanBreath {
-  0%, 100% { opacity: .45; transform: scale(1); }
-  50% { opacity: .85; transform: scale(1.04); }
+  animation: pulseGlow 2s infinite;
+  filter: drop-shadow(0 0 5px rgba(255, 92, 92, .75));
 }
 
 /* ── 大地图弹窗 ── */
@@ -1076,7 +822,6 @@ onMounted(() => {
 #big-world-map {
   width: 100%;
   height: 100%;
-  filter: brightness(.95) contrast(1.08) saturate(1.15);
 }
 #big-world-map :deep(.fish-map-label) {
   background: rgba(5, 24, 48, .88);
@@ -1087,12 +832,8 @@ onMounted(() => {
   box-shadow: 0 0 12px rgba(56, 189, 248, .25);
   font-size: 12px;
 }
-#big-world-map :deep(.hainan-label) {
-  border-color: rgba(45, 212, 191, .8);
-}
-#big-world-map :deep(.world-label) {
-  border-color: rgba(255, 107, 107, .75);
-}
+#big-world-map :deep(.hainan-label) { border-color: rgba(45, 212, 191, .8); }
+#big-world-map :deep(.world-label) { border-color: rgba(255, 107, 107, .75); }
 
 /* ── 趋势图 ── */
 .trend-line { fill: none; stroke-width: 2.4; transition: stroke-width 0.25s ease, filter 0.25s ease, opacity 0.25s ease; cursor: pointer; pointer-events: stroke; }
@@ -1100,30 +841,6 @@ onMounted(() => {
 .line-chart svg:hover .trend-line:not(:hover) { opacity: 0.35; }
 .blue-trend { color: #38bdf8; stroke: currentColor; }
 .green-line { color: #34d399; stroke: currentColor; }
-
-/* ── 弹窗内容 ── */
-.modal-scroll { overflow-x: auto; }
-.full-table { width: 100%; min-width: 700px; border-collapse: collapse; }
-.full-table th, .full-table td { padding: 12px 10px; border-bottom: 1px solid rgba(39, 151, 255, 0.12); text-align: left; color: #b9d6ee; }
-.full-table th { position: sticky; top: 0; z-index: 1; font-weight: 600; color: #fff; background: rgba(7, 28, 52, 0.98); }
-.confirm-btn, .generate-btn { padding: 8px 24px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-.confirm-btn:hover, .generate-btn:hover { background: #059669; }
-.cancel-btn { padding: 8px 20px; background: transparent; border: 1px solid #5a7a9e; border-radius: 8px; color: #cbd5e1; cursor: pointer; margin-right: 12px; }
-.cancel-btn:hover { background: rgba(90, 122, 158, 0.3); border-color: #7a9abe; }
-.generate-btn:disabled { background: #5a7a9e; cursor: not-allowed; }
-.status-running { color: #10b981; }
-.status-warning { color: #f59e0b; }
-.trend-up { color: #10b981; }
-
-/* ── 建议卡片 ── */
-.advice-grid { display: flex; flex-direction: column; gap: 12px; padding: 16px 0; }
-.advice-card { background: rgba(30, 55, 91, 0.6); border-radius: 12px; padding: 14px 16px; border-left: 3px solid; }
-.advice-card.priority-high { border-left-color: #ef4444; }
-.advice-card.priority-mid { border-left-color: #f59e0b; }
-.advice-card.priority-low { border-left-color: #10b981; }
-.advice-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #fff; }
-.priority-tag { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); margin-left: auto; }
-.advice-content { color: #cbd5e1; font-size: 14px; line-height: 1.5; margin: 0; }
 
 /* ── 报告表单 ── */
 .report-form { padding: 8px 0; }
@@ -1146,21 +863,7 @@ onMounted(() => {
 .stat-value { font-size: 16px; font-weight: 600; color: #10b981; }
 
 /* ── 指标单位 ── */
-.indicator-unit {
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 500;
-  color: rgba(226, 245, 255, .78);
-  margin-left: 3px;
-}
-.micro-grid article small {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.micro-grid article small b {
-  font-weight: 500;
-  color: rgba(226, 245, 255, .72);
-}
-
+.indicator-unit { font-size: 12px; font-style: normal; font-weight: 500; color: rgba(226, 245, 255, .78); margin-left: 3px; }
+.micro-grid article small { display: flex; align-items: center; gap: 6px; }
+.micro-grid article small b { font-weight: 500; color: rgba(226, 245, 255, .72); }
 </style>

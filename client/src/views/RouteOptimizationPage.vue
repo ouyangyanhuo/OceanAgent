@@ -5,19 +5,12 @@ import { marked } from 'marked'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 import AppModal from '../components/common/AppModal.vue'
-
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import OceanCurrent from '../components/common/OceanCurrent.vue'
+import { useSatelliteMap } from '../composables/useSatelliteMap'
 
 marked.setOptions({ gfm: true, breaks: true })
 
-const SATELLITE_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-
-const addSatelliteBaseLayer = (mapInstance) => {
-  return L.tileLayer(SATELLITE_TILE_URL, {
-    maxZoom: 18
-  }).addTo(mapInstance)
-}
+const { L, addSatelliteBaseLayer } = useSatelliteMap()
 
 // ── 指标数据 ──
 const metrics = [
@@ -521,35 +514,8 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
               </div>
             </header>
             <div class="map-wrapper">
-              <div id="route-leaflet-map" class="real-route-map"></div>
-              <div class="ocean-current-layer ocean-current-small">
-                <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
-                  <path class="current-flow strong-current" d="M10 505 C160 445,320 365,520 255 S825 150,1000 90" />
-                  <path class="current-flow delay-a" d="M0 545 C165 470,320 405,510 325 S790 245,1000 175" />
-                  <path class="current-flow delay-b" d="M70 595 C235 515,420 425,610 305 S865 180,1000 75" />
-                  <path class="current-flow coastal-current" d="M115 575 C220 485,315 385,405 292" />
-                  <path class="current-flow coastal-current delay-c" d="M175 610 C260 525,345 430,438 345" />
-                  <path class="current-flow strong-current delay-d" d="M245 610 C450 500,660 350,1000 120" />
-                  <path class="current-flow delay-e" d="M35 360 C90 315,155 255,240 180" />
-                  <path class="current-flow delay-f" d="M540 465 C640 355,760 245,875 145" />
-                  <path class="current-flow thin-current" d="M315 570 C430 500,548 430,700 320 S900 210,980 140" />
-                  <path class="current-flow thin-current delay-b" d="M20 255 C125 225,230 195,365 120" />
-                  <path class="current-flow thin-current delay-e" d="M640 585 C700 490,770 405,910 305" />
-                  <path class="current-flow thin-current delay-c" d="M470 590 C560 505,680 415,795 315" />
-                </svg>
-                <div class="ocean-particles small-particles">
-                  <span
-                    v-for="i in 70"
-                    :key="i"
-                    :style="{
-                      left: ((i * 37) % 100) + '%',
-                      top: ((i * 23) % 100) + '%',
-                      animationDelay: -((i * 0.17) % 6).toFixed(2) + 's',
-                      animationDuration: (6 + (i % 7)) + 's'
-                    }"
-                  ></span>
-                </div>
-              </div>
+              <div id="route-leaflet-map" class="real-route-map leaflet-map-base"></div>
+              <OceanCurrent size="small" />
             </div>
             <!-- 航线图例 -->
             <div class="route-legend">
@@ -699,26 +665,18 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
     </div>
 
     <!-- 数据来源弹窗 -->
-    <Teleport to="body">
-      <div v-if="showDataSourceModal" class="modal-overlay" @click.self="showDataSourceModal = false">
-        <div class="modal-content" style="width:420px;">
-          <div class="modal-header">
-            <h3>全部数据来源</h3>
-            <button class="modal-close" @click="showDataSourceModal = false">&times;</button>
-          </div>
-          <ul class="modal-source-list">
-            <li
-              v-for="source in allDataSources"
-              :key="source.name"
-              :class="['source-link', { 'clicked': isSourceClicked(source.name) }]"
-              @click="clickDataSource(source)"
-            >
-              {{ source.name }} <span>›</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </Teleport>
+    <AppModal v-model:visible="showDataSourceModal" title="全部数据来源" width="420px">
+      <ul class="modal-source-list">
+        <li
+          v-for="source in allDataSources"
+          :key="source.name"
+          :class="['source-link', { 'clicked': isSourceClicked(source.name) }]"
+          @click="clickDataSource(source)"
+        >
+          {{ source.name }} <span>›</span>
+        </li>
+      </ul>
+    </AppModal>
 
     <!-- 智能问答弹窗 -->
     <Teleport to="body">
@@ -795,41 +753,6 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
   gap: 16px;
 }
 
-/* ── Leaflet 地图容器 ── */
-.map-wrapper {
-  position: relative;
-  width: 100%;
-  height: 282px;
-  overflow: hidden;
-  border-radius: 10px;
-}
-.map-wrapper .real-route-map {
-  height: 100%;
-}
-.real-route-map {
-  position: relative;
-  width: 100%;
-  height: 282px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(45, 144, 220, .45);
-}
-
-/* Leaflet 控件样式 */
-.real-route-map :deep(.leaflet-control-zoom a) {
-  background: rgba(5, 28, 55, .95);
-  color: #fff;
-  border-color: rgba(86, 171, 255, .8);
-}
-.real-route-map :deep(.leaflet-popup-content-wrapper) {
-  background: rgba(5, 24, 48, .95);
-  color: #fff;
-  border: 1px solid rgba(48, 145, 255, .65);
-}
-.real-route-map :deep(.leaflet-popup-tip) {
-  background: rgba(5, 24, 48, .95);
-}
-
 /* 航线发光效果 */
 :deep(.route-glow-line) {
   filter: drop-shadow(0 0 6px rgba(34, 197, 94, .8)) drop-shadow(0 0 14px rgba(34, 197, 94, .4));
@@ -872,22 +795,6 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
   border-radius: 4px;
   padding: 1px 5px;
   font-size: 10px;
-}
-
-/* 地图滤镜 */
-.real-route-map :deep(.leaflet-tile) {
-  filter: saturate(1.15) brightness(0.95) contrast(1.08);
-}
-.real-route-map :deep(.leaflet-marker-pane),
-.real-route-map :deep(.leaflet-overlay-pane),
-.real-route-map :deep(.leaflet-popup-pane),
-.real-route-map :deep(.leaflet-tooltip-pane) {
-  position: relative;
-  z-index: 600;
-}
-.real-route-map :deep(.leaflet-control-container) {
-  position: relative;
-  z-index: 700;
 }
 
 /* ── 航线图例 ── */
@@ -1034,58 +941,7 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
 }
 .more-btn:hover { background: rgba(82, 184, 255, 0.1); }
 
-/* ── 数据来源弹窗 ── */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal-content {
-  max-width: 90%;
-  max-height: 80vh;
-  background: linear-gradient(145deg, rgba(18, 73, 130, 0.95), rgba(5, 26, 51, 0.98));
-  border: 1px solid rgba(60, 154, 255, 0.35);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  animation: slideUp 0.3s ease;
-}
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(92, 171, 255, 0.25);
-}
-.modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #dff7ff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.modal-close {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgba(92, 171, 255, 0.4);
-  background: rgba(6, 28, 54, 0.8);
-  color: #b9d4ea;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-.modal-close:hover { background: rgba(60, 154, 255, 0.3); color: #fff; }
+/* ── 数据来源列表 ── */
 .modal-source-list { list-style: none; margin: 0; padding: 12px 16px; }
 .modal-source-list li {
   padding: 8px 12px;
@@ -1228,12 +1084,6 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
 .share-btn.wechat:hover :deep(svg) { background: rgba(7, 193, 96, 0.2); color: #07C160; }
 .share-btn.qq:hover svg,
 .share-btn.qq:hover :deep(svg) { background: rgba(18, 183, 245, 0.2); color: #12B7F5; }
-
-/* ── 滚动条 ── */
-.agent-search-page::-webkit-scrollbar { width: 8px; }
-.agent-search-page::-webkit-scrollbar-track { background: rgba(6, 28, 54, 0.5); border-radius: 4px; }
-.agent-search-page::-webkit-scrollbar-thumb { background: rgba(60, 154, 255, 0.4); border-radius: 4px; }
-.agent-search-page::-webkit-scrollbar-thumb:hover { background: rgba(60, 154, 255, 0.6); }
 
 /* ── 响应式 ── */
 @media (max-width: 768px) {

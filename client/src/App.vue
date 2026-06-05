@@ -151,7 +151,7 @@ onUnmounted(() => {
         </div>
       </div>
       <div class="top-actions">
-        <button ref="bellRef" class="icon-button alert" aria-label="通知" @click.stop="toggleNotifications">
+        <button ref="bellRef" class="icon-button has-badge" aria-label="通知" @click.stop="toggleNotifications">
           <Bell :size="22" />
           <span v-if="unreadCount > 0">{{ unreadCount }}</span>
         </button>

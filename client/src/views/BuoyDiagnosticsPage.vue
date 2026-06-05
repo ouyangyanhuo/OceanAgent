@@ -4,17 +4,10 @@ import { AlertTriangle, Battery, Bot, FileText, RadioTower, Settings, Share2, Wr
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 import AppModal from '../components/common/AppModal.vue'
+import OceanCurrent from '../components/common/OceanCurrent.vue'
+import { useSatelliteMap } from '../composables/useSatelliteMap'
 
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-
-const SATELLITE_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-
-const addSatelliteBaseLayer = (mapInstance) => {
-  return L.tileLayer(SATELLITE_TILE_URL, {
-    maxZoom: 18
-  }).addTo(mapInstance)
-}
+const { L, addSatelliteBaseLayer } = useSatelliteMap()
 
 const metrics = [
   { label: '在线浮标', value: '128', trend: '8', tone: 'teal', sparkline: [16, 19, 18, 24, 21, 27, 24, 34, 28, 38, 31, 44] },
@@ -206,35 +199,8 @@ onMounted(() => {
           <section class="panel ocean-map buoy-map">
             <header class="panel-header"><h2>浮标分布与状态</h2><div class="tabs"></div></header>
             <div class="map-wrapper">
-              <div id="buoy-leaflet-map" class="real-buoy-map"></div>
-              <div class="ocean-current-layer ocean-current-small">
-                <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
-                  <path class="current-flow strong-current" d="M10 505 C160 445,320 365,520 255 S825 150,1000 90" />
-                  <path class="current-flow delay-a" d="M0 545 C165 470,320 405,510 325 S790 245,1000 175" />
-                  <path class="current-flow delay-b" d="M70 595 C235 515,420 425,610 305 S865 180,1000 75" />
-                  <path class="current-flow coastal-current" d="M115 575 C220 485,315 385,405 292" />
-                  <path class="current-flow coastal-current delay-c" d="M175 610 C260 525,345 430,438 345" />
-                  <path class="current-flow strong-current delay-d" d="M245 610 C450 500,660 350,1000 120" />
-                  <path class="current-flow delay-e" d="M35 360 C90 315,155 255,240 180" />
-                  <path class="current-flow delay-f" d="M540 465 C640 355,760 245,875 145" />
-                  <path class="current-flow thin-current" d="M315 570 C430 500,548 430,700 320 S900 210,980 140" />
-                  <path class="current-flow thin-current delay-b" d="M20 255 C125 225,230 195,365 120" />
-                  <path class="current-flow thin-current delay-e" d="M640 585 C700 490,770 405,910 305" />
-                  <path class="current-flow thin-current delay-c" d="M470 590 C560 505,680 415,795 315" />
-                </svg>
-                <div class="ocean-particles small-particles">
-                  <span
-                    v-for="i in 70"
-                    :key="i"
-                    :style="{
-                      left: ((i * 37) % 100) + '%',
-                      top: ((i * 23) % 100) + '%',
-                      animationDelay: -((i * 0.17) % 6).toFixed(2) + 's',
-                      animationDuration: (6 + (i % 7)) + 's'
-                    }"
-                  ></span>
-                </div>
-              </div>
+              <div id="buoy-leaflet-map" class="real-buoy-map leaflet-map-base"></div>
+              <OceanCurrent size="small" />
             </div>
           </section>
 
@@ -395,42 +361,7 @@ onMounted(() => {
 .buoy-main-area { display: flex; flex-direction: column; gap: 16px; }
 .buoy-aside { display: flex; flex-direction: column; gap: 16px; }
 
-/* ── Leaflet 地图容器 ── */
-.map-wrapper {
-  position: relative;
-  width: 100%;
-  height: 282px;
-  overflow: hidden;
-  border-radius: 10px;
-}
-.map-wrapper .real-buoy-map {
-  height: 100%;
-}
-.real-buoy-map {
-  position: relative;
-  width: 100%;
-  height: 282px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(45, 144, 220, .45);
-}
-
-/* Leaflet 控件样式 */
-.real-buoy-map :deep(.leaflet-control-zoom a) {
-  background: rgba(5, 28, 55, .95);
-  color: #fff;
-  border-color: rgba(86, 171, 255, .8);
-}
-.real-buoy-map :deep(.leaflet-popup-content-wrapper) {
-  background: rgba(5, 24, 48, .95);
-  color: #fff;
-  border: 1px solid rgba(48, 145, 255, .65);
-}
-.real-buoy-map :deep(.leaflet-popup-tip) {
-  background: rgba(5, 24, 48, .95);
-}
-
-/* 地图滤镜与覆盖 */
+/* ── 地图覆盖层（页面特有蓝色滤镜） ── */
 .real-buoy-map::after {
   content: '';
   position: absolute;
@@ -442,28 +373,8 @@ onMounted(() => {
     linear-gradient(135deg, rgba(0, 120, 255, .28), rgba(0, 255, 180, .08));
   mix-blend-mode: screen;
 }
-.real-buoy-map :deep(.leaflet-tile) {
-  filter: saturate(1.15) brightness(0.95) contrast(1.08);
-}
-.real-buoy-map :deep(.leaflet-marker-pane),
-.real-buoy-map :deep(.leaflet-overlay-pane),
-.real-buoy-map :deep(.leaflet-popup-pane),
-.real-buoy-map :deep(.leaflet-tooltip-pane) {
-  position: relative;
-  z-index: 600;
-}
-.real-buoy-map :deep(.leaflet-control-container) {
-  position: relative;
-  z-index: 700;
-}
 .real-buoy-map :deep(.leaflet-interactive) {
-  animation: pulseBuoy 2s infinite;
-}
-
-@keyframes pulseBuoy {
-  0% { filter: drop-shadow(0 0 5px rgba(0, 217, 255, .75)); }
-  50% { filter: drop-shadow(0 0 18px rgba(0, 217, 255, 1)); }
-  100% { filter: drop-shadow(0 0 5px rgba(0, 217, 255, .75)); }
+  animation: pulseGlow 2s infinite;
 }
 
 /* ── 传感器 ── */
@@ -490,25 +401,4 @@ onMounted(() => {
 .fault-distribution li span { flex: 1; }
 .fault-distribution li b { color: #dff7ff; }
 .fault-distribution li em { color: #8fb9df; font-style: normal; font-size: 11px; }
-
-/* ── 弹窗内容 ── */
-.modal-scroll { overflow-x: auto; }
-.full-table { width: 100%; min-width: 700px; border-collapse: collapse; }
-.full-table th, .full-table td { padding: 12px 10px; border-bottom: 1px solid rgba(39,151,255,0.12); text-align: left; color: #b9d6ee; }
-.full-table th { position: sticky; top: 0; z-index: 1; font-weight: 600; color: #fff; background: rgba(7,28,52,0.98); }
-.confirm-btn { padding: 8px 24px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-.confirm-btn:hover { background: #059669; }
-.status-ok { color: #10b981; }
-.status-warn { color: #f59e0b; }
-.status-fault { color: #ef4444; }
-
-/* ── 建议卡片 ── */
-.advice-grid { display: flex; flex-direction: column; gap: 12px; padding: 16px 0; }
-.advice-card { background: rgba(30,55,91,0.6); border-radius: 12px; padding: 14px 16px; border-left: 3px solid; }
-.advice-card.priority-high { border-left-color: #ef4444; }
-.advice-card.priority-mid { border-left-color: #f59e0b; }
-.advice-card.priority-low { border-left-color: #10b981; }
-.advice-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #fff; }
-.priority-tag { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: rgba(255,255,255,0.1); margin-left: auto; }
-.advice-content { color: #cbd5e1; font-size: 14px; line-height: 1.5; margin: 0; }
 </style>

@@ -15,9 +15,9 @@ Frontend:
 
 ```bash
 cd client
-npm run dev      # start Vite locally
-npm run build    # build production assets into dist/
-npm run preview  # preview the production build
+bun run dev      # start Vite locally
+bun run build    # build production assets into dist/
+bun run preview  # preview the production build
 ```
 
 Backend:
