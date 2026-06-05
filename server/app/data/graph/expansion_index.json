@@ -167,5 +167,45 @@
     "summary": "为海域B01浮标扩展了四个新节点，分别为叶绿素浓度异常观测、海面温度升高、2025年福建赤潮事件和加强水质监测，并通过指示、可能触发和缓解关系与浮标相连。",
     "created_at": "2026-06-04T15:45:43",
     "updated_at": "2026-06-04T15:45:43"
+  },
+  "observation_ba82c622:ecological_species": {
+    "node_id": "observation_ba82c622",
+    "expand_type": "ecological_species",
+    "expanded": true,
+    "generated_node_ids": [
+      "species_e971d410",
+      "fishery_area_67934c4a",
+      "species_8f34e916",
+      "risk_factor_11909304"
+    ],
+    "generated_edge_ids": [
+      "edge_5d9d9b2e",
+      "edge_fb94d637",
+      "edge_8cc3088c",
+      "edge_8c558a65"
+    ],
+    "summary": "扩展了与东海北部初级生产力相关的小黄鱼、带鱼物种，长江口渔场，以及长江入海径流变化风险因子。",
+    "created_at": "2026-06-05T04:02:06",
+    "updated_at": "2026-06-05T04:02:06"
+  },
+  "risk_factor_11909304:risk_factors": {
+    "node_id": "risk_factor_11909304",
+    "expand_type": "risk_factors",
+    "expanded": true,
+    "generated_node_ids": [
+      "observation_dd6d46e0",
+      "observation_d14df4a0",
+      "risk_factor_a2e9d228",
+      "prevention_measure_6c059c23"
+    ],
+    "generated_edge_ids": [
+      "edge_ce178fab",
+      "edge_1e39e534",
+      "edge_648be97b",
+      "edge_2bffdfe7"
+    ],
+    "summary": "扩展了长江入海径流变化的风险因子节点，增加了两个观测（营养盐浓度、盐度分布）、一个风险因子（营养盐输入）和一个防治措施（污染物减排），并建立了指示、触发和缓解关系。",
+    "created_at": "2026-06-05T04:02:42",
+    "updated_at": "2026-06-05T04:02:42"
   }
 }

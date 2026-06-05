@@ -866,5 +866,179 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "observation_ba82c622",
+    "type": "Observation",
+    "name": "东海北部初级生产力水平",
+    "properties": {
+      "description": "基于叶绿素a浓度估算的东海北部海域初级生产力，反映浮游植物生物量，为舟山渔场产卵保护区提供饵料基础。"
+    },
+    "expanded": {
+      "ecological_species": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_62f7cee3",
+      "created_at": "2026-06-05T03:55:39",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_8d820d63",
+    "type": "RiskFactor",
+    "name": "东海赤潮风险因子",
+    "properties": {
+      "description": "由东海中部和北部浮标监测到的叶绿素异常导致的赤潮风险因子。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_5d972c77",
+      "created_at": "2026-06-05T03:56:23",
+      "updated_at": "2026-06-05T03:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_f327a26e",
+    "type": "RedTideEvent",
+    "name": "东海赤潮事件",
+    "properties": {
+      "description": "东海频繁发生的赤潮事件，由富营养化等因素引发，对渔业资源造成影响"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_8d820d63",
+      "created_at": "2026-06-05T04:00:14",
+      "updated_at": "2026-06-05T04:00:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_e971d410",
+    "type": "Species",
+    "name": "小黄鱼",
+    "properties": {
+      "description": "中国东海重要经济鱼类，以浮游动物为食，初级生产力影响其饵料丰度。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_8f34e916",
+    "type": "Species",
+    "name": "带鱼",
+    "properties": {
+      "description": "中国东海主要经济鱼类，幼鱼阶段以浮游动物为食，初级生产力影响饵料基础。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_11909304",
+    "type": "RiskFactor",
+    "name": "长江入海径流变化",
+    "properties": {
+      "description": "长江入海径流量季节变化影响东海北部营养盐和初级生产力分布。"
+    },
+    "expanded": {
+      "risk_factors": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_dd6d46e0",
+    "type": "Observation",
+    "name": "东海北部营养盐浓度",
+    "properties": {
+      "description": "受长江径流影响，东海北部海域营养盐（如硝酸盐、磷酸盐）浓度呈现季节变化，影响浮游植物生长。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_d14df4a0",
+    "type": "Observation",
+    "name": "长江口海域盐度分布",
+    "properties": {
+      "description": "长江入海径流量变化导致河口盐度梯度变化，影响水团混合和生物分布。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_a2e9d228",
+    "type": "RiskFactor",
+    "name": "长江入海营养盐输入",
+    "properties": {
+      "description": "长江径流携带大量陆源营养盐入海，是东海富营养化的重要驱动因子。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "prevention_measure_6c059c23",
+    "type": "PreventionMeasure",
+    "name": "长江流域污染物减排",
+    "properties": {
+      "description": "通过控制工业废水、农业面源和生活污水排放，减少进入长江的营养盐负荷。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

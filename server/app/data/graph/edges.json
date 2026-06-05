@@ -1004,5 +1004,257 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_d45a7f08",
+    "source": "observation_62f7cee3",
+    "target": "observation_ba82c622",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "叶绿素a浓度是估算初级生产力的关键参数"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T03:55:39",
+      "updated_at": "2026-06-05T03:55:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_b01c88d5",
+    "source": "observation_ba82c622",
+    "target": "fishery_area_3bea08e6",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "初级生产力影响饵料生物丰度，进而影响产卵场鱼类的繁殖成功率"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T03:55:39",
+      "updated_at": "2026-06-05T03:55:39",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_df939da7",
+    "source": "buoy_5d972c77",
+    "target": "risk_factor_8d820d63",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "东海浮标C02的叶绿素数据指示赤潮风险。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_8d820d63",
+      "created_at": "2026-06-05T03:56:23",
+      "updated_at": "2026-06-05T03:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_6b713305",
+    "source": "",
+    "target": "buoy_e9d355b9",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "赤潮风险因子与东海北部浮标D01的观测结果相关。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_8d820d63",
+      "created_at": "2026-06-05T03:56:23",
+      "updated_at": "2026-06-05T03:56:23",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_14206b66",
+    "source": "risk_factor_8d820d63",
+    "target": "red_tide_event_f327a26e",
+    "relation": "may_trigger",
+    "weight": 0.7,
+    "properties": {
+      "description": "东海赤潮风险因子可能触发赤潮事件"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f327a26e",
+      "created_at": "2026-06-05T04:00:14",
+      "updated_at": "2026-06-05T04:00:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_367fdcfb",
+    "source": "red_tide_event_f327a26e",
+    "target": "fishery_area_3bea08e6",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "赤潮事件与舟山渔场产卵保护区存在相关性，可能影响鱼类繁殖"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_f327a26e",
+      "created_at": "2026-06-05T04:00:14",
+      "updated_at": "2026-06-05T04:00:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_5d9d9b2e",
+    "source": "observation_ba82c622",
+    "target": "species_e971d410",
+    "relation": "affected_by",
+    "weight": 0.7,
+    "properties": {
+      "description": "初级生产力影响小黄鱼的饵料基础，进而影响其资源量。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_fb94d637",
+    "source": "observation_ba82c622",
+    "target": "fishery_area_67934c4a",
+    "relation": "correlated_with",
+    "weight": 0.8,
+    "properties": {
+      "description": "初级生产力是长江口渔场饵料生物量的基础指标。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_8cc3088c",
+    "source": "observation_ba82c622",
+    "target": "species_8f34e916",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "初级生产力影响带鱼幼鱼饵料丰度。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_8c558a65",
+    "source": "observation_ba82c622",
+    "target": "risk_factor_11909304",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "长江入海径流变化影响海域营养盐和初级生产力。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_ba82c622",
+      "created_at": "2026-06-05T04:02:05",
+      "updated_at": "2026-06-05T04:02:05",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_ce178fab",
+    "source": "risk_factor_11909304",
+    "target": "observation_dd6d46e0",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "长江入海径流变化影响东海北部营养盐浓度。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_1e39e534",
+    "source": "risk_factor_11909304",
+    "target": "observation_d14df4a0",
+    "relation": "indicates",
+    "weight": 0.7,
+    "properties": {
+      "description": "长江入海径流量变化直接改变河口盐度分布。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_648be97b",
+    "source": "risk_factor_11909304",
+    "target": "risk_factor_a2e9d228",
+    "relation": "may_trigger",
+    "weight": 0.9,
+    "properties": {
+      "description": "长江入海径流变化是陆源营养盐输入的主要驱动因素之一。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_2bffdfe7",
+    "source": "risk_factor_11909304",
+    "target": "prevention_measure_6c059c23",
+    "relation": "mitigated_by",
+    "weight": 0.6,
+    "properties": {
+      "description": "通过减排措施可缓解长江入海径流带来的营养盐负荷。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_11909304",
+      "created_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
   }
 ]
