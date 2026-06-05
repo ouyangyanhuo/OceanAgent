@@ -119,6 +119,7 @@ const cyContainerRef = ref(null)
 const canvasWrapperRef = ref(null)
 
 let cy = null
+let labelCullRaf = null
 
 /* ── 工具栏 ── */
 const tools = [
@@ -163,9 +164,7 @@ const settings = ref({
 function toggleSetting(key) {
   settings.value[key] = !settings.value[key]
   if (key === 'showEdgeLabels' && cy) {
-    cy.edges().forEach((e) => {
-      e.style('label', settings.value.showEdgeLabels ? (RELATION_LABELS[e.data('relation')] || e.data('relation')) : '')
-    })
+    scheduleLabelCulling()
   }
 }
 
@@ -198,13 +197,36 @@ function filteredProps(node) {
 }
 
 /* ── Cytoscape 初始化 ── */
+function edgePairKey(edge) {
+  const ends = [edge.source, edge.target].sort()
+  return `${ends[0]}::${ends[1]}`
+}
+
+function multiEdgeIds(edges) {
+  const grouped = new Map()
+  edges.forEach((edge) => {
+    const key = edgePairKey(edge)
+    if (!grouped.has(key)) grouped.set(key, [])
+    grouped.get(key).push(edge.id)
+  })
+
+  const ids = new Set()
+  grouped.forEach((group) => {
+    if (group.length <= 1) return
+    group.forEach((id) => ids.add(id))
+  })
+  return ids
+}
+
 function toElements(nodes, edges) {
+  const curvedEdgeIds = multiEdgeIds(edges)
   const nodeElements = nodes.map((n) => {
     const type = n.type || 'Observation'
     return {
       data: {
         id: n.id,
         label: n.name,
+        visibleLabel: n.name,
         color: NODE_TYPE_COLORS[type] || '#3b82f6',
         nodeType: type,
         size: type === 'SeaArea' ? 70 : 46,
@@ -218,13 +240,71 @@ function toElements(nodes, edges) {
       id: e.id,
       source: e.source,
       target: e.target,
-      label: settings.value.showEdgeLabels ? (RELATION_LABELS[e.relation] || e.relation) : '',
+      label: RELATION_LABELS[e.relation] || e.relation,
+      visibleLabel: settings.value.showEdgeLabels ? (RELATION_LABELS[e.relation] || e.relation) : '',
       relation: e.relation,
       raw: e,
     },
-    classes: SOLID_RELATIONS.has(e.relation) ? '' : 'dashed',
+    classes: [
+      SOLID_RELATIONS.has(e.relation) ? '' : 'dashed',
+      curvedEdgeIds.has(e.id) ? 'multi-edge' : '',
+    ].filter(Boolean).join(' '),
   }))
   return [...nodeElements, ...edgeElements]
+}
+
+function updateMultiEdgeClasses() {
+  if (!cy) return
+  const groups = new Map()
+  cy.edges().forEach((edge) => {
+    const source = edge.data('source')
+    const target = edge.data('target')
+    const key = [source, target].sort().join('::')
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key).push(edge)
+  })
+
+  cy.edges().removeClass('multi-edge')
+  groups.forEach((edges) => {
+    if (edges.length <= 1) return
+    edges.forEach((edge) => edge.addClass('multi-edge'))
+  })
+}
+
+function scheduleLabelCulling() {
+  if (!cy || labelCullRaf) return
+  labelCullRaf = requestAnimationFrame(() => {
+    labelCullRaf = null
+    applyLabelCulling()
+  })
+}
+
+function applyLabelCulling() {
+  if (!cy) return
+  const zoom = cy.zoom()
+  const extent = cy.extent()
+  const margin = 120 / Math.max(zoom, 0.2)
+  const visibleExtent = {
+    x1: extent.x1 - margin,
+    x2: extent.x2 + margin,
+    y1: extent.y1 - margin,
+    y2: extent.y2 + margin,
+  }
+
+  cy.batch(() => {
+    cy.nodes().forEach((node) => {
+      const pos = node.position()
+      const inViewport = pos.x >= visibleExtent.x1 && pos.x <= visibleExtent.x2
+        && pos.y >= visibleExtent.y1 && pos.y <= visibleExtent.y2
+      const keepLabel = inViewport && (zoom >= 0.55 || node.selected() || node.data('isCore'))
+      node.data('visibleLabel', keepLabel ? node.data('label') : '')
+    })
+
+    cy.edges().forEach((edge) => {
+      const keepLabel = settings.value.showEdgeLabels && zoom >= 0.75 && !edge.hasClass('dimmed')
+      edge.data('visibleLabel', keepLabel ? edge.data('label') : '')
+    })
+  })
 }
 
 function initCytoscape() {
@@ -243,7 +323,7 @@ function initCytoscape() {
       {
         selector: 'node',
         style: {
-          'label': 'data(label)',
+          'label': 'data(visibleLabel)',
           'shape': 'ellipse',
           'width': 'data(size)',
           'height': 'data(size)',
@@ -342,7 +422,7 @@ function initCytoscape() {
           'target-arrow-shape': 'triangle',
           'arrow-scale': 0.8,
           'curve-style': 'straight',
-          'label': 'data(label)',
+          'label': 'data(visibleLabel)',
           'font-size': 9,
           'color': 'rgba(180, 210, 240, 0.7)',
           'text-rotation': 'autorotate',
@@ -352,6 +432,14 @@ function initCytoscape() {
           'overlay-opacity': 0,
           'transition-property': 'line-color, opacity',
           'transition-duration': '0.2s',
+        },
+      },
+      /* ── 多重边/双向边：仅局部使用小弧线避免重合 ── */
+      {
+        selector: 'edge.multi-edge',
+        style: {
+          'curve-style': 'bezier',
+          'control-point-step-size': 34,
         },
       },
       /* ── 虚线边 ── */
@@ -384,19 +472,25 @@ function initCytoscape() {
 
   cy.ready(() => {
     applyStableGraphLayout(cy, { animate: settings.value.animateLayout, fit: true })
+    updateMultiEdgeClasses()
+    scheduleLabelCulling()
   })
 
   // 事件绑定
   cy.on('tap', 'node', (evt) => {
     const raw = evt.target.data('raw')
     onNodeClick(raw)
+    scheduleLabelCulling()
   })
 
   cy.on('tap', (evt) => {
     if (evt.target === cy) {
       closeDetail()
+      scheduleLabelCulling()
     }
   })
+
+  cy.on('viewport resize', scheduleLabelCulling)
 
   // 鼠标样式
   cy.on('mouseover', 'node', () => {
@@ -421,6 +515,7 @@ function initCytoscape() {
   // 松手后再做一轮全局消除残余
   cy.on('free', 'node', () => {
     resolveGraphConstraints(cy)
+    scheduleLabelCulling()
   })
 }
 
@@ -454,6 +549,7 @@ watch(searchQuery, (q) => {
   if (!trimmed) {
     cy.nodes().removeClass('dimmed')
     cy.edges().removeClass('dimmed')
+    scheduleLabelCulling()
     return
   }
   const matchIds = new Set(
@@ -469,6 +565,7 @@ watch(searchQuery, (q) => {
     const tgt = e.data('target')
     e.toggleClass('dimmed', !matchIds.has(src) && !matchIds.has(tgt))
   })
+  scheduleLabelCulling()
 })
 
 /* ── 关系筛选 ── */
@@ -481,6 +578,7 @@ watch(filterRelation, (val) => {
       e.style('display', e.data('relation') === val ? 'element' : 'none')
     }
   })
+  scheduleLabelCulling()
 })
 
 /* ── 交互 ── */
@@ -559,6 +657,8 @@ async function handleExpand(expandType) {
       if (filtered.length) {
         cy.add(filtered)
       }
+      updateMultiEdgeClasses()
+      scheduleLabelCulling()
       // 更新中心节点数据
       if (result.center_node) {
         const cyNode = cy.getElementById(result.center_node.id)
@@ -619,6 +719,7 @@ function closeDetail() {
   selectedNode.value = null
   expandOptions.value = []
   if (cy) cy.nodes().unselect()
+  scheduleLabelCulling()
 }
 
 /* ── 点击外部关闭设置面板 ── */
@@ -636,6 +737,10 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (labelCullRaf) {
+    cancelAnimationFrame(labelCullRaf)
+    labelCullRaf = null
+  }
   if (cy) {
     cy.destroy()
     cy = null
@@ -723,6 +828,8 @@ function mergeNewData(newNodes, newEdges) {
     const elements = toElements(filteredNodes, filteredEdges)
     if (elements.length) {
       cy.add(elements)
+      updateMultiEdgeClasses()
+      scheduleLabelCulling()
       const anchorId = filteredEdges[0]?.source || filteredEdges[0]?.target || selectedNode.value?.id
       const newNodeIds = filteredNodes.map((node) => node.id)
       if (!placeNewNodesAround(cy, anchorId, newNodeIds, { animate: settings.value.animateLayout })) {

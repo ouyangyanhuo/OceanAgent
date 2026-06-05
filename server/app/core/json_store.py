@@ -55,7 +55,52 @@ def write_json(path: Path, data: Any) -> None:
         atomic_write_json(path, data)
 
 
+def append_jsonl(path: Path, item: Any) -> None:
+    """Append one JSON object as a durable JSONL record."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with file_lock(path):
+        with path.open("a", encoding="utf-8") as file:
+            json.dump(item, file, ensure_ascii=False, separators=(",", ":"))
+            file.write("\n")
+            file.flush()
+            os.fsync(file.fileno())
+
+
+def read_jsonl(path: Path) -> list[Any]:
+    """Read JSONL records, ignoring blank lines."""
+    if not path.exists():
+        return []
+
+    records: list[Any] = []
+    with path.open("r", encoding="utf-8") as file:
+        for line_number, line in enumerate(file, start=1):
+            text = line.strip()
+            if not text:
+                continue
+            try:
+                records.append(json.loads(text))
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Invalid JSONL record in {path}:{line_number}") from exc
+    return records
+
+
+def truncate_file(path: Path) -> None:
+    """Truncate a text file after durable compact has succeeded."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with file_lock(path):
+        with path.open("w", encoding="utf-8") as file:
+            file.flush()
+            os.fsync(file.fileno())
+
+
 def ensure_json_file(path: Path, default: Any) -> None:
     """如果文件不存在，则用默认值创建。"""
     if not path.exists():
         write_json(path, default)
+
+
+def ensure_text_file(path: Path) -> None:
+    """Create an empty text file if it does not exist."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        path.touch()

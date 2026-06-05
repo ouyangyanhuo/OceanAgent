@@ -70,9 +70,8 @@ class ExpansionService:
         # apply_expansion_result 会重新加载图谱、正式构造节点/边并落盘。
         response = self.apply_expansion_result(node_id, expand_type, valid_result)
 
-        # center_node 是扩展前从 graph 中拿到的对象，这里复制一份更新 expanded 状态，
         # 保证响应能立即体现本次扩展结果，不依赖调用方再次请求节点详情。
-        response.center_node = center_node.model_copy(update={"expanded": {**center_node.expanded, expand_type: True}})
+        response.center_node.expanded[expand_type] = True
         return response
 
     def get_existing_expansion(
@@ -142,66 +141,88 @@ class ExpansionService:
         llm_result: dict[str, Any],
     ) -> ExpandNodeResponse:
         """把校验后的候选扩展结果写入图谱。"""
-        graph = self.graph_service.load_graph()
-        center_node = self._find_node(graph, node_id)
+        def mutate(graph: GraphData) -> dict[str, Any]:
+            center_node = self._find_node(graph, node_id)
+            if center_node.expanded.get(expand_type):
+                return {"skipped_existing": True, "center_node": center_node, "nodes": [], "edges": []}
 
-        # 这两个列表用于构造响应和写 expansion_index。
-        generated_nodes: list[GraphNode] = []
-        generated_edges: list[GraphEdge] = []
+            # 这两个列表用于构造响应和写 expansion_index。
+            generated_nodes: list[GraphNode] = []
+            generated_edges: list[GraphEdge] = []
 
-        # LLM 候选边常用中文 name 引用节点；这里先建立已有节点 name -> id 映射。
-        node_ref_by_name = {node.name: node.id for node in graph.nodes}
+            # LLM 候选边常用中文 name 引用节点；这里先建立已有节点 name -> id 映射。
+            node_ref_by_name = {node.name: node.id for node in graph.nodes}
 
-        # 同时允许候选边直接使用中心节点 ID。
-        node_ref_by_name[center_node.id] = center_node.id
+            # 同时允许候选边直接使用中心节点 ID。
+            node_ref_by_name[center_node.id] = center_node.id
 
-        # 先写节点，再建立 name/id 到正式节点 ID 的映射，供边引用解析。
-        for candidate in llm_result.get("nodes", []):
-            # build_node 统一补齐 ID 和 metadata，避免信任 LLM 生成的 ID。
-            node = self.graph_service.build_node(
-                candidate["type"],
-                candidate["name"],
-                candidate.get("properties", {}),
-                parent_node_id=node_id,
-            )
+            # 先写节点，再建立 name/id 到正式节点 ID 的映射，供边引用解析。
+            for candidate in llm_result.get("nodes", []):
+                # build_node 统一补齐 ID 和 metadata，避免信任 LLM 生成的 ID。
+                node = self.graph_service.build_node(
+                    candidate["type"],
+                    candidate["name"],
+                    candidate.get("properties", {}),
+                    parent_node_id=node_id,
+                )
 
-            # add_node 内部会按 type+name 去重；stored 可能是已有节点，也可能是新节点。
-            stored = self.graph_service.add_node(graph, node)
+                # add_node 内部会按 type+name 去重；stored 可能是已有节点，也可能是新节点。
+                stored = self.graph_service.add_node(graph, node)
 
-            # 将正式存储节点加入映射，使后续边可以通过 name 或 id 找到正确 target。
-            node_ref_by_name[stored.name] = stored.id
-            node_ref_by_name[stored.id] = stored.id
-            generated_nodes.append(stored)
+                # 将正式存储节点加入映射，使后续边可以通过 name 或 id 找到正确 target。
+                node_ref_by_name[stored.name] = stored.id
+                node_ref_by_name[stored.id] = stored.id
+                generated_nodes.append(stored)
 
-        # 候选边可以用 source_ref/target_name 指向中心节点或本次生成节点。
-        for candidate in llm_result.get("edges", []):
-            # source_ref 缺省时默认从中心节点出发，适配简单扩展结果。
-            source_ref = candidate.get("source_ref", node_id)
+            # 候选边可以用 source_ref/target_name 指向中心节点或本次生成节点。
+            for candidate in llm_result.get("edges", []):
+                # source_ref 缺省时默认从中心节点出发，适配简单扩展结果。
+                source_ref = candidate.get("source_ref", node_id)
 
-            # target_ref 兼容未来可能直接提供 target_ref 的结构；当前 mock 使用 target_name。
-            target_ref = candidate.get("target_ref") or candidate.get("target_name")
+                # target_ref 兼容未来可能直接提供 target_ref 的结构；当前 mock 使用 target_name。
+                target_ref = candidate.get("target_ref") or candidate.get("target_name")
 
-            # 如果 ref 是中文 name，则映射到正式节点 ID；如果已经是 ID，则保持原值。
-            source = node_ref_by_name.get(source_ref, source_ref)
-            target = node_ref_by_name.get(target_ref, target_ref)
+                # 如果 ref 是中文 name，则映射到正式节点 ID；如果已经是 ID，则保持原值。
+                source = node_ref_by_name.get(source_ref, source_ref)
+                target = node_ref_by_name.get(target_ref, target_ref)
 
-            # build_edge 统一生成 edge ID 和 metadata。
-            edge = self.graph_service.build_edge(
-                source=source,
-                target=target,
-                relation=candidate["relation"],
-                weight=float(candidate.get("weight", 1.0)),
-                properties=candidate.get("properties", {}),
-                parent_node_id=node_id,
-            )
+                # build_edge 统一生成 edge ID 和 metadata。
+                edge = self.graph_service.build_edge(
+                    source=source,
+                    target=target,
+                    relation=candidate["relation"],
+                    weight=float(candidate.get("weight", 1.0)),
+                    properties=candidate.get("properties", {}),
+                    parent_node_id=node_id,
+                )
 
-            # add_edge 内部会按 source+target+relation 去重。
-            stored_edge = self.graph_service.add_edge(graph, edge)
-            generated_edges.append(stored_edge)
+                # add_edge 内部会按 source+target+relation+业务键 去重。
+                stored_edge = self.graph_service.add_edge(graph, edge)
+                generated_edges.append(stored_edge)
 
-        # 结构性变化统一落盘：graph、扩展索引、快照三者一起更新。
-        self.graph_service.mark_expanded(graph, node_id, expand_type)
-        self.graph_service.save_graph(graph)
+            # 结构性变化统一落盘：graph、扩展索引、快照三者一起更新。
+            self.graph_service.mark_expanded(graph, node_id, expand_type)
+            return {
+                "skipped_existing": False,
+                "center_node": self._find_node(graph, node_id),
+                "nodes": generated_nodes,
+                "edges": generated_edges,
+            }
+
+        mutation, graph = self.graph_service.apply_mutation(
+            reason=f"expand:{node_id}:{expand_type}",
+            mutator=mutate,
+        )
+
+        if mutation["skipped_existing"]:
+            existing = self.get_existing_expansion(node_id, expand_type)
+            if existing:
+                return existing
+            return ExpandNodeResponse(center_node=mutation["center_node"], from_cache=True, summary=llm_result.get("summary"))
+
+        generated_nodes = mutation["nodes"]
+        generated_edges = mutation["edges"]
+        center_node = mutation["center_node"]
 
         # 索引必须在 graph 写入后更新，保证索引中的 ID 能在 graph.json 中找到。
         self._write_index(
@@ -226,7 +247,7 @@ class ExpansionService:
         )
 
         return ExpandNodeResponse(
-            center_node=self._find_node(graph, node_id),
+            center_node=center_node,
             new_nodes=generated_nodes,
             new_edges=generated_edges,
             from_cache=False,

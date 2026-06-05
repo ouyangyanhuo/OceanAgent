@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.router import api_router, root_router
 from app.core.config import get_settings
 from app.core.errors import AppError
-from app.core.json_store import ensure_json_file
+from app.core.json_store import ensure_json_file, ensure_text_file
 from app.core.paths import (
     AGENT_CACHE_FILE,
     AI_CACHE_FILE,
@@ -18,6 +18,7 @@ from app.core.paths import (
     GRAPH_EDGES_FILE,
     GRAPH_META_FILE,
     GRAPH_NODES_FILE,
+    GRAPH_WAL_FILE,
     NOTIFICATION_FILE,
     REPORT_CACHE_FILE,
     SCHEMA_RULES_FILE,
@@ -62,6 +63,7 @@ def ensure_runtime_files() -> None:
     ensure_json_file(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
     ensure_json_file(GRAPH_NODES_FILE, [])
     ensure_json_file(GRAPH_EDGES_FILE, [])
+    ensure_text_file(GRAPH_WAL_FILE)
 
     # expansion_index 记录结构扩展历史，空对象表示尚未扩展任何节点。
     ensure_json_file(EXPANSION_INDEX_FILE, {})

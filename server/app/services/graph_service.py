@@ -4,7 +4,8 @@ GraphService 是 graph.json 的主要访问入口，负责：
 - 读取和保存完整图谱
 - 查询节点、边和邻居
 - 按稳定规则生成节点/边 ID
-- 按 type+name、source+target+relation 去重
+- 按 type+name、source+target+relation+业务键 去重
+- 通过图谱级事务、WAL 和内存索引保护并发写入
 
 注意：这里不直接调用 LLM。LLM 生成的候选数据由 ExpansionService 校验后再通过本服务写入。
 """
@@ -12,12 +13,16 @@ GraphService 是 graph.json 的主要访问入口，负责：
 import hashlib
 import re
 from datetime import datetime
-from typing import Any
+from dataclasses import dataclass
+from threading import RLock
+from typing import Any, Callable, TypeVar
 
 from app.core.errors import NotFoundError
-from app.core.json_store import read_json, write_json
-from app.core.paths import GRAPH_EDGES_FILE, GRAPH_META_FILE, GRAPH_NODES_FILE
+from app.core.json_store import append_jsonl, read_json, read_jsonl, truncate_file, write_json
+from app.core.paths import GRAPH_EDGES_FILE, GRAPH_META_FILE, GRAPH_NODES_FILE, GRAPH_WAL_FILE
 from app.models.graph import GraphData, GraphEdge, GraphMetadata, GraphNode
+
+T = TypeVar("T")
 
 
 def now_iso() -> str:
@@ -45,16 +50,74 @@ def generate_node_id(node_type: str, name: str, parent_node_id: str | None = Non
     return f"{prefix}_{short_hash(raw)}"
 
 
-def generate_edge_id(source: str, relation: str, target: str) -> str:
-    """根据 source、relation、target 生成稳定边 ID。"""
-    return f"edge_{short_hash(f'{source}:{relation}:{target}')}"
+def _business_value(properties: dict[str, Any]) -> str | None:
+    """Extract the explicit business key that makes a relation unique."""
+    for key in ("timestamp", "observed_at", "time", "event_id", "observation_id"):
+        value = properties.get(key)
+        if value not in (None, ""):
+            return f"{key}={value}"
+    return None
+
+
+def edge_business_key(edge: GraphEdge) -> str:
+    """Return the edge business key used for multi-edge dedupe."""
+    return _business_value(edge.properties) or ""
+
+
+def edge_dedupe_key(source: str, target: str, relation: str, business_key: str = "") -> str:
+    """Build the stable edge dedupe key."""
+    return f"{source}:{target}:{relation}:{business_key}"
+
+
+def generate_edge_id(source: str, relation: str, target: str, properties: dict[str, Any] | None = None) -> str:
+    """根据 source、relation、target 和显式业务键生成稳定边 ID。"""
+    business_key = _business_value(properties or {}) or ""
+    return f"edge_{short_hash(edge_dedupe_key(source, target, relation, business_key))}"
+
+
+def node_type_name_key(node_type: str, name: str) -> str:
+    """Normalize the node dedupe key."""
+    return f"{node_type}:{name.strip().casefold()}"
+
+
+@dataclass
+class GraphIndex:
+    """In-memory indexes derived from the current graph snapshot."""
+
+    node_by_id: dict[str, GraphNode]
+    node_by_type_name: dict[str, GraphNode]
+    edge_by_id: dict[str, GraphEdge]
+    edge_by_dedupe_key: dict[str, GraphEdge]
+
+
+def build_graph_index(graph: GraphData) -> GraphIndex:
+    """Build fast lookup indexes for the current graph."""
+    return GraphIndex(
+        node_by_id={node.id: node for node in graph.nodes},
+        node_by_type_name={node_type_name_key(node.type, node.name): node for node in graph.nodes},
+        edge_by_id={edge.id: edge for edge in graph.edges},
+        edge_by_dedupe_key={
+            edge_dedupe_key(edge.source, edge.target, edge.relation, edge_business_key(edge)): edge
+            for edge in graph.edges
+        },
+    )
 
 
 class GraphService:
     """封装 graph.json 的读写和基础查询。"""
 
-    def load_graph(self) -> GraphData:
-        """从分文件存储读取图谱并组装为 GraphData。"""
+    _graph_lock = RLock()
+    _graph_cache: GraphData | None = None
+    _index_cache: GraphIndex | None = None
+
+    @classmethod
+    def _copy_graph(cls, graph: GraphData) -> GraphData:
+        """Return an isolated graph object so callers cannot mutate the cache."""
+        return graph.model_copy(deep=True)
+
+    @classmethod
+    def _read_base_graph(cls) -> GraphData:
+        """Read the compacted graph files from disk."""
         meta = read_json(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
         nodes_raw = read_json(GRAPH_NODES_FILE, [])
         edges_raw = read_json(GRAPH_EDGES_FILE, [])
@@ -65,11 +128,126 @@ class GraphService:
             edges=[GraphEdge.model_validate(e) for e in edges_raw],
         )
 
+    @classmethod
+    def _dump_by_id(cls, items: list[GraphNode] | list[GraphEdge]) -> dict[str, dict[str, Any]]:
+        """Serialize graph items by ID for change detection."""
+        return {item.id: item.model_dump(mode="json") for item in items}
+
+    @classmethod
+    def _wal_records_for_change(cls, before: GraphData, after: GraphData, reason: str) -> list[dict[str, Any]]:
+        """Create WAL records for changed nodes and edges."""
+        before_nodes = cls._dump_by_id(before.nodes)
+        before_edges = cls._dump_by_id(before.edges)
+        records: list[dict[str, Any]] = []
+
+        for node in after.nodes:
+            payload = node.model_dump(mode="json")
+            if before_nodes.get(node.id) != payload:
+                records.append({"kind": "node_upsert", "node": payload})
+
+        for edge in after.edges:
+            payload = edge.model_dump(mode="json")
+            if before_edges.get(edge.id) != payload:
+                records.append({"kind": "edge_upsert", "edge": payload})
+
+        if records:
+            stamp = now_iso()
+            for record in records:
+                record.update({
+                    "timestamp": stamp,
+                    "reason": reason,
+                    "graph_id": after.graph_id,
+                    "version": after.version,
+                })
+        return records
+
+    @classmethod
+    def _apply_wal_records(cls, graph: GraphData, records: list[dict[str, Any]]) -> GraphData:
+        """Replay WAL records idempotently over a compacted graph."""
+        if not records:
+            return graph
+
+        node_by_id = {node.id: node for node in graph.nodes}
+        edge_by_id = {edge.id: edge for edge in graph.edges}
+        version = graph.version
+
+        for record in records:
+            kind = record.get("kind")
+            if kind == "node_upsert":
+                node = GraphNode.model_validate(record.get("node", {}))
+                node_by_id[node.id] = node
+            elif kind == "edge_upsert":
+                edge = GraphEdge.model_validate(record.get("edge", {}))
+                edge_by_id[edge.id] = edge
+            version = max(version, int(record.get("version") or version))
+
+        return GraphData(
+            graph_id=graph.graph_id,
+            version=version,
+            nodes=list(node_by_id.values()),
+            edges=list(edge_by_id.values()),
+        )
+
+    @classmethod
+    def _load_current_locked(cls) -> GraphData:
+        """Load compacted files plus any unapplied WAL records."""
+        graph = cls._read_base_graph()
+        graph = cls._apply_wal_records(graph, read_jsonl(GRAPH_WAL_FILE))
+        cls._graph_cache = graph
+        cls._index_cache = build_graph_index(graph)
+        return graph
+
+    @classmethod
+    def _current_locked(cls) -> GraphData:
+        """Return the current cached graph, loading it if needed."""
+        if cls._graph_cache is None or cls._index_cache is None:
+            return cls._load_current_locked()
+        return cls._graph_cache
+
+    @classmethod
+    def _refresh_cache_locked(cls, graph: GraphData) -> None:
+        """Refresh graph and index caches after a committed write."""
+        cls._graph_cache = graph
+        cls._index_cache = build_graph_index(graph)
+
+    def load_graph(self) -> GraphData:
+        """从内存快照读取图谱，必要时从主文件和 WAL 组装。"""
+        with self._graph_lock:
+            return self._copy_graph(self._current_locked())
+
     def save_graph(self, graph: GraphData) -> None:
-        """将图谱分文件写入 meta.json、nodes.json、edges.json。"""
-        write_json(GRAPH_META_FILE, {"graph_id": graph.graph_id, "version": graph.version})
-        write_json(GRAPH_NODES_FILE, [n.model_dump(mode="json") for n in graph.nodes])
-        write_json(GRAPH_EDGES_FILE, [e.model_dump(mode="json") for e in graph.edges])
+        """将图谱分文件写入 meta.json、nodes.json、edges.json，并刷新索引。
+
+        业务结构变更优先使用 apply_mutation；此方法保留给初始化脚本和数据重置脚本。
+        """
+        with self._graph_lock:
+            write_json(GRAPH_META_FILE, {"graph_id": graph.graph_id, "version": graph.version})
+            write_json(GRAPH_NODES_FILE, [n.model_dump(mode="json") for n in graph.nodes])
+            write_json(GRAPH_EDGES_FILE, [e.model_dump(mode="json") for e in graph.edges])
+            truncate_file(GRAPH_WAL_FILE)
+            self._refresh_cache_locked(self._copy_graph(graph))
+
+    def apply_mutation(self, reason: str, mutator: Callable[[GraphData], T]) -> tuple[T, GraphData]:
+        """Run a graph read-modify-write sequence as one in-process transaction."""
+        with self._graph_lock:
+            before = self._copy_graph(self._load_current_locked())
+            working = self._copy_graph(before)
+            result = mutator(working)
+
+            records = self._wal_records_for_change(before, working, reason)
+            for record in records:
+                append_jsonl(GRAPH_WAL_FILE, record)
+
+            if records:
+                write_json(GRAPH_META_FILE, {"graph_id": working.graph_id, "version": working.version})
+                write_json(GRAPH_NODES_FILE, [n.model_dump(mode="json") for n in working.nodes])
+                write_json(GRAPH_EDGES_FILE, [e.model_dump(mode="json") for e in working.edges])
+                truncate_file(GRAPH_WAL_FILE)
+                self._refresh_cache_locked(working)
+            else:
+                self._refresh_cache_locked(before)
+
+            return result, self._copy_graph(self._current_locked())
 
     def get_graph(self) -> GraphData:
         """返回完整图谱。"""
@@ -77,22 +255,20 @@ class GraphService:
 
     def get_node(self, node_id: str) -> GraphNode:
         """按节点 ID 查询节点，不存在则抛业务异常。"""
-        graph = self.load_graph()
-
-        # 当前图谱规模较小，直接线性扫描即可；后续数据增大再考虑内存索引。
-        for node in graph.nodes:
-            if node.id == node_id:
-                return node
+        with self._graph_lock:
+            self._current_locked()
+            node = self._index_cache.node_by_id.get(node_id) if self._index_cache else None
+            if node:
+                return node.model_copy(deep=True)
         raise NotFoundError(f"Node not found: {node_id}", code="NODE_NOT_FOUND")
 
     def get_edge(self, edge_id: str) -> GraphEdge:
         """按边 ID 查询边，不存在则抛业务异常。"""
-        graph = self.load_graph()
-
-        # 边数量目前也较小，线性扫描比维护额外索引更简单。
-        for edge in graph.edges:
-            if edge.id == edge_id:
-                return edge
+        with self._graph_lock:
+            self._current_locked()
+            edge = self._index_cache.edge_by_id.get(edge_id) if self._index_cache else None
+            if edge:
+                return edge.model_copy(deep=True)
         raise NotFoundError(f"Edge not found: {edge_id}", code="EDGE_NOT_FOUND")
 
     def get_neighbors(self, node_id: str, depth: int = 1) -> dict[str, Any]:
@@ -197,9 +373,15 @@ class GraphService:
     def add_edge(self, graph: GraphData, edge: GraphEdge) -> GraphEdge:
         """向图谱添加边。
 
-        去重规则：source、target、relation 三者相同即视为同一条边。
+        去重规则：source、target、relation 和显式业务键相同即视为同一条边。
         """
-        existing = self.find_edge(graph, edge.source, edge.target, edge.relation)
+        existing = self.find_edge(
+            graph,
+            edge.source,
+            edge.target,
+            edge.relation,
+            business_key=edge_business_key(edge),
+        )
         if existing:
             # 已存在的边直接复用，避免重复关系污染图谱。
             return existing
@@ -211,10 +393,7 @@ class GraphService:
 
     def find_similar_node(self, graph: GraphData, node_type: str, name: str) -> GraphNode | None:
         """按节点去重规则查找已有节点。"""
-        for node in graph.nodes:
-            if node.type == node_type and node.name == name:
-                return node
-        return None
+        return build_graph_index(graph).node_by_type_name.get(node_type_name_key(node_type, name))
 
     def find_edge(
         self,
@@ -222,12 +401,11 @@ class GraphService:
         source: str,
         target: str,
         relation: str,
+        business_key: str = "",
     ) -> GraphEdge | None:
         """按边去重规则查找已有边。"""
-        for edge in graph.edges:
-            if edge.source == source and edge.target == target and edge.relation == relation:
-                return edge
-        return None
+        key = edge_dedupe_key(source, target, relation, business_key)
+        return build_graph_index(graph).edge_by_dedupe_key.get(key)
 
     def edge_exists(self, graph: GraphData, source: str, target: str, relation: str) -> bool:
         """判断某条边是否存在。"""
@@ -284,8 +462,8 @@ class GraphService:
         """根据候选边数据构造后端正式边。"""
         created_at = now_iso()
         return GraphEdge(
-            # 边 ID 由三元组生成，配合 add_edge 的去重规则保持稳定。
-            id=generate_edge_id(source, relation, target),
+            # 边 ID 由三元组和显式业务键生成，配合 add_edge 支持多重边。
+            id=generate_edge_id(source, relation, target, properties),
             source=source,
             target=target,
             relation=relation,

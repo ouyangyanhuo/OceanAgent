@@ -388,7 +388,6 @@ export function resolveGraphConstraints(
   }
 
   resolveSpatialCollisions(cy)
-  resolveStraightEdgeOverlaps(cy)
   resolveEdgeNodeOverlaps(cy)
 }
 

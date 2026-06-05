@@ -24,6 +24,7 @@ GRAPH_FILE = GRAPH_DIR / "graph.json"  # 兼容旧文件，迁移后可删除
 GRAPH_META_FILE = GRAPH_DIR / "meta.json"
 GRAPH_NODES_FILE = GRAPH_DIR / "nodes.json"
 GRAPH_EDGES_FILE = GRAPH_DIR / "edges.json"
+GRAPH_WAL_FILE = GRAPH_DIR / "graph_wal.jsonl"
 EXPANSION_INDEX_FILE = GRAPH_DIR / "expansion_index.json"
 SCHEMA_RULES_FILE = GRAPH_DIR / "schema_rules.json"
 

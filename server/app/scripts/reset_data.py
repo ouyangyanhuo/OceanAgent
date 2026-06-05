@@ -7,7 +7,7 @@
 
 import argparse
 
-from app.core.json_store import write_json
+from app.core.json_store import truncate_file, write_json
 from app.core.paths import (
     AGENT_CACHE_FILE,
     AI_CACHE_FILE,
@@ -15,6 +15,7 @@ from app.core.paths import (
     GRAPH_EDGES_FILE,
     GRAPH_META_FILE,
     GRAPH_NODES_FILE,
+    GRAPH_WAL_FILE,
     REPORT_CACHE_FILE,
 )
 
@@ -36,7 +37,8 @@ def main() -> None:
         write_json(GRAPH_META_FILE, {"graph_id": "ocean_kg_demo_v1", "version": 1})
         write_json(GRAPH_NODES_FILE, [])
         write_json(GRAPH_EDGES_FILE, [])
-        print("✓ graph files cleared (meta.json, nodes.json, edges.json)")
+        truncate_file(GRAPH_WAL_FILE)
+        print("✓ graph files cleared (meta.json, nodes.json, edges.json, graph_wal.jsonl)")
 
     print("\n重置完成。重启后端后生效。")
     if not args.all:

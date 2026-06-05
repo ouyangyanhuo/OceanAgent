@@ -970,24 +970,6 @@
     }
   },
   {
-    "id": "edge_ddf449d7",
-    "source": "red_tide_event_0b8a87a8",
-    "target": "risk_factor_49d2b1",
-    "relation": "affected_by",
-    "weight": 0.7,
-    "properties": {
-      "description": "海面温度升高促进营养盐循环，增加赤潮事件发生的可能性。"
-    },
-    "metadata": {
-      "source": "generated",
-      "parent_node": "red_tide_event_0b8a87a8",
-      "created_at": "2026-06-04T15:48:56",
-      "updated_at": "2026-06-04T15:48:56",
-      "version": 1,
-      "locked": true
-    }
-  },
-  {
     "id": "edge_4bc2f8e0",
     "source": "observation_d2ae4160",
     "target": "buoy_e9d355b9",
