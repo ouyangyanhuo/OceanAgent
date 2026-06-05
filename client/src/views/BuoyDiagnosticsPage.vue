@@ -1,9 +1,20 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { AlertTriangle, Battery, Bot, FileText, RadioTower, Settings, Share2, Wrench } from 'lucide-vue-next'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 import AppModal from '../components/common/AppModal.vue'
+
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+const SATELLITE_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+
+const addSatelliteBaseLayer = (mapInstance) => {
+  return L.tileLayer(SATELLITE_TILE_URL, {
+    maxZoom: 18
+  }).addTo(mapInstance)
+}
 
 const metrics = [
   { label: '在线浮标', value: '128', trend: '8', tone: 'teal', sparkline: [16, 19, 18, 24, 21, 27, 24, 34, 28, 38, 31, 44] },
@@ -38,22 +49,69 @@ const indicators = ['水温', '盐度', '溶解氧', '叶绿素-a', '电池电�
 const indicatorValues = ['17.6', '32.1', '6.2', '1.48', '78', '92']
 const indicatorTones = ['blue', 'teal', 'green', 'violet', 'amber', 'violet']
 
-// ── 浮标点位（海南周边） ──
+// ── 浮标点位（真实经纬度） ──
 const buoyPoints = [
-  { name: '琼州海峡浮标', x: 48, y: 22, status: '正常', type: '综合观测', battery: '86%' },
-  { name: '文昌外海浮标', x: 64, y: 34, status: '预警', type: '水文气象', battery: '32%' },
-  { name: '万宁近海浮标', x: 66, y: 44, status: '正常', type: '水质监测', battery: '91%' },
-  { name: '陵水浮标', x: 53, y: 58, status: '正常', type: '海流观测', battery: '78%' },
-  { name: '三亚外海浮标', x: 58, y: 65, status: '故障', type: '综合观测', battery: '12%' },
-  { name: '东方近海浮标', x: 26, y: 43, status: '正常', type: '水质监测', battery: '94%' },
-  { name: '儋州近海浮标', x: 35, y: 33, status: '预警', type: '水文气象', battery: '45%' },
-  { name: '西沙北部浮标', x: 78, y: 72, status: '正常', type: '深海观测', battery: '67%' },
-  { name: '海口近岸浮标', x: 44, y: 16, status: '正常', type: '水质监测', battery: '88%' },
-  { name: '洋浦外海浮标', x: 30, y: 28, status: '正常', type: '海流观测', battery: '73%' },
+  { name: '琼州海峡浮标', lat: 20.15, lng: 110.25, status: '正常', type: '综合观测', battery: '86%' },
+  { name: '文昌外海浮标', lat: 19.75, lng: 111.25, status: '预警', type: '水文气象', battery: '32%' },
+  { name: '万宁近海浮标', lat: 18.75, lng: 110.55, status: '正常', type: '水质监测', battery: '91%' },
+  { name: '陵水浮标', lat: 18.45, lng: 109.95, status: '正常', type: '海流观测', battery: '78%' },
+  { name: '三亚外海浮标', lat: 18.15, lng: 109.55, status: '故障', type: '综合观测', battery: '12%' },
+  { name: '东方近海浮标', lat: 19.05, lng: 108.65, status: '正常', type: '水质监测', battery: '94%' },
+  { name: '儋州近海浮标', lat: 19.75, lng: 109.15, status: '预警', type: '水文气象', battery: '45%' },
+  { name: '西沙北部浮标', lat: 16.85, lng: 112.35, status: '正常', type: '深海观测', battery: '67%' },
+  { name: '海口近岸浮标', lat: 20.35, lng: 110.55, status: '正常', type: '水质监测', battery: '88%' },
+  { name: '洋浦外海浮标', lat: 19.85, lng: 109.05, status: '正常', type: '海流观测', battery: '73%' },
 ]
 
 const activeBuoy = ref(null)
 const selectBuoy = (point) => { activeBuoy.value = point }
+
+// ── Leaflet 地图 ──
+let buoyMap = null
+
+const getStatusColor = (status) => {
+  if (status === '故障') return '#ef4444'
+  if (status === '预警') return '#f59e0b'
+  return '#22c55e'
+}
+
+const initBuoyMap = () => {
+  if (buoyMap) {
+    buoyMap.remove()
+    buoyMap = null
+  }
+
+  buoyMap = L.map('buoy-leaflet-map', {
+    zoomControl: false,
+    attributionControl: false
+  }).setView([19.2, 110.3], 7)
+
+  addSatelliteBaseLayer(buoyMap)
+
+  L.control.zoom({
+    position: 'topleft'
+  }).addTo(buoyMap)
+
+  buoyPoints.forEach(point => {
+    L.circleMarker(
+      [point.lat, point.lng],
+      {
+        radius: 8,
+        color: '#fff',
+        weight: 2,
+        fillColor: getStatusColor(point.status),
+        fillOpacity: 1
+      }
+    )
+      .addTo(buoyMap)
+      .bindPopup(`
+        <b>${point.name}</b><br>
+        状态：${point.status}<br>
+        类型：${point.type}<br>
+        电量：${point.battery}
+      `)
+  })
+}
 
 // ── 弹窗控制 ──
 const showMoreSources = ref(false)
@@ -109,6 +167,10 @@ const sideSources = ['浮标实时监测数据', '浮标历史数据', '气象�
 const modelNames = ['数据质量评估模型', '异常诊断模型', '设备健康评估模型', '剩余寿命预测模型', '维护建议生成模型']
 
 onMounted(() => {
+  setTimeout(() => {
+    initBuoyMap()
+  }, 100)
+
   const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
   tl.from('.page-hero', { y: 16, opacity: 0, duration: 0.5, ease: 'power3.out' })
   tl.from('.buoy-main-area > .panel', { x: -30, opacity: 0, duration: 0.5, stagger: 0.1 }, '-=0.3')
@@ -140,45 +202,38 @@ onMounted(() => {
 
         <!-- 主内容区 -->
         <div class="buoy-main-area">
-          <!-- 浮标分布与状态 -->
+          <!-- 浮标分布与状态（Leaflet 地图） -->
           <section class="panel ocean-map buoy-map">
             <header class="panel-header"><h2>浮标分布与状态</h2><div class="tabs"></div></header>
-            <div class="map-surface buoy-surface" @click="activeBuoy = null">
-              <div class="hainan-island-sm">
-                <span class="city-sm c-hk">海口</span>
-                <span class="city-sm c-sy">三亚</span>
-                <span class="city-sm c-wn">万宁</span>
-                <span class="city-sm c-df">东方</span>
-              </div>
-              <span class="sea-label-sm s-south">南海北部</span>
-              <span class="sea-label-sm s-qz">琼州海峡</span>
-              <span class="sea-label-sm s-xs">西沙方向</span>
-
-              <button
-                v-for="point in buoyPoints"
-                :key="point.name"
-                class="buoy-btn"
-                :class="point.status === '故障' ? 'fault' : point.status === '预警' ? 'warn' : 'ok'"
-                :style="{ left: point.x + '%', top: point.y + '%' }"
-                @click.stop="activeBuoy = point"
-              >
-                <b></b>
-                <span>{{ point.name }}</span>
-              </button>
-
-              <div v-if="activeBuoy" class="buoy-popup" :style="{ left: activeBuoy.x + '%', top: activeBuoy.y + '%' }" @click.stop>
-                <button class="popup-close" @click="activeBuoy = null">×</button>
-                <strong>{{ activeBuoy.name }}</strong>
-                <p>状态：{{ activeBuoy.status }}</p>
-                <p>类型：{{ activeBuoy.type }}</p>
-                <p>电量：{{ activeBuoy.battery }}</p>
-              </div>
-
-              <div class="map-legend buoy-legend">
-                <strong>状态图例</strong>
-                <span class="green">正常</span>
-                <span class="amber">预警</span>
-                <span class="red">故障</span>
+            <div class="map-wrapper">
+              <div id="buoy-leaflet-map" class="real-buoy-map"></div>
+              <div class="ocean-current-layer ocean-current-small">
+                <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+                  <path class="current-flow strong-current" d="M10 505 C160 445,320 365,520 255 S825 150,1000 90" />
+                  <path class="current-flow delay-a" d="M0 545 C165 470,320 405,510 325 S790 245,1000 175" />
+                  <path class="current-flow delay-b" d="M70 595 C235 515,420 425,610 305 S865 180,1000 75" />
+                  <path class="current-flow coastal-current" d="M115 575 C220 485,315 385,405 292" />
+                  <path class="current-flow coastal-current delay-c" d="M175 610 C260 525,345 430,438 345" />
+                  <path class="current-flow strong-current delay-d" d="M245 610 C450 500,660 350,1000 120" />
+                  <path class="current-flow delay-e" d="M35 360 C90 315,155 255,240 180" />
+                  <path class="current-flow delay-f" d="M540 465 C640 355,760 245,875 145" />
+                  <path class="current-flow thin-current" d="M315 570 C430 500,548 430,700 320 S900 210,980 140" />
+                  <path class="current-flow thin-current delay-b" d="M20 255 C125 225,230 195,365 120" />
+                  <path class="current-flow thin-current delay-e" d="M640 585 C700 490,770 405,910 305" />
+                  <path class="current-flow thin-current delay-c" d="M470 590 C560 505,680 415,795 315" />
+                </svg>
+                <div class="ocean-particles small-particles">
+                  <span
+                    v-for="i in 70"
+                    :key="i"
+                    :style="{
+                      left: ((i * 37) % 100) + '%',
+                      top: ((i * 23) % 100) + '%',
+                      animationDelay: -((i * 0.17) % 6).toFixed(2) + 's',
+                      animationDuration: (6 + (i % 7)) + 's'
+                    }"
+                  ></span>
+                </div>
               </div>
             </div>
           </section>
@@ -340,71 +395,178 @@ onMounted(() => {
 .buoy-main-area { display: flex; flex-direction: column; gap: 16px; }
 .buoy-aside { display: flex; flex-direction: column; gap: 16px; }
 
-/* ── 地图 ── */
-.buoy-surface {
+/* ── Leaflet 地图容器 ── */
+.map-wrapper {
   position: relative;
-  height: 280px;
+  width: 100%;
+  height: 282px;
   overflow: hidden;
   border-radius: 10px;
-  background: linear-gradient(160deg, #05263f, #0a3a5c 60%, #0e4a70);
-  border: 1px solid rgba(56, 160, 220, 0.4);
+}
+.map-wrapper .real-buoy-map {
+  height: 100%;
+}
+.real-buoy-map {
+  position: relative;
+  width: 100%;
+  height: 282px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 144, 220, .45);
 }
 
-.hainan-island-sm {
+/* Leaflet 控件样式 */
+.real-buoy-map :deep(.leaflet-control-zoom a) {
+  background: rgba(5, 28, 55, .95);
+  color: #fff;
+  border-color: rgba(86, 171, 255, .8);
+}
+.real-buoy-map :deep(.leaflet-popup-content-wrapper) {
+  background: rgba(5, 24, 48, .95);
+  color: #fff;
+  border: 1px solid rgba(48, 145, 255, .65);
+}
+.real-buoy-map :deep(.leaflet-popup-tip) {
+  background: rgba(5, 24, 48, .95);
+}
+
+/* 地图滤镜与覆盖 */
+.real-buoy-map::after {
+  content: '';
   position: absolute;
-  left: 22%; top: 24%;
-  width: 140px; height: 180px;
-  background: linear-gradient(145deg, rgba(37, 94, 70, 0.92), rgba(24, 71, 58, 0.98));
-  clip-path: polygon(42% 0, 70% 10%, 88% 32%, 78% 62%, 55% 88%, 28% 100%, 8% 78%, 0 44%, 16% 14%);
-  box-shadow: inset 0 0 40px rgba(42, 245, 178, 0.16);
+  inset: 0;
+  z-index: 450;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 65% 35%, rgba(0, 255, 220, .12), transparent 28%),
+    linear-gradient(135deg, rgba(0, 120, 255, .28), rgba(0, 255, 180, .08));
+  mix-blend-mode: screen;
 }
-.city-sm { position: absolute; color: #fff; font-size: 12px; font-weight: 600; pointer-events: none; text-shadow: 0 0 4px #00182d, 0 0 8px #00b7ff; }
-.c-hk { left: 42%; top: 8%; }
-.c-sy { left: 40%; bottom: 10%; }
-.c-wn { right: 8%; top: 48%; }
-.c-df { left: 6%; top: 46%; }
-.sea-label-sm { position: absolute; color: rgba(255,255,255,0.5); font-size: 11px; pointer-events: none; }
-.s-south { left: 66%; top: 14%; }
-.s-qz { left: 36%; top: 16%; }
-.s-xs { left: 80%; top: 60%; }
+.real-buoy-map :deep(.leaflet-tile) {
+  filter: saturate(1.15) brightness(0.95) contrast(1.08);
+}
+.real-buoy-map :deep(.leaflet-marker-pane),
+.real-buoy-map :deep(.leaflet-overlay-pane),
+.real-buoy-map :deep(.leaflet-popup-pane),
+.real-buoy-map :deep(.leaflet-tooltip-pane) {
+  position: relative;
+  z-index: 600;
+}
+.real-buoy-map :deep(.leaflet-control-container) {
+  position: relative;
+  z-index: 700;
+}
+.real-buoy-map :deep(.leaflet-interactive) {
+  animation: pulseBuoy 2s infinite;
+}
 
-.buoy-btn {
+@keyframes pulseBuoy {
+  0% { filter: drop-shadow(0 0 5px rgba(0, 217, 255, .75)); }
+  50% { filter: drop-shadow(0 0 18px rgba(0, 217, 255, 1)); }
+  100% { filter: drop-shadow(0 0 5px rgba(0, 217, 255, .75)); }
+}
+
+/* ── 洋流动画 ── */
+.ocean-current-layer {
   position: absolute;
-  z-index: 12;
-  transform: translate(-6px, -50%);
-  border: none; background: transparent;
-  cursor: pointer; color: #fff;
-  display: flex; align-items: center; gap: 6px;
+  inset: 0;
+  z-index: 520;
+  pointer-events: none;
+  overflow: hidden;
 }
-.buoy-btn b { flex-shrink: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; }
-.buoy-btn span { font-size: 11px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; text-shadow: 0 0 6px #00182d; background: rgba(3,19,36,0.55); padding: 1px 4px; border-radius: 3px; }
-.buoy-btn:hover span { opacity: 1; }
-.buoy-btn.ok b { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.8); }
-.buoy-btn.warn b { background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.8); }
-.buoy-btn.fault b { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.8); }
+.ocean-current-layer svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.current-flow {
+  fill: none;
+  stroke: #8efcff;
+  stroke-width: 3.2;
+  opacity: .86;
+  stroke-linecap: round;
+  stroke-dasharray: 14 24;
+  filter:
+    drop-shadow(0 0 8px rgba(142, 252, 255, .95))
+    drop-shadow(0 0 18px rgba(0, 180, 255, .45));
+  animation:
+    flowMove 7.5s linear infinite,
+    flowGlow 3.2s ease-in-out infinite;
+}
+.strong-current {
+  stroke: #c9ffff;
+  stroke-width: 4.4 !important;
+  opacity: .95;
+  stroke-dasharray: 18 24;
+}
+.coastal-current {
+  stroke: #00ffe0;
+  stroke-width: 3.6 !important;
+  opacity: .92;
+}
+.thin-current {
+  stroke-width: 2.1 !important;
+  opacity: .58;
+  stroke-dasharray: 8 18;
+}
+.delay-a { animation-delay: -1s, -.4s; }
+.delay-b { animation-delay: -2s, -.8s; }
+.delay-c { animation-delay: -3s, -1.2s; }
+.delay-d { animation-delay: -4s, -1.6s; }
+.delay-e { animation-delay: -5s, -2s; }
+.delay-f { animation-delay: -6s, -2.4s; }
 
-.buoy-popup {
-  position: absolute; z-index: 20; width: 160px;
-  padding: 10px 12px; transform: translate(14px, -50%);
-  background: rgba(5,24,48,0.94); border: 1px solid rgba(48,145,255,0.65);
-  border-radius: 8px; color: #fff; font-size: 12px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+.ocean-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
-.buoy-popup p { margin: 4px 0 0; color: #cde8ff; }
-.popup-close { position: absolute; right: 6px; top: 4px; border: none; background: transparent; color: #9ed8ff; font-size: 16px; cursor: pointer; }
+.ocean-particles span {
+  position: absolute;
+  width: 3px;
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(230, 255, 255, .98), rgba(0, 220, 255, .35), transparent);
+  box-shadow: 0 0 7px rgba(155, 255, 255, .9), 0 0 18px rgba(0, 180, 255, .45);
+  opacity: .78;
+  transform: rotate(58deg);
+  animation: particleMove linear infinite;
+}
+.small-particles span:nth-child(3n) { width: 2px; height: 16px; opacity: .52; }
+.small-particles span:nth-child(4n) { opacity: .95; }
 
-.buoy-legend {
-  position: absolute; right: 12px; top: 12px; z-index: 10;
-  width: 110px; padding: 10px;
-  background: rgba(5,24,48,0.9); border: 1px solid rgba(48,145,255,0.55);
-  border-radius: 8px; color: #fff; font-size: 11px;
+@keyframes flowMove {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -260; }
 }
-.buoy-legend strong { display: block; margin-bottom: 4px; font-size: 12px; }
-.buoy-legend span { display: block; margin-top: 5px; }
-.buoy-legend span::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 2px; background: #6ab7ff; }
-.buoy-legend .green::before { background: #22c55e; }
-.buoy-legend .amber::before { background: #f59e0b; }
-.buoy-legend .red::before { background: #ef4444; }
+@keyframes flowGlow {
+  0% { opacity: .48; }
+  50% { opacity: .96; }
+  100% { opacity: .48; }
+}
+@keyframes particleMove {
+  from { transform: translateX(-40px) translateY(30px) rotate(58deg) scale(.75); }
+  to { transform: translateX(170px) translateY(-115px) rotate(58deg) scale(1.08); }
+}
+.ocean-current-layer::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 22% 78%, rgba(0, 255, 255, .12), transparent 22%),
+    radial-gradient(circle at 68% 30%, rgba(0, 160, 255, .14), transparent 24%),
+    radial-gradient(circle at 78% 72%, rgba(0, 255, 180, .09), transparent 28%);
+  animation: oceanBreath 5s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+@keyframes oceanBreath {
+  0%, 100% { opacity: .45; transform: scale(1); }
+  50% { opacity: .85; transform: scale(1.04); }
+}
 
 /* ── 传感器 ── */
 .sensor-panel article { display: grid; grid-template-columns: 1fr 100px 42px 36px; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: #b9d6ee; }

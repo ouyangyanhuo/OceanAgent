@@ -347,7 +347,6 @@ watch(conversations, persist, { deep: true })
           <header class="panel-header"><h2>图谱命中节点</h2></header>
           <ul>
             <li v-for="node in relatedNodes" :key="node.id">
-              <span class="node-type-tag">{{ node.type }}</span>
               <span class="node-name">{{ node.name }}</span>
             </li>
           </ul>
