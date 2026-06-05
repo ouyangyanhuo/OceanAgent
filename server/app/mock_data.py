@@ -15,8 +15,8 @@ DASHBOARD_DATA = {
     "metrics": [
         {
             "label": "接入智能体",
-            "value": "6",
-            "trend": "1",
+            "value": "123",
+            "trend": "8",
             "unit": "",
             "tone": "blue",
             "sparkline": [22, 26, 25, 31, 28, 35, 29, 41, 33, 37, 35, 45],

@@ -6,7 +6,18 @@ import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
 import AppModal from '../components/common/AppModal.vue'
 
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
 marked.setOptions({ gfm: true, breaks: true })
+
+const SATELLITE_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+
+const addSatelliteBaseLayer = (mapInstance) => {
+  return L.tileLayer(SATELLITE_TILE_URL, {
+    maxZoom: 18
+  }).addTo(mapInstance)
+}
 
 // ── 指标数据 ──
 const metrics = [
@@ -62,14 +73,186 @@ const segmentRisks = [
   { segment: 'S5', risk: '适航风险', level: '低', time: '05-25 14:00 - 20:00' },
 ]
 
+// ── 航线坐标 ──
+// A1 推荐：上海→宁波→那霸
+const routeA1 = [
+  [31.4, 121.5],  // 上海
+  [29.9, 121.5],  // 宁波
+  [28.7, 121.4],  // 台州
+  [26.3, 127.8],  // 那霸
+]
+
+// A2 备选：上海→那霸（直达）
+const routeA2 = [
+  [31.4, 121.5],
+  [26.3, 127.8],
+]
+
+// A3 备选：上海→宁波→台州→厦门→那霸
+const routeA3 = [
+  [31.4, 121.5],
+  [29.9, 121.5],  // 宁波
+  [28.7, 121.4],  // 台州
+  [24.5, 118.1],  // 厦门
+  [26.3, 127.8],  // 那霸
+]
+
+// ── 危险区域 ──
+const dangerZones = [
+  { center: [28.5, 124.5], radius: 80000, level: '高', label: '强风大浪区' },
+  { center: [26.0, 122.0], radius: 60000, level: '中', label: '对流天气区' },
+]
+
+// ── 港口标注 ──
+const ports = [
+  { name: '上海港', lat: 31.4, lng: 121.5 },
+  { name: '那霸港', lat: 26.3, lng: 127.8 },
+  { name: '连云港', lat: 34.6, lng: 119.2 },
+  { name: '青岛港', lat: 36.1, lng: 120.4 },
+  { name: '烟台港', lat: 37.5, lng: 121.4 },
+  { name: '大连港', lat: 38.9, lng: 121.6 },
+  { name: '天津港', lat: 39.0, lng: 117.2 },
+  { name: '日照港', lat: 35.4, lng: 119.5 },
+  { name: '海口港', lat: 20.0, lng: 110.3 },
+  { name: '三亚港', lat: 18.2, lng: 109.5 },
+  { name: '洋浦港', lat: 19.7, lng: 109.2 },
+  { name: '八所港', lat: 19.1, lng: 108.6 },
+  { name: '清澜港', lat: 19.6, lng: 110.8 },
+]
+
 // ── 弹窗控制 ──
 const showDataSourceModal = ref(false)
 const showShareModal = ref(false)
 const clickedSources = ref(new Set())
 
+// ── Leaflet 地图 ──
+let routeMap = null
+
+const initRouteMap = () => {
+  if (routeMap) {
+    routeMap.remove()
+    routeMap = null
+  }
+
+  routeMap = L.map('route-leaflet-map', {
+    zoomControl: false,
+    attributionControl: false
+  }).setView([28, 124], 6)
+
+  addSatelliteBaseLayer(routeMap)
+
+  L.control.zoom({ position: 'topleft' }).addTo(routeMap)
+
+  // A3 备选（粉色实线）
+  L.polyline(routeA3, {
+    color: '#ec4899',
+    weight: 2.5,
+    opacity: 0.7,
+  }).addTo(routeMap).bindPopup('<b>A3 备选航线</b><br>上海→宁波→台州→厦门→那霸<br>航程：1,634 km<br>风险：高')
+
+  // A2 备选（灰色实线）
+  L.polyline(routeA2, {
+    color: '#6b7280',
+    weight: 2.5,
+    opacity: 0.7,
+  }).addTo(routeMap).bindPopup('<b>A2 备选航线</b><br>上海→那霸（直达）<br>航程：1,586 km<br>风险：中')
+
+  // A1 推荐（绿色实线 + 发光）
+  L.polyline(routeA1, {
+    color: '#22c55e',
+    weight: 4,
+    opacity: 0.95,
+    className: 'route-glow-line',
+  }).addTo(routeMap).bindPopup('<b>A1 推荐航线</b><br>上海→宁波→那霸<br>航程：1,468 km<br>节油率：12.4%<br>风险：低')
+
+  // 危险区域
+  dangerZones.forEach(zone => {
+    const color = zone.level === '高' ? '#ef4444' : '#f59e0b'
+    L.circle(zone.center, {
+      radius: zone.radius,
+      color: color,
+      fillColor: color,
+      fillOpacity: 0.15,
+      weight: 1.5,
+      dashArray: '6, 4',
+    }).addTo(routeMap).bindPopup(`<b>${zone.label}</b><br>风险等级：${zone.level}`)
+  })
+
+  // 港口标记
+  ports.forEach(port => {
+    const isMain = port.name === '上海港' || port.name === '那霸港'
+    L.circleMarker([port.lat, port.lng], {
+      radius: isMain ? 8 : 5,
+      color: '#fff',
+      weight: isMain ? 2 : 1.5,
+      fillColor: '#3b82f6',
+      fillOpacity: 1,
+    })
+      .addTo(routeMap)
+      .bindTooltip(port.name, {
+        permanent: isMain,
+        direction: 'top',
+        offset: [0, isMain ? -12 : -8],
+        className: isMain ? 'port-label' : 'port-label-small',
+      })
+  })
+
+  // 航路途经城市
+  const routeCities = [
+    { name: '宁波', lat: 29.9, lng: 121.5 },
+    { name: '台州', lat: 28.7, lng: 121.4 },
+    { name: '厦门', lat: 24.5, lng: 118.1 },
+  ]
+  routeCities.forEach(city => {
+    L.circleMarker([city.lat, city.lng], {
+      radius: 5,
+      color: '#fff',
+      weight: 1.5,
+      fillColor: '#22c55e',
+      fillOpacity: 0.9,
+    })
+      .addTo(routeMap)
+      .bindTooltip(city.name, {
+        permanent: true,
+        direction: 'right',
+        offset: [8, 0],
+        className: 'city-label',
+      })
+  })
+
+  // 参考城市（灰色小标注）
+  const refCities = [
+    { name: '温州', lat: 28.0, lng: 120.7 },
+    { name: '福州', lat: 26.1, lng: 119.3 },
+    { name: '泉州', lat: 24.9, lng: 118.6 },
+    { name: '汕头', lat: 23.4, lng: 116.7 },
+    { name: '高雄', lat: 22.6, lng: 120.3 },
+    { name: '台北', lat: 25.0, lng: 121.5 },
+    { name: '基隆', lat: 25.1, lng: 121.7 },
+    { name: '冲绳', lat: 26.3, lng: 127.8 },
+  ]
+  refCities.forEach(city => {
+    L.circleMarker([city.lat, city.lng], {
+      radius: 3,
+      color: 'rgba(255,255,255,0.5)',
+      weight: 1,
+      fillColor: 'rgba(255,255,255,0.3)',
+      fillOpacity: 0.8,
+    })
+      .addTo(routeMap)
+      .bindTooltip(city.name, {
+        permanent: true,
+        direction: 'right',
+        offset: [6, 0],
+        className: 'ref-city-label',
+      })
+  })
+
+}
+
 // ── 聊天相关 ──
 const showChatModal = ref(false)
-const chatMessages = ref([])  // { role, text, status? }
+const chatMessages = ref([])
 const chatInput = ref('')
 const isLoading = ref(false)
 let chatAbortController = null
@@ -129,7 +312,6 @@ const sendChatMessage = async () => {
   const botIdx = chatMessages.value.length - 1
   chatScrollToBottom()
 
-  // 构建历史
   const history = chatMessages.value
     .slice(0, -2)
     .filter(m => m.text)
@@ -182,11 +364,6 @@ const clickDataSource = (source) => {
   }
 }
 const isSourceClicked = (name) => clickedSources.value.has(name)
-
-// ── 综合视图 ──
-const goToMapView = () => {
-  window.open('https://www.openstreetmap.org/export/embed.html?bbox=115,20,130,35&layer=mapnik', '_blank')
-}
 
 // ── 生成报告 ──
 const generateReport = async () => {
@@ -281,6 +458,10 @@ const shareToQQ = () => {
 
 // ── GSAP 入场动画 ──
 onMounted(() => {
+  setTimeout(() => {
+    initRouteMap()
+  }, 100)
+
   const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
 
   tl.from('.agent-search-metrics .metric-card', {
@@ -336,60 +517,48 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
             <header class="panel-header">
               <h2>航线优化地图</h2>
               <div class="tabs">
-                <button @click="goToMapView"><Navigation :size="14" /> 综合视图</button>
+                <button class="active">航线视图</button>
               </div>
             </header>
-            <div class="map-surface route-surface">
-              <span class="place p1">上海</span>
-              <span class="place p2">宁波</span>
-              <span class="place p3">台州</span>
-              <span class="place p4">厦门</span>
-              <span class="place p5">那霸</span>
-
-              <svg viewBox="0 0 100 60" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
-                    <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
-                  </linearGradient>
-                  <filter id="glowGreen">
-                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </defs>
-                <polyline class="route-alt-2" points="28,22 30,36 44,42 60,46 78,50" />
-                <polyline class="route-alt-2" points="18,12 34,18 48,22 61,25 77,31 90,40" />
-                <polyline class="route-main route-optimal" points="18,12 27,20 38,24 50,34 63,40 76,48 88,52" />
-                <g class="route-arrow">
-                  <polygon points="50,34 47,31 48,36" fill="#22c55e" />
-                  <polygon points="63,40 60,37 61,42" fill="#22c55e" />
-                  <polygon points="76,48 73,45 74,50" fill="#22c55e" />
-                </g>
-              </svg>
-
-              <div class="optimal-label">
-                <span class="route-name">A1</span>
-                <span class="route-tag-text">最优推荐</span>
+            <div class="map-wrapper">
+              <div id="route-leaflet-map" class="real-route-map"></div>
+              <div class="ocean-current-layer ocean-current-small">
+                <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+                  <path class="current-flow strong-current" d="M10 505 C160 445,320 365,520 255 S825 150,1000 90" />
+                  <path class="current-flow delay-a" d="M0 545 C165 470,320 405,510 325 S790 245,1000 175" />
+                  <path class="current-flow delay-b" d="M70 595 C235 515,420 425,610 305 S865 180,1000 75" />
+                  <path class="current-flow coastal-current" d="M115 575 C220 485,315 385,405 292" />
+                  <path class="current-flow coastal-current delay-c" d="M175 610 C260 525,345 430,438 345" />
+                  <path class="current-flow strong-current delay-d" d="M245 610 C450 500,660 350,1000 120" />
+                  <path class="current-flow delay-e" d="M35 360 C90 315,155 255,240 180" />
+                  <path class="current-flow delay-f" d="M540 465 C640 355,760 245,875 145" />
+                  <path class="current-flow thin-current" d="M315 570 C430 500,548 430,700 320 S900 210,980 140" />
+                  <path class="current-flow thin-current delay-b" d="M20 255 C125 225,230 195,365 120" />
+                  <path class="current-flow thin-current delay-e" d="M640 585 C700 490,770 405,910 305" />
+                  <path class="current-flow thin-current delay-c" d="M470 590 C560 505,680 415,795 315" />
+                </svg>
+                <div class="ocean-particles small-particles">
+                  <span
+                    v-for="i in 70"
+                    :key="i"
+                    :style="{
+                      left: ((i * 37) % 100) + '%',
+                      top: ((i * 23) % 100) + '%',
+                      animationDelay: -((i * 0.17) % 6).toFixed(2) + 's',
+                      animationDuration: (6 + (i % 7)) + 's'
+                    }"
+                  ></span>
+                </div>
               </div>
-
-              <i class="danger-zone dz1"></i>
-              <i class="danger-zone dz2"></i>
-              <i class="weather-zone wz1"></i>
-
-              <b class="port start">上海港</b>
-              <b class="port end">那霸港</b>
-
-              <div class="map-legend buoy-legend route-legend-small">
-                <span class="green">A1 最优</span>
-                <span class="blue">A2 备选</span>
-                <span class="route-alt-hint">A3 备选</span>
-                <span class="red">高风险</span>
-                <span class="amber">中风险</span>
-              </div>
+            </div>
+            <!-- 航线图例 -->
+            <div class="route-legend">
+              <span class="legend-item"><i class="legend-line legend-a1"></i> A1 最优</span>
+              <span class="legend-item"><i class="legend-line legend-a2"></i> A2 备选</span>
+              <span class="legend-item"><i class="legend-line legend-a3"></i> A3 备选</span>
+              <span class="legend-item"><i class="legend-dot legend-danger"></i> 高风险</span>
+              <span class="legend-item"><i class="legend-dot legend-warn"></i> 中风险</span>
+              <span class="legend-item"><i class="legend-dot legend-port"></i> 港口</span>
             </div>
           </section>
 
@@ -573,11 +742,8 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
                   <User v-if="msg.role === 'user'" :size="16" />
                   <Bot v-else :size="16" />
                 </div>
-                <!-- 用户消息 -->
                 <div v-if="msg.role === 'user'" class="message-content">{{ msg.text }}</div>
-                <!-- Bot：有文本 → Markdown -->
                 <div v-else-if="msg.text" class="message-content md-content" v-html="renderMarkdown(msg.text)"></div>
-                <!-- Bot：有状态 → 思考中 -->
                 <div v-else-if="msg.status" class="message-content loading">
                   <LoaderCircle :size="16" class="spinner" /> {{ msg.status }}
                 </div>
@@ -618,19 +784,145 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
 
 <style scoped>
 /* ── 航线主页特定样式 ── */
-
 .route-main-area.route-main-area {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-
 .route-aside.route-aside {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+/* ── Leaflet 地图容器 ── */
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 282px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.map-wrapper .real-route-map {
+  height: 100%;
+}
+.real-route-map {
+  position: relative;
+  width: 100%;
+  height: 282px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 144, 220, .45);
+}
+
+/* Leaflet 控件样式 */
+.real-route-map :deep(.leaflet-control-zoom a) {
+  background: rgba(5, 28, 55, .95);
+  color: #fff;
+  border-color: rgba(86, 171, 255, .8);
+}
+.real-route-map :deep(.leaflet-popup-content-wrapper) {
+  background: rgba(5, 24, 48, .95);
+  color: #fff;
+  border: 1px solid rgba(48, 145, 255, .65);
+}
+.real-route-map :deep(.leaflet-popup-tip) {
+  background: rgba(5, 24, 48, .95);
+}
+
+/* 航线发光效果 */
+:deep(.route-glow-line) {
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, .8)) drop-shadow(0 0 14px rgba(34, 197, 94, .4));
+}
+
+/* 港口标注 */
+:deep(.port-label) {
+  background: rgba(5, 24, 48, .88);
+  border: 1px solid rgba(59, 130, 246, .7);
+  color: #fff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  box-shadow: 0 0 12px rgba(59, 130, 246, .3);
+  font-size: 12px;
+  font-weight: 600;
+}
+:deep(.port-label-small) {
+  background: rgba(5, 24, 48, .8);
+  border: 1px solid rgba(59, 130, 246, .4);
+  color: #b9d6ee;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+/* 城市标注 */
+:deep(.city-label) {
+  background: rgba(5, 24, 48, .85);
+  border: 1px solid rgba(34, 197, 94, .6);
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 11px;
+  box-shadow: 0 0 8px rgba(34, 197, 94, .2);
+}
+:deep(.ref-city-label) {
+  background: rgba(5, 24, 48, .7);
+  border: 1px solid rgba(255, 255, 255, .15);
+  color: rgba(255, 255, 255, .6);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+/* 地图滤镜 */
+.real-route-map :deep(.leaflet-tile) {
+  filter: saturate(1.15) brightness(0.95) contrast(1.08);
+}
+.real-route-map :deep(.leaflet-marker-pane),
+.real-route-map :deep(.leaflet-overlay-pane),
+.real-route-map :deep(.leaflet-popup-pane),
+.real-route-map :deep(.leaflet-tooltip-pane) {
+  position: relative;
+  z-index: 600;
+}
+.real-route-map :deep(.leaflet-control-container) {
+  position: relative;
+  z-index: 700;
+}
+
+/* ── 航线图例 ── */
+.route-legend {
+  display: flex;
+  gap: 16px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #b9d6ee;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-line {
+  display: inline-block;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+}
+.legend-a1 { background: #22c55e; }
+.legend-a2 { background: #6b7280; opacity: .7; }
+.legend-a3 { background: #ec4899; opacity: .7; }
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.legend-danger { background: #ef4444; }
+.legend-warn { background: #f59e0b; }
+.legend-port { background: #3b82f6; }
+
+/* ── 指标悬浮 ── */
 .metric-item-hover {
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -659,22 +951,9 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
   border: 1px solid rgba(92, 171, 255, 0.4);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
-.metric-tooltip strong {
-  display: block;
-  margin-bottom: 6px;
-  color: #60a5fa;
-  font-size: 13px;
-}
-.metric-tooltip p {
-  margin: 3px 0;
-  color: #b9d4ea;
-  font-size: 11px;
-}
-.metric-item-hover:hover .metric-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
+.metric-tooltip strong { display: block; margin-bottom: 6px; color: #60a5fa; font-size: 13px; }
+.metric-tooltip p { margin: 3px 0; color: #b9d4ea; font-size: 11px; }
+.metric-item-hover:hover .metric-tooltip { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 .metric-item-hover .metric-tooltip::after {
   content: '';
   position: absolute;
@@ -683,111 +962,6 @@ onUnmounted(() => { if (chatAbortController) chatAbortController.abort() })
   transform: translateX(-50%);
   border: 8px solid transparent;
   border-top-color: rgba(6, 28, 54, 0.95);
-}
-
-/* ── 航线地图 ── */
-.route-alt-hint {
-  display: inline-flex;
-  align-items: center;
-}
-.route-alt-hint::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 2px;
-  margin-right: 6px;
-  background: #ec4899;
-  border-radius: 1px;
-}
-.route-legend-small {
-  padding: 6px 8px !important;
-  font-size: 10px !important;
-  width: 90px !important;
-  gap: 4px !important;
-}
-.route-legend-small strong { display: none; }
-.route-legend-small span { margin: 1px 0; }
-
-.optimal-label {
-  position: absolute;
-  left: 40%;
-  top: 32%;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
-}
-.optimal-label .route-name { font-size: 14px; font-weight: bold; }
-.optimal-label .route-tag-text { font-size: 9px; opacity: 0.9; }
-
-.route-optimal {
-  stroke: #22c55e !important;
-  stroke-width: 0.8 !important;
-  filter: url(#glowGreen) !important;
-}
-.route-alt-2 {
-  stroke: #6b7280;
-  stroke-width: 0.3;
-  fill: none;
-  stroke-dasharray: 2,1;
-  opacity: 0.5;
-}
-
-.map-legend .green {
-  color: #22c55e !important;
-  font-weight: bold;
-}
-.map-legend .green::before {
-  background: #22c55e !important;
-}
-
-.ocean-map .tabs button {
-  min-height: 34px;
-  border: 1px solid rgba(75, 143, 210, 0.42);
-  border-radius: 7px;
-  color: #d9efff;
-  background: rgba(5, 28, 55, 0.8);
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-.ocean-map .tabs button:hover {
-  background: rgba(20, 60, 100, 0.8);
-  border-color: rgba(75, 143, 210, 0.6);
-}
-
-/* ── 微面板 tabs ── */
-.micro-panel .tabs button,
-.trend-panel .tabs button {
-  min-height: 34px;
-  border: 1px solid rgba(75, 143, 210, 0.42);
-  border-radius: 7px;
-  color: #d9efff;
-  background: rgba(5, 28, 55, 0.8);
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.micro-panel .tabs button:hover,
-.trend-panel .tabs button:hover {
-  background: rgba(20, 60, 100, 0.8);
-  border-color: rgba(75, 143, 210, 0.6);
 }
 
 /* ── 趋势图 ── */

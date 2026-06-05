@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick } from 'vue'
 import { Anchor, Bot, FileText, Fish, RadioTower, Settings, Share2, ShieldCheck, Database, Globe, Cloud } from 'lucide-vue-next'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
+import AppModal from '../components/common/AppModal.vue'
 
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -472,7 +473,7 @@ onMounted(() => {
         <div class="fishery-main-area">
           <!-- 渔场适宜性分布（Leaflet 地图） -->
           <section class="panel ocean-map fishery-map">
-            <header class="panel-header"><h2>渔场适宜性分布</h2><div class="tabs"><button class="active">表层(0-10m)</button><button @click="openSuitabilityMap">适宜度综合</button></div></header>
+            <header class="panel-header"><h2>渔场适宜性分布</h2><div class="tabs"><button @click="openSuitabilityMap">适宜度综合</button></div></header>
             <div class="map-wrapper">
               <div id="hainan-map" class="real-hainan-map"></div>
               <div class="ocean-current-layer ocean-current-small">
@@ -508,7 +509,7 @@ onMounted(() => {
 
           <!-- 关键评估指标 -->
           <section class="panel micro-panel">
-            <header class="panel-header"><h2>关键评估指标</h2><div class="tabs"><button>表层</button><button>24小时</button></div></header>
+            <header class="panel-header"><h2>关键评估指标</h2><div class="tabs"><button> 24小时 </button></div></header>
             <div class="micro-grid">
               <article
                 v-for="item in indicators"
@@ -665,167 +666,137 @@ onMounted(() => {
     </div>
 
     <!-- 渔场排行弹窗 -->
-    <div v-if="showMoreRanking" class="modal-overlay" @click="showMoreRanking = false">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>渔场排行详情（共 {{ fullRankingData.length }} 个渔场）</h3>
-          <button class="close-btn" @click="showMoreRanking = false">×</button>
-        </div>
-        <div class="modal-body-scroll">
-          <table class="full-table">
-            <thead><tr><th>排名</th><th>渔场名称</th><th>综合适宜度</th><th>资源丰度</th><th>主要目标鱼种</th><th>最佳作业窗口</th></tr></thead>
-            <tbody>
-              <tr v-for="item in fullRankingData" :key="item.rank">
-                <td>{{ item.rank }}</td><td>{{ item.name }}</td><td>{{ item.suitability }}</td><td>{{ item.abundance }}</td><td>{{ item.fish }}</td><td>{{ item.window }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer"><button class="confirm-btn" @click="showMoreRanking = false">关闭</button></div>
+    <AppModal v-model:visible="showMoreRanking" :title="`渔场排行详情（共 ${fullRankingData.length} 个渔场）`" width="1000px">
+      <div class="modal-scroll">
+        <table class="full-table">
+          <thead><tr><th>排名</th><th>渔场名称</th><th>综合适宜度</th><th>资源丰度</th><th>主要目标鱼种</th><th>最佳作业窗口</th></tr></thead>
+          <tbody>
+            <tr v-for="item in fullRankingData" :key="item.rank">
+              <td>{{ item.rank }}</td><td>{{ item.name }}</td><td>{{ item.suitability }}</td><td>{{ item.abundance }}</td><td>{{ item.fish }}</td><td>{{ item.window }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
+      <template #footer>
+        <button class="confirm-btn" @click="showMoreRanking = false">关闭</button>
+      </template>
+    </AppModal>
 
     <!-- 模型运行状态弹窗 -->
-    <div v-if="showMoreModels" class="modal-overlay" @click="showMoreModels = false">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>模型运行状态（共 {{ modelDetails.length }} 个模型）</h3>
-          <button class="close-btn" @click="showMoreModels = false">×</button>
-        </div>
-        <div class="modal-body-scroll">
-          <table class="full-table">
-            <thead><tr><th>模型名称</th><th>状态</th><th>准确率</th><th>更新时间</th><th>描述</th></tr></thead>
-            <tbody>
-              <tr v-for="(item, idx) in modelDetails" :key="idx">
-                <td>{{ item.name }}</td>
-                <td><span :class="item.status === '运行中' ? 'status-running' : 'status-warning'">{{ item.status }}</span></td>
-                <td>{{ item.accuracy }}</td><td>{{ item.updateTime }}</td><td>{{ item.description }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer"><button class="confirm-btn" @click="showMoreModels = false">关闭</button></div>
+    <AppModal v-model:visible="showMoreModels" :title="`模型运行状态（共 ${modelDetails.length} 个模型）`" width="1000px">
+      <div class="modal-scroll">
+        <table class="full-table">
+          <thead><tr><th>模型名称</th><th>状态</th><th>准确率</th><th>更新时间</th><th>描述</th></tr></thead>
+          <tbody>
+            <tr v-for="(item, idx) in modelDetails" :key="idx">
+              <td>{{ item.name }}</td>
+              <td><span :class="item.status === '运行中' ? 'status-running' : 'status-warning'">{{ item.status }}</span></td>
+              <td>{{ item.accuracy }}</td><td>{{ item.updateTime }}</td><td>{{ item.description }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
+      <template #footer>
+        <button class="confirm-btn" @click="showMoreModels = false">关闭</button>
+      </template>
+    </AppModal>
 
     <!-- 目标鱼种分析弹窗 -->
-    <div v-if="showMoreFishTarget" class="modal-overlay" @click="showMoreFishTarget = false">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>目标鱼种分析（共 {{ fishTargetDetails.length }} 种）</h3>
-          <button class="close-btn" @click="showMoreFishTarget = false">×</button>
-        </div>
-        <div class="modal-body-scroll">
-          <table class="full-table">
-            <thead><tr><th>鱼种</th><th>资源丰度</th><th>趋势</th><th>占比</th><th>栖息地</th><th>最佳季节</th></tr></thead>
-            <tbody>
-              <tr v-for="(item, idx) in fishTargetDetails" :key="idx">
-                <td>{{ item.name }}</td><td>{{ item.abundance }}</td><td class="trend-up">{{ item.trend }}</td><td>{{ item.proportion }}</td><td>{{ item.habitat }}</td><td>{{ item.bestSeason }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer"><button class="confirm-btn" @click="showMoreFishTarget = false">关闭</button></div>
+    <AppModal v-model:visible="showMoreFishTarget" :title="`目标鱼种分析（共 ${fishTargetDetails.length} 种）`" width="900px">
+      <div class="modal-scroll">
+        <table class="full-table">
+          <thead><tr><th>鱼种</th><th>资源丰度</th><th>趋势</th><th>占比</th><th>栖息地</th><th>最佳季节</th></tr></thead>
+          <tbody>
+            <tr v-for="(item, idx) in fishTargetDetails" :key="idx">
+              <td>{{ item.name }}</td><td>{{ item.abundance }}</td><td class="trend-up">{{ item.trend }}</td><td>{{ item.proportion }}</td><td>{{ item.habitat }}</td><td>{{ item.bestSeason }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
+      <template #footer>
+        <button class="confirm-btn" @click="showMoreFishTarget = false">关闭</button>
+      </template>
+    </AppModal>
 
     <!-- 数据来源弹窗 -->
-    <div v-if="showMoreSources" class="modal-overlay" @click="showMoreSources = false">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>数据来源详情（共 {{ sourceDetails.length }} 个数据源）</h3>
-          <button class="close-btn" @click="showMoreSources = false">×</button>
-        </div>
-        <div class="modal-body-scroll">
-          <table class="full-table">
-            <thead><tr><th>数据源</th><th>状态</th><th>延迟</th><th>类型</th><th>覆盖范围</th><th>更新频率</th></tr></thead>
-            <tbody>
-              <tr v-for="(item, idx) in sourceDetails" :key="idx">
-                <td>{{ item.name }}</td><td><span class="status-running">{{ item.status }}</span></td><td>{{ item.delay }}</td><td>{{ item.type }}</td><td>{{ item.coverage }}</td><td>{{ item.updateFreq }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer"><button class="confirm-btn" @click="showMoreSources = false">关闭</button></div>
+    <AppModal v-model:visible="showMoreSources" :title="`数据来源详情（共 ${sourceDetails.length} 个数据源）`" width="900px">
+      <div class="modal-scroll">
+        <table class="full-table">
+          <thead><tr><th>数据源</th><th>状态</th><th>延迟</th><th>类型</th><th>覆盖范围</th><th>更新频率</th></tr></thead>
+          <tbody>
+            <tr v-for="(item, idx) in sourceDetails" :key="idx">
+              <td>{{ item.name }}</td><td><span class="status-running">{{ item.status }}</span></td><td>{{ item.delay }}</td><td>{{ item.type }}</td><td>{{ item.coverage }}</td><td>{{ item.updateFreq }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
+      <template #footer>
+        <button class="confirm-btn" @click="showMoreSources = false">关闭</button>
+      </template>
+    </AppModal>
 
     <!-- 智能作业建议弹窗 -->
-    <div v-if="showMoreAdvice" class="modal-overlay" @click="showMoreAdvice = false">
-      <div class="modal-content modal-advice" @click.stop>
-        <div class="modal-header">
-          <h3>智能作业建议（共 {{ adviceDetails.length }} 条）</h3>
-          <button class="close-btn" @click="showMoreAdvice = false">×</button>
-        </div>
-        <div class="modal-body-scroll">
-          <div class="advice-grid">
-            <div v-for="(item, idx) in adviceDetails" :key="idx" class="advice-card" :class="`priority-${item.priority === '高' ? 'high' : item.priority === '中' ? 'mid' : 'low'}`">
-              <div class="advice-header">
-                <component :is="item.icon === 'Anchor' ? Anchor : item.icon === 'ShieldCheck' ? ShieldCheck : item.icon === 'Fish' ? Fish : item.icon === 'RadioTower' ? RadioTower : item.icon === 'Settings' ? Settings : item.icon === 'Database' ? Database : item.icon === 'Globe' ? Globe : Cloud" :size="20" />
-                <strong>{{ item.title }}</strong>
-                <span class="priority-tag">{{ item.priority }}优先级</span>
-              </div>
-              <p class="advice-content">{{ item.content }}</p>
-            </div>
+    <AppModal v-model:visible="showMoreAdvice" :title="`智能作业建议（共 ${adviceDetails.length} 条）`" width="800px">
+      <div class="advice-grid">
+        <div v-for="(item, idx) in adviceDetails" :key="idx" class="advice-card" :class="`priority-${item.priority === '高' ? 'high' : item.priority === '中' ? 'mid' : 'low'}`">
+          <div class="advice-header">
+            <component :is="item.icon === 'Anchor' ? Anchor : item.icon === 'ShieldCheck' ? ShieldCheck : item.icon === 'Fish' ? Fish : item.icon === 'RadioTower' ? RadioTower : item.icon === 'Settings' ? Settings : item.icon === 'Database' ? Database : item.icon === 'Globe' ? Globe : Cloud" :size="20" />
+            <strong>{{ item.title }}</strong>
+            <span class="priority-tag">{{ item.priority }}优先级</span>
           </div>
+          <p class="advice-content">{{ item.content }}</p>
         </div>
-        <div class="modal-footer"><button class="confirm-btn" @click="showMoreAdvice = false">关闭</button></div>
       </div>
-    </div>
+      <template #footer>
+        <button class="confirm-btn" @click="showMoreAdvice = false">关闭</button>
+      </template>
+    </AppModal>
 
     <!-- 生成报告弹窗 -->
-    <div v-if="showReportDialog" class="modal-overlay" @click="showReportDialog = false">
-      <div class="modal-content report-modal" @click.stop>
-        <div class="modal-header">
-          <h3>生成评估报告</h3>
-          <button class="close-btn" @click="showReportDialog = false">×</button>
-        </div>
-        <div class="modal-body-scroll">
-          <div class="report-form">
-            <div class="form-group">
-              <label>报告类型</label>
-              <div class="report-type-buttons">
-                <button v-for="type in reportTypes" :key="type" :class="['type-btn', { active: reportConfig.type === type }]" @click="reportConfig.type = type">{{ type }}</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>时间范围</label>
-              <select v-model="reportConfig.timeRange" class="time-select">
-                <option v-for="range in timeRanges" :key="range" :value="range">{{ range }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>输出格式</label>
-              <div class="format-options">
-                <label class="format-option"><input type="radio" value="PDF" v-model="reportConfig.format"> PDF文档</label>
-                <label class="format-option"><input type="radio" value="Excel" v-model="reportConfig.format"> Excel表格</label>
-                <label class="format-option"><input type="radio" value="Word" v-model="reportConfig.format"> Word文档</label>
-                <label class="format-option"><input type="radio" value="HTML" v-model="reportConfig.format"> 在线预览</label>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>包含内容</label>
-              <div class="content-options">
-                <label class="content-option"><input type="checkbox" v-model="reportConfig.includeCharts"> 包含图表分析</label>
-                <label class="content-option"><input type="checkbox" v-model="reportConfig.includeData"> 包含原始数据</label>
-              </div>
-            </div>
-            <div class="report-preview">
-              <h4>报告预览</h4>
-              <div class="preview-stats">
-                <div class="stat-item"><span class="stat-label">预计页数</span><span class="stat-value">{{ reportConfig.includeCharts && reportConfig.includeData ? '8-10' : '4-6' }}页</span></div>
-                <div class="stat-item"><span class="stat-label">数据量</span><span class="stat-value">约 {{ reportConfig.includeData ? '156' : '42' }}条数据</span></div>
-                <div class="stat-item"><span class="stat-label">图表数量</span><span class="stat-value">{{ reportConfig.includeCharts ? '12' : '0' }}个</span></div>
-              </div>
-            </div>
+    <AppModal v-model:visible="showReportDialog" title="生成评估报告" width="600px">
+      <div class="report-form">
+        <div class="form-group">
+          <label>报告类型</label>
+          <div class="report-type-buttons">
+            <button v-for="type in reportTypes" :key="type" :class="['type-btn', { active: reportConfig.type === type }]" @click="reportConfig.type = type">{{ type }}</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="cancel-btn" @click="showReportDialog = false">取消</button>
-          <button class="generate-btn" @click="generateReport" :disabled="isGenerating">{{ isGenerating ? '生成中...' : '生成报告' }}</button>
+        <div class="form-group">
+          <label>时间范围</label>
+          <select v-model="reportConfig.timeRange" class="time-select">
+            <option v-for="range in timeRanges" :key="range" :value="range">{{ range }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>输出格式</label>
+          <div class="format-options">
+            <label class="format-option"><input type="radio" value="PDF" v-model="reportConfig.format"> PDF文档</label>
+            <label class="format-option"><input type="radio" value="Excel" v-model="reportConfig.format"> Excel表格</label>
+            <label class="format-option"><input type="radio" value="Word" v-model="reportConfig.format"> Word文档</label>
+            <label class="format-option"><input type="radio" value="HTML" v-model="reportConfig.format"> 在线预览</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>包含内容</label>
+          <div class="content-options">
+            <label class="content-option"><input type="checkbox" v-model="reportConfig.includeCharts"> 包含图表分析</label>
+            <label class="content-option"><input type="checkbox" v-model="reportConfig.includeData"> 包含原始数据</label>
+          </div>
+        </div>
+        <div class="report-preview">
+          <h4>报告预览</h4>
+          <div class="preview-stats">
+            <div class="stat-item"><span class="stat-label">预计页数</span><span class="stat-value">{{ reportConfig.includeCharts && reportConfig.includeData ? '8-10' : '4-6' }}页</span></div>
+            <div class="stat-item"><span class="stat-label">数据量</span><span class="stat-value">约 {{ reportConfig.includeData ? '156' : '42' }}条数据</span></div>
+            <div class="stat-item"><span class="stat-label">图表数量</span><span class="stat-value">{{ reportConfig.includeCharts ? '12' : '0' }}个</span></div>
+          </div>
         </div>
       </div>
-    </div>
+      <template #footer>
+        <button class="cancel-btn" @click="showReportDialog = false">取消</button>
+        <button class="generate-btn" @click="generateReport" :disabled="isGenerating">{{ isGenerating ? '生成中...' : '生成报告' }}</button>
+      </template>
+    </AppModal>
   </section>
 </template>
 
@@ -1130,65 +1101,8 @@ onMounted(() => {
 .blue-trend { color: #38bdf8; stroke: currentColor; }
 .green-line { color: #34d399; stroke: currentColor; }
 
-/* ── 弹窗 ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  overflow-y: auto;
-  padding: 40px 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  background: rgba(3, 17, 61, .52);
-  z-index: 1000;
-}
-.modal-content {
-  background: rgb(27, 63, 103);
-  border-radius: 16px;
-  width: 90%;
-  max-width: 1000px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.modal-advice { max-width: 800px; }
-.report-modal { max-width: 600px; }
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(39, 151, 255, 0.12);
-  flex-shrink: 0;
-  color: #fff;
-}
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #fff;
-  opacity: .7;
-}
-.close-btn:hover { opacity: 1; }
-.modal-body-scroll {
-  flex: 1;
-  min-height: 0;
-  max-height: calc(80vh - 120px);
-  overflow-y: auto;
-  overflow-x: auto;
-  padding: 0 20px;
-}
-.modal-body-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-.modal-body-scroll::-webkit-scrollbar-track { background: #1e375b; border-radius: 4px; }
-.modal-body-scroll::-webkit-scrollbar-thumb { background: #5a9bd8; border-radius: 4px; }
-.modal-footer {
-  padding: 12px 20px;
-  border-top: 1px solid rgba(39, 151, 255, 0.12);
-  text-align: right;
-  flex-shrink: 0;
-}
+/* ── 弹窗内容 ── */
+.modal-scroll { overflow-x: auto; }
 .full-table { width: 100%; min-width: 700px; border-collapse: collapse; }
 .full-table th, .full-table td { padding: 12px 10px; border-bottom: 1px solid rgba(39, 151, 255, 0.12); text-align: left; color: #b9d6ee; }
 .full-table th { position: sticky; top: 0; z-index: 1; font-weight: 600; color: #fff; background: rgba(7, 28, 52, 0.98); }
@@ -1249,10 +1163,4 @@ onMounted(() => {
   color: rgba(226, 245, 255, .72);
 }
 
-/* ── 过渡动画 ── */
-.modal-fade-enter-active, .modal-fade-leave-active { transition: opacity 0.35s ease; }
-.modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; }
-.modal-fade-enter-active .big-map-dialog, .modal-fade-leave-active .big-map-dialog { transition: transform 0.35s ease, opacity 0.35s ease; }
-.modal-fade-enter-from .big-map-dialog, .modal-fade-leave-to .big-map-dialog { transform: translateY(28px) scale(0.96); opacity: 0; }
-.modal-fade-enter-to .big-map-dialog, .modal-fade-leave-from .big-map-dialog { transform: translateY(0) scale(1); opacity: 1; }
 </style>

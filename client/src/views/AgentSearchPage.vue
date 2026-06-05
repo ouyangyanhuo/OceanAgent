@@ -74,10 +74,10 @@ onMounted(() => {
           <div class="page-hero-icon"><Search :size="28" /></div>
           <div class="page-hero-text">
             <h1>智能体检索</h1>
-            <p>检索并调用海洋智能体，执行监测、分析、预测等任务</p>
+            <p>检索并调用海洋智能体，执行监测、分析、预测等任务，自动调用无需手动开启。</p>
           </div>
           <div class="page-hero-meta">
-            <span class="meta-badge"><Bot :size="14" /> {{ dashboard.data.agents.length }} 个智能体</span>
+            <span class="meta-badge"><Bot :size="14" />已自动调用 {{ dashboard.data.agents.length }} 个智能体</span>
           </div>
         </div>
 
