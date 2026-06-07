@@ -1,50 +1,50 @@
 {
   "notifications": [
     {
-      "id": "5d2bf1f9be01",
+      "id": "542afd243837",
       "type": "graph_expansion",
       "title": "图谱扩展完成",
-      "message": "节点「长江入海径流变化」的 risk_factors 扩展已完成，新增 4 个节点和 4 条边",
+      "message": "节点「2025年浙江近海赤潮事件」的 related_events 扩展已完成，新增 3 个节点和 3 条边",
       "read": false,
-      "created_at": "2026-06-05T12:02:42.422583",
-      "related_node_id": "risk_factor_11909304"
+      "created_at": "2026-06-07T11:27:56.904499",
+      "related_node_id": "red_tide_event_90013806"
     },
     {
-      "id": "f0c118ad4bad",
+      "id": "b2b5da063d88",
       "type": "graph_expansion",
       "title": "图谱扩展完成",
-      "message": "节点「东海北部初级生产力水平」的 ecological_species 扩展已完成，新增 4 个节点和 4 条边",
+      "message": "节点「中国毛虾」的 related_events 扩展已完成，新增 2 个节点和 2 条边",
       "read": false,
-      "created_at": "2026-06-05T12:02:06.185089",
-      "related_node_id": "observation_ba82c622"
+      "created_at": "2026-06-07T11:27:33.795823",
+      "related_node_id": "species_d13f4ae7"
     },
     {
-      "id": "d16edabbe560",
-      "type": "node_connected",
-      "title": "节点连接完成",
-      "message": "已通过桥梁节点「东海赤潮事件」连接「东海赤潮风险因子」和「舟山渔场产卵保护区」",
+      "id": "db6b1306a87e",
+      "type": "graph_expansion",
+      "title": "图谱扩展完成",
+      "message": "节点「东海浮标B01」的 ecological_species 扩展已完成，新增 3 个节点和 3 条边",
       "read": false,
-      "created_at": "2026-06-05T12:00:14.843436",
-      "related_node_id": "red_tide_event_f327a26e"
+      "created_at": "2026-06-07T11:27:14.571486",
+      "related_node_id": "buoy_4129921a"
     },
     {
-      "id": "d435785c028f",
+      "id": "c97304832e27",
       "type": "node_connected",
       "title": "节点连接完成",
-      "message": "已通过桥梁节点「东海赤潮风险因子」连接「东海浮标C02」和「东海北部浮标D01」",
-      "read": true,
-      "created_at": "2026-06-05T11:56:23.687488",
-      "related_node_id": "risk_factor_8d820d63"
+      "message": "已通过桥梁节点「舟山渔场」连接「东海北部初级生产力水平」和「长江口海域盐度分布」",
+      "read": false,
+      "created_at": "2026-06-07T11:25:53.446580",
+      "related_node_id": "fishery_area_196d437c"
     },
     {
-      "id": "e05441ac3fdc",
-      "type": "node_connected",
-      "title": "节点连接完成",
-      "message": "已通过桥梁节点「东海北部初级生产力水平」连接「东海北部叶绿素观测数据2025」和「舟山渔场产卵保护区」",
-      "read": true,
-      "created_at": "2026-06-05T11:55:39.329268",
-      "related_node_id": "observation_ba82c622"
+      "id": "ca941263e11f",
+      "type": "graph_expansion",
+      "title": "图谱扩展完成",
+      "message": "节点「长江口盐水入侵」的 risk_factors 扩展已完成，新增 3 个节点和 3 条边",
+      "read": false,
+      "created_at": "2026-06-07T11:07:32.522237",
+      "related_node_id": "risk_factor_f6c1585e"
     }
   ],
-  "unread_count": 3
+  "unread_count": 5
 }

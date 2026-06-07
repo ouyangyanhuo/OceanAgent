@@ -1256,5 +1256,401 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_bbd6e979",
+    "source": "risk_factor_49ed2349",
+    "target": "red_tide_event_3ca53733",
+    "relation": "correlated_with",
+    "weight": 0.85,
+    "properties": {
+      "description": "陆源营养盐输入与2023年舟山海域赤潮事件高度相关"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_49ed2349",
+      "created_at": "2026-06-06T08:52:48",
+      "updated_at": "2026-06-06T08:52:48",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_f3a4965a",
+    "source": "risk_factor_49ed2349",
+    "target": "observation_a93d3d22",
+    "relation": "correlated_with",
+    "weight": 0.9,
+    "properties": {
+      "description": "陆源营养盐输入导致营养盐浓度观测值偏高"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_49ed2349",
+      "created_at": "2026-06-06T08:52:48",
+      "updated_at": "2026-06-06T08:52:48",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_61b03fac",
+    "source": "observation_d14df4a0",
+    "target": "risk_factor_f6c1585e",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "盐度分布观测指示盐水入侵程度。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_3bfe7e9f",
+    "source": "observation_d14df4a0",
+    "target": "risk_factor_d91af91b",
+    "relation": "indicates",
+    "weight": 0.7,
+    "properties": {
+      "description": "盐度分布影响营养盐输运路径。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_a393ac09",
+    "source": "observation_d14df4a0",
+    "target": "prevention_measure_429e0a05",
+    "relation": "mitigated_by",
+    "weight": 0.6,
+    "properties": {
+      "description": "盐度分布监测可辅助缓解盐水入侵风险。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_b48c8876",
+    "source": "observation_d14df4a0",
+    "target": "risk_factor_d230d553",
+    "relation": "indicates",
+    "weight": 0.6,
+    "properties": {
+      "description": "盐度层化程度指示底层缺氧风险。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_55ee9102",
+    "source": "species_32d00d03",
+    "target": "species_0f546336",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "中肋骨条藻与尖刺拟菱形藻同为近海常见硅藻，常在同一水域共存"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_32d00d03",
+      "created_at": "2026-06-07T02:50:08",
+      "updated_at": "2026-06-07T02:50:08",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_8e699f74",
+    "source": "species_32d00d03",
+    "target": "risk_factor_4a820236",
+    "relation": "suitable_for",
+    "weight": 0.9,
+    "properties": {
+      "description": "高营养盐浓度促进中肋骨条藻快速增殖"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_32d00d03",
+      "created_at": "2026-06-07T02:50:08",
+      "updated_at": "2026-06-07T02:50:08",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_a833d9ca",
+    "source": "species_32d00d03",
+    "target": "fishery_area_578d7bc7",
+    "relation": "affected_by",
+    "weight": 0.6,
+    "properties": {
+      "description": "中肋骨条藻赤潮爆发会影响黄海渔场的水质和渔业生产"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_32d00d03",
+      "created_at": "2026-06-07T02:50:08",
+      "updated_at": "2026-06-07T02:50:08",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_f8dea829",
+    "source": "risk_factor_f6c1585e",
+    "target": "risk_factor_d230d553",
+    "relation": "may_trigger",
+    "weight": 0.7,
+    "properties": {
+      "description": "盐水入侵增强水体层化，阻碍底层水体交换，可能引发底层缺氧。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_f6c1585e",
+      "created_at": "2026-06-07T03:07:31",
+      "updated_at": "2026-06-07T03:07:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_e8615d4c",
+    "source": "risk_factor_f6c1585e",
+    "target": "prevention_measure_6baa348f",
+    "relation": "mitigated_by",
+    "weight": 0.8,
+    "properties": {
+      "description": "三峡水库调水增加径流量，有效缓解盐水入侵。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_f6c1585e",
+      "created_at": "2026-06-07T03:07:31",
+      "updated_at": "2026-06-07T03:07:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_417bd2be",
+    "source": "risk_factor_f6c1585e",
+    "target": "prevention_measure_9a5b9da9",
+    "relation": "mitigated_by",
+    "weight": 0.6,
+    "properties": {
+      "description": "实时监测预警可提前预判盐水入侵趋势，为调水决策提供依据。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_f6c1585e",
+      "created_at": "2026-06-07T03:07:31",
+      "updated_at": "2026-06-07T03:07:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_0cc0fb82",
+    "source": "observation_ba82c622",
+    "target": "fishery_area_196d437c",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "东海北部初级生产力水平间接指示舟山渔场的饵料基础状况，高初级生产力支撑高渔获量。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:25:53",
+      "updated_at": "2026-06-07T03:25:53",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_4a56af38",
+    "source": "fishery_area_196d437c",
+    "target": "observation_d14df4a0",
+    "relation": "affected_by",
+    "weight": 0.8,
+    "properties": {
+      "description": "舟山渔场生态环境受长江口海域盐度分布影响，盐度梯度变化影响水团混合和营养盐输送，进而影响渔场生物资源。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:25:53",
+      "updated_at": "2026-06-07T03:25:53",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_6bbb372a",
+    "source": "buoy_4129921a",
+    "target": "species_d13f4ae7",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "浮标监测的环境因子与中国毛虾资源量变化存在相关性。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-07T03:27:14",
+      "updated_at": "2026-06-07T03:27:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_e4e02e99",
+    "source": "buoy_4129921a",
+    "target": "risk_factor_f21c2b2e",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "浮标监测的高营养盐浓度可能源于养殖废水排放。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-07T03:27:14",
+      "updated_at": "2026-06-07T03:27:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_b7ad634f",
+    "source": "buoy_4129921a",
+    "target": "fishery_area_a24fd385",
+    "relation": "correlated_with",
+    "weight": 0.5,
+    "properties": {
+      "description": "东海浮标B01的观测数据可用于评估闽东渔场的环境条件。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-07T03:27:14",
+      "updated_at": "2026-06-07T03:27:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_2e587ac3",
+    "source": "species_d13f4ae7",
+    "target": "red_tide_event_90013806",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "中国毛虾资源量在赤潮期间显著下降，表明赤潮事件对其种群有负面影响。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_d13f4ae7",
+      "created_at": "2026-06-07T03:27:33",
+      "updated_at": "2026-06-07T03:27:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_bc44f872",
+    "source": "species_d13f4ae7",
+    "target": "observation_a035a7e8",
+    "relation": "indicates",
+    "weight": 0.5,
+    "properties": {
+      "description": "叶绿素异常可作为中国毛虾饵料环境变化的指示。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_d13f4ae7",
+      "created_at": "2026-06-07T03:27:33",
+      "updated_at": "2026-06-07T03:27:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_ba185b50",
+    "source": "red_tide_event_90013806",
+    "target": "observation_0fc657bb",
+    "relation": "indicates",
+    "weight": 0.9,
+    "properties": {
+      "description": "叶绿素浓度异常是赤潮事件的直接指示信号。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_90013806",
+      "created_at": "2026-06-07T03:27:56",
+      "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_49206be4",
+    "source": "red_tide_event_90013806",
+    "target": "red_tide_event_796017aa",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "两起赤潮事件均发生在浙江近海，具有相似的环境驱动因素。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_90013806",
+      "created_at": "2026-06-07T03:27:56",
+      "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_6eb17d7b",
+    "source": "red_tide_event_90013806",
+    "target": "observation_896d181f",
+    "relation": "indicates",
+    "weight": 0.8,
+    "properties": {
+      "description": "海水温度升高是赤潮事件的重要诱因之一。"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_90013806",
+      "created_at": "2026-06-07T03:27:56",
+      "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

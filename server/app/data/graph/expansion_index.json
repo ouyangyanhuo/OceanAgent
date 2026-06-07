@@ -207,5 +207,129 @@
     "summary": "扩展了长江入海径流变化的风险因子节点，增加了两个观测（营养盐浓度、盐度分布）、一个风险因子（营养盐输入）和一个防治措施（污染物减排），并建立了指示、触发和缓解关系。",
     "created_at": "2026-06-05T04:02:42",
     "updated_at": "2026-06-05T04:02:42"
+  },
+  "risk_factor_49ed2349:related_events": {
+    "node_id": "risk_factor_49ed2349",
+    "expand_type": "related_events",
+    "expanded": true,
+    "generated_node_ids": [
+      "red_tide_event_3ca53733",
+      "observation_a93d3d22"
+    ],
+    "generated_edge_ids": [
+      "edge_bbd6e979",
+      "edge_f3a4965a"
+    ],
+    "summary": "扩展了与陆源营养盐输入相关的赤潮事件和营养盐观测节点，建立了相关关系。",
+    "created_at": "2026-06-06T08:52:49",
+    "updated_at": "2026-06-06T08:52:49"
+  },
+  "observation_d14df4a0:risk_factors": {
+    "node_id": "observation_d14df4a0",
+    "expand_type": "risk_factors",
+    "expanded": true,
+    "generated_node_ids": [
+      "risk_factor_f6c1585e",
+      "risk_factor_d91af91b",
+      "prevention_measure_429e0a05",
+      "risk_factor_d230d553"
+    ],
+    "generated_edge_ids": [
+      "edge_61b03fac",
+      "edge_3bfe7e9f",
+      "edge_a393ac09",
+      "edge_b48c8876"
+    ],
+    "summary": "基于长江口海域盐度分布观测，扩展了三个相关风险因子（盐水入侵、营养盐分布、底层缺氧风险）和一个预防措施（盐度实时监控系统），通过indicates和mitigated_by关系连接。",
+    "created_at": "2026-06-07T02:38:31",
+    "updated_at": "2026-06-07T02:38:31"
+  },
+  "species_32d00d03:ecological_species": {
+    "node_id": "species_32d00d03",
+    "expand_type": "ecological_species",
+    "expanded": true,
+    "generated_node_ids": [
+      "species_0f546336",
+      "risk_factor_4a820236",
+      "fishery_area_578d7bc7"
+    ],
+    "generated_edge_ids": [
+      "edge_55ee9102",
+      "edge_8e699f74",
+      "edge_a833d9ca"
+    ],
+    "summary": "扩展了与中肋骨条藻相关的物种（尖刺拟菱形藻）、风险因子（营养盐浓度异常升高）和渔业区域（黄海渔场），并建立了关联关系。",
+    "created_at": "2026-06-07T02:50:08",
+    "updated_at": "2026-06-07T02:50:08"
+  },
+  "risk_factor_f6c1585e:risk_factors": {
+    "node_id": "risk_factor_f6c1585e",
+    "expand_type": "risk_factors",
+    "expanded": true,
+    "generated_node_ids": [
+      "risk_factor_d230d553",
+      "prevention_measure_6baa348f",
+      "prevention_measure_9a5b9da9"
+    ],
+    "generated_edge_ids": [
+      "edge_f8dea829",
+      "edge_e8615d4c",
+      "edge_417bd2be"
+    ],
+    "summary": "为长江口盐水入侵风险因素扩展了三个相关节点：一个可能触发的次生风险（底层缺氧），两个缓解措施（调水工程和监测预警系统），并建立了相应的因果关系。",
+    "created_at": "2026-06-07T03:07:32",
+    "updated_at": "2026-06-07T03:07:32"
+  },
+  "buoy_4129921a:ecological_species": {
+    "node_id": "buoy_4129921a",
+    "expand_type": "ecological_species",
+    "expanded": true,
+    "generated_node_ids": [
+      "species_d13f4ae7",
+      "risk_factor_f21c2b2e",
+      "fishery_area_a24fd385"
+    ],
+    "generated_edge_ids": [
+      "edge_6bbb372a",
+      "edge_e4e02e99",
+      "edge_b7ad634f"
+    ],
+    "summary": "扩展了与中国毛虾、养殖废水排放和闽东渔场相关的三个节点，并建立了与东海浮标B01的相关性边。",
+    "created_at": "2026-06-07T03:27:14",
+    "updated_at": "2026-06-07T03:27:14"
+  },
+  "species_d13f4ae7:related_events": {
+    "node_id": "species_d13f4ae7",
+    "expand_type": "related_events",
+    "expanded": true,
+    "generated_node_ids": [
+      "red_tide_event_90013806",
+      "observation_a035a7e8"
+    ],
+    "generated_edge_ids": [
+      "edge_2e587ac3",
+      "edge_bc44f872"
+    ],
+    "summary": "为中国毛虾节点添加了2025年浙江近海赤潮事件和叶绿素异常观测，反映了赤潮事件对该物种的影响。",
+    "created_at": "2026-06-07T03:27:33",
+    "updated_at": "2026-06-07T03:27:33"
+  },
+  "red_tide_event_90013806:related_events": {
+    "node_id": "red_tide_event_90013806",
+    "expand_type": "related_events",
+    "expanded": true,
+    "generated_node_ids": [
+      "observation_0fc657bb",
+      "red_tide_event_796017aa",
+      "observation_896d181f"
+    ],
+    "generated_edge_ids": [
+      "edge_ba185b50",
+      "edge_49206be4",
+      "edge_6eb17d7b"
+    ],
+    "summary": "为2025年浙江近海赤潮事件扩展了相关叶绿素异常观测、历史赤潮事件和温度异常观测，共3个节点和3条边。",
+    "created_at": "2026-06-07T03:27:56",
+    "updated_at": "2026-06-07T03:27:56"
   }
 }

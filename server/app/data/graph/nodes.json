@@ -25,12 +25,14 @@
     "properties": {
       "description": "来自河流和沿岸排放的氮磷营养盐，是赤潮的主要诱因之一"
     },
-    "expanded": {},
+    "expanded": {
+      "related_events": true
+    },
     "metadata": {
       "source": "seed",
       "parent_node": null,
       "created_at": "2026-06-04T05:49:17",
-      "updated_at": "2026-06-04T05:49:17",
+      "updated_at": "2026-06-06T08:52:48",
       "version": 1,
       "locked": true
     }
@@ -216,12 +218,14 @@
     "properties": {
       "description": "部署于东海浙江近海的海洋环境监测浮标，实时监测水温、盐度、叶绿素等参数。"
     },
-    "expanded": {},
+    "expanded": {
+      "ecological_species": true
+    },
     "metadata": {
       "source": "generated",
       "parent_node": "red_tide_event_981af7e4",
       "created_at": "2026-06-04T05:53:40",
-      "updated_at": "2026-06-04T05:53:40",
+      "updated_at": "2026-06-07T03:27:14",
       "version": 1,
       "locked": true
     }
@@ -373,12 +377,14 @@
     "properties": {
       "description": "中国近海常见赤潮藻种，硅藻类，适宜水温15-25℃，盐度25-35‰，在富营养化水体中易爆发"
     },
-    "expanded": {},
+    "expanded": {
+      "ecological_species": true
+    },
     "metadata": {
       "source": "generated",
       "parent_node": "red_tide_event_f1374af3",
       "created_at": "2026-06-04T08:21:56",
-      "updated_at": "2026-06-04T08:21:56",
+      "updated_at": "2026-06-07T02:50:08",
       "version": 1,
       "locked": true
     }
@@ -997,12 +1003,14 @@
     "properties": {
       "description": "长江入海径流量变化导致河口盐度梯度变化，影响水团混合和生物分布。"
     },
-    "expanded": {},
+    "expanded": {
+      "risk_factors": true
+    },
     "metadata": {
       "source": "generated",
       "parent_node": "risk_factor_11909304",
       "created_at": "2026-06-05T04:02:42",
-      "updated_at": "2026-06-05T04:02:42",
+      "updated_at": "2026-06-07T02:38:31",
       "version": 1,
       "locked": true
     }
@@ -1037,6 +1045,335 @@
       "parent_node": "risk_factor_11909304",
       "created_at": "2026-06-05T04:02:42",
       "updated_at": "2026-06-05T04:02:42",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_3ca53733",
+    "type": "RedTideEvent",
+    "name": "2023年舟山海域赤潮事件",
+    "properties": {
+      "description": "2023年夏季舟山海域发生大面积赤潮，主要诱因为陆源营养盐输入"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_49ed2349",
+      "created_at": "2026-06-06T08:52:48",
+      "updated_at": "2026-06-06T08:52:48",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_a93d3d22",
+    "type": "Observation",
+    "name": "舟山海域营养盐浓度观测",
+    "properties": {
+      "description": "监测到氮磷营养盐浓度异常升高"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_49ed2349",
+      "created_at": "2026-06-06T08:52:48",
+      "updated_at": "2026-06-06T08:52:48",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_f6c1585e",
+    "type": "RiskFactor",
+    "name": "长江口盐水入侵",
+    "properties": {
+      "description": "长江口盐水入侵现象，受径流量和潮汐影响，改变盐度分布。"
+    },
+    "expanded": {
+      "risk_factors": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T03:07:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_d91af91b",
+    "type": "RiskFactor",
+    "name": "冲淡水区营养盐分布",
+    "properties": {
+      "description": "长江冲淡水携带大量陆源营养盐，盐度梯度影响营养盐的输运和扩散。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "prevention_measure_429e0a05",
+    "type": "PreventionMeasure",
+    "name": "长江口盐度实时监控系统",
+    "properties": {
+      "description": "通过布设盐度传感器网络，实时监测河口盐度变化，为赤潮预警提供数据。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_d230d553",
+    "type": "RiskFactor",
+    "name": "长江口底层缺氧风险",
+    "properties": {
+      "description": "盐度层化导致底层水体交换弱，易出现缺氧现象，影响生态系统。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "observation_d14df4a0",
+      "created_at": "2026-06-07T02:38:31",
+      "updated_at": "2026-06-07T02:38:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_0f546336",
+    "type": "Species",
+    "name": "尖刺拟菱形藻",
+    "properties": {
+      "description": "中国近海常见赤潮硅藻，能产生软骨藻酸，适宜水温10-25℃，盐度28-33‰"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_32d00d03",
+      "created_at": "2026-06-07T02:50:08",
+      "updated_at": "2026-06-07T02:50:08",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_4a820236",
+    "type": "RiskFactor",
+    "name": "营养盐浓度异常升高",
+    "properties": {
+      "description": "氮磷营养盐浓度超过正常范围，刺激赤潮藻类大量繁殖"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_32d00d03",
+      "created_at": "2026-06-07T02:50:08",
+      "updated_at": "2026-06-07T02:50:08",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "fishery_area_578d7bc7",
+    "type": "FisheryArea",
+    "name": "黄海渔场",
+    "properties": {
+      "description": "位于黄海海域，是中国重要渔场，受赤潮灾害影响较大"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_32d00d03",
+      "created_at": "2026-06-07T02:50:08",
+      "updated_at": "2026-06-07T02:50:08",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "prevention_measure_6baa348f",
+    "type": "PreventionMeasure",
+    "name": "长江口调水压咸工程",
+    "properties": {
+      "description": "通过三峡水库等调水工程增加长江下游径流量，压减盐水入侵范围，缓解盐度异常。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_f6c1585e",
+      "created_at": "2026-06-07T03:07:31",
+      "updated_at": "2026-06-07T03:07:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "prevention_measure_9a5b9da9",
+    "type": "PreventionMeasure",
+    "name": "长江口盐度实时监测预警系统",
+    "properties": {
+      "description": "在大戢山、徐六泾等站点布设盐度自动监测浮标，实时预警盐水入侵强度。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "risk_factor_f6c1585e",
+      "created_at": "2026-06-07T03:07:31",
+      "updated_at": "2026-06-07T03:07:31",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_d13f4ae7",
+    "type": "Species",
+    "name": "中国毛虾",
+    "properties": {
+      "description": "中国近海常见小型经济虾类，是带鱼等经济鱼类的重要饵料生物。"
+    },
+    "expanded": {
+      "related_events": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-07T03:27:14",
+      "updated_at": "2026-06-07T03:27:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "risk_factor_f21c2b2e",
+    "type": "RiskFactor",
+    "name": "养殖废水排放",
+    "properties": {
+      "description": "沿海水产养殖尾水排放导致近海营养盐过剩，增加赤潮风险。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-07T03:27:14",
+      "updated_at": "2026-06-07T03:27:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "fishery_area_a24fd385",
+    "type": "FisheryArea",
+    "name": "闽东渔场",
+    "properties": {
+      "description": "位于福建东北部海域的渔场，主要渔获物包括带鱼、大黄鱼等。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "buoy_4129921a",
+      "created_at": "2026-06-07T03:27:14",
+      "updated_at": "2026-06-07T03:27:14",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_90013806",
+    "type": "RedTideEvent",
+    "name": "2025年浙江近海赤潮事件",
+    "properties": {
+      "description": "2025年夏季浙江近海发生的以米氏凯伦藻为主的赤潮事件，导致海域生态异常。"
+    },
+    "expanded": {
+      "related_events": true
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_d13f4ae7",
+      "created_at": "2026-06-07T03:27:33",
+      "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_a035a7e8",
+    "type": "Observation",
+    "name": "浙江近海叶绿素异常观测",
+    "properties": {
+      "description": "2025年7月浙江近海叶绿素浓度异常升高至12 mg/m³，与赤潮事件同步。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "species_d13f4ae7",
+      "created_at": "2026-06-07T03:27:33",
+      "updated_at": "2026-06-07T03:27:33",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_0fc657bb",
+    "type": "Observation",
+    "name": "浙江近海叶绿素浓度异常观测",
+    "properties": {
+      "description": "2025年夏季浙江近海叶绿素a浓度达到15.2 mg/m³，远超正常范围，指示赤潮发生。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_90013806",
+      "created_at": "2026-06-07T03:27:56",
+      "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "red_tide_event_796017aa",
+    "type": "RedTideEvent",
+    "name": "2023年舟山近海赤潮事件",
+    "properties": {
+      "description": "2023年夏季舟山近海发生的赤潮事件，主要藻种为东海原甲藻，导致局部海域生态异常。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_90013806",
+      "created_at": "2026-06-07T03:27:56",
+      "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "observation_896d181f",
+    "type": "Observation",
+    "name": "浙江近海海水温度异常观测",
+    "properties": {
+      "description": "2025年夏季浙江近海表层海水温度达到28.5°C，高于同期均值，有利于赤潮藻类繁殖。"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "red_tide_event_90013806",
+      "created_at": "2026-06-07T03:27:56",
+      "updated_at": "2026-06-07T03:27:56",
       "version": 1,
       "locked": true
     }
