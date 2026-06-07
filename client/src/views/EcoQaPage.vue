@@ -307,9 +307,9 @@ watch(conversations, persist, { deep: true })
               <p class="empty-title">输入问题开始对话</p>
               <p class="empty-desc">基于海洋知识图谱的智能问答，支持多轮对话</p>
               <div class="empty-chips">
-                <button @click="fillPrompt('海洋生物多样性现状如何？')">海洋生物多样性现状如何？</button>
-                <button @click="fillPrompt('珊瑚礁白化的原因及影响？')">珊瑚礁白化的原因及影响？</button>
-                <button @click="fillPrompt('红树林生态价值有哪些？')">红树林生态价值有哪些？</button>
+                <button @click="fillPrompt('2020年东海浮标C01叶绿素异常')">2020年东海浮标C01叶绿素异常</button>
+                <button @click="fillPrompt('陆源营养盐输入')">陆源营养盐输入</button>
+                <button @click="fillPrompt('东海原甲藻')">东海原甲藻</button>
               </div>
             </div>
             <!-- 消息列表 -->
@@ -326,9 +326,9 @@ watch(conversations, persist, { deep: true })
             </article>
           </div>
           <div v-if="messages.length" class="prompt-chips">
-            <button @click="fillPrompt('海洋生物多样性现状如何？')">海洋生物多样性现状如何？</button>
-            <button @click="fillPrompt('珊瑚礁白化的原因及影响？')">珊瑚礁白化的原因及影响？</button>
-            <button @click="fillPrompt('红树林生态价值有哪些？')">红树林生态价值有哪些？</button>
+              <button @click="fillPrompt('2020年东海浮标C01叶绿素异常')">2020年东海浮标C01叶绿素异常</button>
+              <button @click="fillPrompt('陆源营养盐输入')">陆源营养盐输入</button>
+              <button @click="fillPrompt('东海原甲藻')">东海原甲藻</button>
           </div>
           <label class="chat-input">
             <input

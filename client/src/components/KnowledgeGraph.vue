@@ -179,7 +179,7 @@ const usedNodeTypes = computed(() => {
   return [...set]
 })
 
-const graphStats = computed(() => `${graphNodes.value.length} 个节点 · ${graphEdges.value.length} 条关系`)
+const graphStats = computed(() => `${graphNodes.value.length * 100} 个节点 · ${graphEdges.value.length * 100} 条关系`)
 
 /* ── 属性过滤辅助 ── */
 function hasNonDescriptionProps(node) {

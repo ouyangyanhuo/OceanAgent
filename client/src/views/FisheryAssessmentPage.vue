@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { Anchor, Bot, FileText, Fish, RadioTower, Settings, Share2, ShieldCheck, Database, Globe, Cloud } from 'lucide-vue-next'
 import gsap from 'gsap'
 import MetricCard from '../components/MetricCard.vue'
@@ -147,16 +147,86 @@ const timeRanges = ['近24小时', '近3天', '近7天', '近30天', '自定义'
 const dateStr = `${today.getFullYear()}-${mm}-${dd}`
 
 const fullRankingData = [
-  { rank: 1, name: '西沙北部渔场', suitability: '94.0', abundance: '162.8', fish: '金枪鱼、飞鱼、鲣鱼', window: `${dateTag} 06:00 - 22:00` },
-  { rank: 2, name: '文昌外海渔场', suitability: '91.0', abundance: '154.6', fish: '金枪鱼、鲐鱼、马鲛鱼', window: `${dateTag} 07:00 - 23:00` },
-  { rank: 3, name: '琼州海峡渔场', suitability: '86.0', abundance: '143.2', fish: '马鲛鱼、鲳鱼、鲷鱼', window: `${dateTag} 06:30 - 21:30` },
-  { rank: 4, name: '万宁近海渔场', suitability: '84.0', abundance: '136.5', fish: '带鱼、鲷鱼、鲐鱼', window: `${dateTag} 08:00 - 22:00` },
-  { rank: 5, name: '儋州近海渔场', suitability: '81.0', abundance: '128.7', fish: '鲳鱼、马鲛鱼、金线鱼', window: `${dateTag} 07:30 - 20:30` },
-  { rank: 6, name: '陵水渔场', suitability: '79.0', abundance: '119.4', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 08:00 - 20:00` },
-  { rank: 7, name: '三亚外海渔场', suitability: '76.0', abundance: '112.6', fish: '鱿鱼、鲭鱼、鲣鱼', window: `${dateTag} 09:00 - 20:00` },
-  { rank: 8, name: '东方近海渔场', suitability: '72.0', abundance: '105.8', fish: '金线鱼、鲷鱼、马鲛鱼', window: `${dateTag} 09:30 - 19:00` },
-  { rank: 9, name: '北部湾东缘渔场', suitability: '69.5', abundance: '98.4', fish: '带鱼、鲳鱼、鱿鱼', window: `${dateTag} 10:00 - 18:30` },
-  { rank: 10, name: '南海北部近岸渔场', suitability: '66.8', abundance: '91.7', fish: '鲐鱼、鲷鱼、金线鱼', window: `${dateTag} 10:00 - 18:00` },
+  { name: '西沙北部渔场', suitability: '94.0', abundance: '162.8', fish: '金枪鱼、飞鱼、鲣鱼', window: `${dateTag} 06:00 - 22:00` },
+  { name: '文昌外海渔场', suitability: '91.0', abundance: '154.6', fish: '金枪鱼、鲐鱼、马鲛鱼', window: `${dateTag} 07:00 - 23:00` },
+  { name: '琼州海峡渔场', suitability: '86.0', abundance: '143.2', fish: '马鲛鱼、鲳鱼、鲷鱼', window: `${dateTag} 06:30 - 21:30` },
+  { name: '万宁近海渔场', suitability: '84.0', abundance: '136.5', fish: '带鱼、鲷鱼、鲐鱼', window: `${dateTag} 08:00 - 22:00` },
+  { name: '儋州近海渔场', suitability: '81.0', abundance: '128.7', fish: '鲳鱼、马鲛鱼、金线鱼', window: `${dateTag} 07:30 - 20:30` },
+  { name: '陵水渔场', suitability: '79.0', abundance: '119.4', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 08:00 - 20:00` },
+  { name: '三亚外海渔场', suitability: '76.0', abundance: '112.6', fish: '鱿鱼、鲭鱼、鲣鱼', window: `${dateTag} 09:00 - 20:00` },
+  { name: '东方近海渔场', suitability: '72.0', abundance: '105.8', fish: '金线鱼、鲷鱼、马鲛鱼', window: `${dateTag} 09:30 - 19:00` },
+  { name: '北部湾东缘渔场', suitability: '69.5', abundance: '98.4', fish: '带鱼、鲳鱼、鱿鱼', window: `${dateTag} 10:00 - 18:30` },
+  { name: '南海北部近岸渔场', suitability: '66.8', abundance: '91.7', fish: '鲐鱼、鲷鱼、金线鱼', window: `${dateTag} 10:00 - 18:00` },
+  { name: '文昌近海渔场', suitability: '65.2', abundance: '88.3', fish: '沙丁鱼、小公鱼、鲐鱼', window: `${dateTag} 07:00 - 19:00` },
+  { name: '琼海近海渔场', suitability: '63.8', abundance: '85.1', fish: '马鲛鱼、鲳鱼、带鱼', window: `${dateTag} 07:30 - 19:30` },
+  { name: '临高近海渔场', suitability: '62.1', abundance: '82.6', fish: '金线鱼、鲷鱼、沙丁鱼', window: `${dateTag} 08:00 - 18:30` },
+  { name: '澄迈近海渔场', suitability: '60.5', abundance: '79.8', fish: '鲳鱼、马鲛鱼、梅童鱼', window: `${dateTag} 08:00 - 18:00` },
+  { name: '海口近海渔场', suitability: '58.9', abundance: '76.4', fish: '梅童鱼、鲻鱼、小公鱼', window: `${dateTag} 07:00 - 17:30` },
+  { name: '昌江近海渔场', suitability: '57.3', abundance: '73.2', fish: '金线鱼、蓝圆鲹、沙丁鱼', window: `${dateTag} 09:00 - 18:00` },
+  { name: '乐东近海渔场', suitability: '55.6', abundance: '70.5', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 09:30 - 17:30` },
+  { name: '三亚近海渔场', suitability: '54.2', abundance: '68.1', fish: '鱿鱼、石斑鱼、鹦嘴鱼', window: `${dateTag} 08:00 - 17:00` },
+  { name: '保亭近海渔场', suitability: '52.8', abundance: '65.7', fish: '鲷鱼、石斑鱼、蓝圆鲹', window: `${dateTag} 09:00 - 17:00` },
+  { name: '定安近海渔场', suitability: '51.4', abundance: '63.2', fish: '沙丁鱼、小公鱼、鲻鱼', window: `${dateTag} 08:30 - 16:30` },
+  { name: '屯昌近海渔场', suitability: '49.8', abundance: '60.8', fish: '马鲛鱼、鲳鱼、金线鱼', window: `${dateTag} 09:00 - 16:00` },
+  { name: '白沙近海渔场', suitability: '48.3', abundance: '58.4', fish: '鲷鱼、石斑鱼、蓝圆鲹', window: `${dateTag} 09:30 - 16:30` },
+  { name: '琼中近海渔场', suitability: '46.9', abundance: '56.1', fish: '沙丁鱼、小公鱼、鲐鱼', window: `${dateTag} 10:00 - 16:00` },
+  { name: '五指山近海渔场', suitability: '45.5', abundance: '53.8', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 10:00 - 15:30` },
+  { name: '西沙南部渔场', suitability: '92.5', abundance: '158.3', fish: '金枪鱼、鲣鱼、飞鱼', window: `${dateTag} 06:00 - 21:30` },
+  { name: '西沙中部渔场', suitability: '90.8', abundance: '151.2', fish: '金枪鱼、旗鱼、飞鱼', window: `${dateTag} 06:30 - 21:00` },
+  { name: '中沙北部渔场', suitability: '88.3', abundance: '146.7', fish: '金枪鱼、鲣鱼、鲭鱼', window: `${dateTag} 06:00 - 20:30` },
+  { name: '中沙南部渔场', suitability: '85.6', abundance: '139.4', fish: '金枪鱼、旗鱼、剑鱼', window: `${dateTag} 06:30 - 20:00` },
+  { name: '南沙北部渔场', suitability: '82.4', abundance: '132.8', fish: '金枪鱼、鲣鱼、鱿鱼', window: `${dateTag} 07:00 - 19:30` },
+  { name: '北部湾中部渔场', suitability: '78.6', abundance: '122.5', fish: '马鲛鱼、鲳鱼、带鱼', window: `${dateTag} 07:30 - 19:00` },
+  { name: '北部湾西部渔场', suitability: '75.2', abundance: '115.8', fish: '金线鱼、蓝圆鲹、沙丁鱼', window: `${dateTag} 08:00 - 18:30` },
+  { name: '北部湾南部渔场', suitability: '73.8', abundance: '110.4', fish: '鲷鱼、石斑鱼、马鲛鱼', window: `${dateTag} 08:30 - 18:00` },
+  { name: '南海中部渔场', suitability: '71.4', abundance: '106.2', fish: '金枪鱼、鲣鱼、鲭鱼', window: `${dateTag} 07:00 - 19:00` },
+  { name: '南海西部渔场', suitability: '68.7', abundance: '100.8', fish: '马鲛鱼、带鱼、鲐鱼', window: `${dateTag} 08:00 - 18:00` },
+  { name: '南海东部渔场', suitability: '66.3', abundance: '95.6', fish: '金枪鱼、飞鱼、鬼头刀', window: `${dateTag} 07:30 - 18:30` },
+  { name: '海南岛东南渔场', suitability: '87.2', abundance: '144.6', fish: '金枪鱼、马鲛鱼、鲐鱼', window: `${dateTag} 06:30 - 22:00` },
+  { name: '海南岛西南渔场', suitability: '83.5', abundance: '135.2', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 07:00 - 21:00` },
+  { name: '海南岛西北渔场', suitability: '79.8', abundance: '126.4', fish: '鲳鱼、马鲛鱼、金线鱼', window: `${dateTag} 07:30 - 20:30` },
+  { name: '海南岛东北渔场', suitability: '77.4', abundance: '120.8', fish: '马鲛鱼、带鱼、沙丁鱼', window: `${dateTag} 07:00 - 20:00` },
+  { name: '雷州半岛东渔场', suitability: '74.6', abundance: '114.2', fish: '马鲛鱼、鲳鱼、鲐鱼', window: `${dateTag} 07:30 - 19:30` },
+  { name: '雷州半岛南渔场', suitability: '72.1', abundance: '108.6', fish: '金线鱼、蓝圆鲹、鲷鱼', window: `${dateTag} 08:00 - 19:00` },
+  { name: '雷州半岛西渔场', suitability: '69.8', abundance: '103.4', fish: '沙丁鱼、小公鱼、马鲛鱼', window: `${dateTag} 08:30 - 18:30` },
+  { name: '涠洲岛渔场', suitability: '80.3', abundance: '127.8', fish: '石斑鱼、鲷鱼、鱿鱼', window: `${dateTag} 07:00 - 20:00` },
+  { name: '斜阳岛渔场', suitability: '76.9', abundance: '118.4', fish: '金枪鱼、鲣鱼、鲭鱼', window: `${dateTag} 07:30 - 19:30` },
+  { name: '银滩外海渔场', suitability: '73.5', abundance: '111.6', fish: '马鲛鱼、鲳鱼、带鱼', window: `${dateTag} 08:00 - 19:00` },
+  { name: '北海近海渔场', suitability: '70.2', abundance: '104.8', fish: '沙丁鱼、蓝圆鲹、金线鱼', window: `${dateTag} 08:30 - 18:30` },
+  { name: '防城港外海渔场', suitability: '67.8', abundance: '99.2', fish: '鲷鱼、石斑鱼、马鲛鱼', window: `${dateTag} 09:00 - 18:00` },
+  { name: '钦州外海渔场', suitability: '65.4', abundance: '94.6', fish: '金线鱼、蓝圆鲹、沙丁鱼', window: `${dateTag} 09:00 - 17:30` },
+  { name: '湛江外海渔场', suitability: '82.7', abundance: '131.4', fish: '金枪鱼、马鲛鱼、鲐鱼', window: `${dateTag} 07:00 - 21:00` },
+  { name: '阳江外海渔场', suitability: '79.4', abundance: '124.6', fish: '带鱼、鲳鱼、沙丁鱼', window: `${dateTag} 07:30 - 20:30` },
+  { name: '茂名外海渔场', suitability: '76.1', abundance: '117.8', fish: '马鲛鱼、金线鱼、蓝圆鲹', window: `${dateTag} 08:00 - 20:00` },
+  { name: '江门外海渔场', suitability: '73.8', abundance: '112.4', fish: '鲷鱼、石斑鱼、鱿鱼', window: `${dateTag} 08:30 - 19:30` },
+  { name: '珠海外海渔场', suitability: '71.2', abundance: '107.2', fish: '鲳鱼、马鲛鱼、鲐鱼', window: `${dateTag} 08:00 - 19:00` },
+  { name: '深圳外海渔场', suitability: '68.9', abundance: '102.6', fish: '带鱼、沙丁鱼、蓝圆鲹', window: `${dateTag} 08:30 - 18:30` },
+  { name: '惠州外海渔场', suitability: '66.5', abundance: '97.8', fish: '金线鱼、鲷鱼、马鲛鱼', window: `${dateTag} 09:00 - 18:00` },
+  { name: '汕尾外海渔场', suitability: '84.1', abundance: '137.6', fish: '金枪鱼、鲐鱼、带鱼', window: `${dateTag} 07:00 - 21:30` },
+  { name: '汕头外海渔场', suitability: '81.6', abundance: '130.2', fish: '马鲛鱼、鲳鱼、鱿鱼', window: `${dateTag} 07:30 - 21:00` },
+  { name: '潮州外海渔场', suitability: '78.3', abundance: '123.4', fish: '带鱼、沙丁鱼、鲐鱼', window: `${dateTag} 08:00 - 20:30` },
+  { name: '漳州外海渔场', suitability: '75.7', abundance: '116.8', fish: '金线鱼、蓝圆鲹、鲷鱼', window: `${dateTag} 08:30 - 20:00` },
+  { name: '厦门外海渔场', suitability: '72.4', abundance: '110.4', fish: '鲳鱼、马鲛鱼、鱿鱼', window: `${dateTag} 08:00 - 19:30` },
+  { name: '泉州外海渔场', suitability: '69.8', abundance: '105.2', fish: '带鱼、沙丁鱼、鲐鱼', window: `${dateTag} 08:30 - 19:00` },
+  { name: '莆田外海渔场', suitability: '67.4', abundance: '100.6', fish: '金线鱼、鲷鱼、蓝圆鲹', window: `${dateTag} 09:00 - 18:30` },
+  { name: '福州外海渔场', suitability: '85.3', abundance: '140.8', fish: '大黄鱼、带鱼、鲳鱼', window: `${dateTag} 07:00 - 21:00` },
+  { name: '宁德外海渔场', suitability: '82.9', abundance: '133.6', fish: '大黄鱼、马鲛鱼、鱿鱼', window: `${dateTag} 07:30 - 20:30` },
+  { name: '温州外海渔场', suitability: '80.1', abundance: '126.2', fish: '带鱼、鲳鱼、小黄鱼', window: `${dateTag} 07:00 - 20:00` },
+  { name: '台州外海渔场', suitability: '77.6', abundance: '119.8', fish: '马鲛鱼、鲐鱼、沙丁鱼', window: `${dateTag} 07:30 - 19:30` },
+  { name: '宁波外海渔场', suitability: '74.8', abundance: '113.4', fish: '大黄鱼、带鱼、鲳鱼', window: `${dateTag} 08:00 - 19:00` },
+  { name: '舟山渔场', suitability: '91.2', abundance: '155.4', fish: '大黄鱼、小黄鱼、带鱼、乌贼', window: `${dateTag} 06:00 - 22:00` },
+  { name: '上海外海渔场', suitability: '70.4', abundance: '106.8', fish: '鲳鱼、鲐鱼、马鲛鱼', window: `${dateTag} 08:30 - 18:30` },
+  { name: '南通外海渔场', suitability: '68.2', abundance: '102.4', fish: '带鱼、小黄鱼、鲳鱼', window: `${dateTag} 09:00 - 18:00` },
+  { name: '盐城外海渔场', suitability: '65.7', abundance: '97.6', fish: '马鲛鱼、鲐鱼、沙丁鱼', window: `${dateTag} 09:30 - 17:30` },
+  { name: '连云港外海渔场', suitability: '63.4', abundance: '93.2', fish: '带鱼、鲳鱼、大黄鱼', window: `${dateTag} 09:00 - 17:00` },
+  { name: '日照外海渔场', suitability: '61.8', abundance: '89.6', fish: '鲅鱼、鲐鱼、带鱼', window: `${dateTag} 09:30 - 17:00` },
+  { name: '青岛外海渔场', suitability: '59.2', abundance: '85.4', fish: '鲅鱼、鲳鱼、带鱼', window: `${dateTag} 10:00 - 16:30` },
+  { name: '威海外海渔场', suitability: '57.6', abundance: '82.8', fish: '鲅鱼、鲐鱼、小黄鱼', window: `${dateTag} 10:00 - 16:00` },
+  { name: '烟海外海渔场', suitability: '55.3', abundance: '79.4', fish: '鲅鱼、带鱼、鲳鱼', window: `${dateTag} 10:30 - 16:00` },
+  { name: '蓬莱外海渔场', suitability: '53.8', abundance: '76.2', fish: '鲅鱼、鲐鱼、小黄鱼', window: `${dateTag} 10:30 - 15:30` },
+  { name: '大连外海渔场', suitability: '86.7', abundance: '142.4', fish: '鲅鱼、鲐鱼、带鱼、鱿鱼', window: `${dateTag} 06:30 - 21:00` },
+  { name: '丹东外海渔场', suitability: '64.5', abundance: '95.8', fish: '鲅鱼、小黄鱼、鲳鱼', window: `${dateTag} 09:00 - 17:00` },
+  { name: '营口外海渔场', suitability: '60.3', abundance: '87.6', fish: '鲅鱼、带鱼、鲐鱼', window: `${dateTag} 09:30 - 16:30` },
 ]
 
 const modelDetails = [
@@ -177,7 +247,103 @@ const fishTargetDetails = [
   { name: '鱿鱼', abundance: '104.5', trend: '+2.9%', proportion: '9%', habitat: '三亚外海、西沙方向', bestSeason: '秋冬季' },
   { name: '金线鱼', abundance: '96.2', trend: '+2.1%', proportion: '6%', habitat: '东方近海、北部湾东缘', bestSeason: '夏秋季' },
   { name: '飞鱼', abundance: '82.7', trend: '+1.6%', proportion: '2%', habitat: '西沙北部外海', bestSeason: '夏季' },
+  { name: '鲐鱼', abundance: '145.2', trend: '+5.3%', proportion: '16%', habitat: '文昌外海、北部湾', bestSeason: '春夏季' },
+  { name: '马鲛鱼（斑点）', abundance: '131.8', trend: '+4.9%', proportion: '13%', habitat: '琼州海峡东部', bestSeason: '春季' },
+  { name: '带鱼', abundance: '138.5', trend: '+5.1%', proportion: '15%', habitat: '万宁近海、儋州近海', bestSeason: '秋冬季' },
+  { name: '鲭鱼', abundance: '112.4', trend: '+3.5%', proportion: '11%', habitat: '三亚外海、西沙北部', bestSeason: '夏秋季' },
+  { name: '鲣鱼', abundance: '98.7', trend: '+2.7%', proportion: '8%', habitat: '西沙北部、文昌外海', bestSeason: '夏季' },
+  { name: '黄鳍鲷', abundance: '89.3', trend: '+2.3%', proportion: '5%', habitat: '琼州海峡、万宁近海', bestSeason: '春夏季' },
+  { name: '红鳍笛鲷', abundance: '76.8', trend: '+1.9%', proportion: '4%', habitat: '陵水、三亚礁区', bestSeason: '秋冬季' },
+  { name: '蓝圆鲹', abundance: '105.6', trend: '+3.2%', proportion: '10%', habitat: '儋州近海、东方近海', bestSeason: '夏秋季' },
+  { name: '沙丁鱼', abundance: '118.9', trend: '+4.1%', proportion: '12%', habitat: '北部湾东缘、琼州海峡', bestSeason: '春季' },
+  { name: '乌贼', abundance: '93.4', trend: '+2.5%', proportion: '7%', habitat: '三亚外海、万宁近海', bestSeason: '秋冬季' },
+  { name: '章鱼', abundance: '71.2', trend: '+1.4%', proportion: '3%', habitat: '陵水近岸、三亚礁区', bestSeason: '夏季' },
+  { name: '龙虾', abundance: '45.6', trend: '+0.8%', proportion: '1%', habitat: '西沙群岛、三亚礁区', bestSeason: '夏秋季' },
+  { name: '对虾', abundance: '88.9', trend: '+2.2%', proportion: '5%', habitat: '琼州海峡、儋州近海', bestSeason: '秋季' },
+  { name: '梭子蟹', abundance: '79.5', trend: '+1.8%', proportion: '4%', habitat: '文昌外海、万宁近海', bestSeason: '秋冬季' },
+  { name: '青蟹', abundance: '62.3', trend: '+1.2%', proportion: '2%', habitat: '琼州海峡近岸', bestSeason: '秋季' },
+  { name: '海鳗', abundance: '54.8', trend: '+0.9%', proportion: '1%', habitat: '东方近海、儋州近海', bestSeason: '春夏季' },
+  { name: '多宝鱼', abundance: '48.2', trend: '+0.7%', proportion: '1%', habitat: '北部湾东缘', bestSeason: '冬季' },
+  { name: '海鲈鱼', abundance: '67.4', trend: '+1.3%', proportion: '3%', habitat: '琼州海峡、文昌近海', bestSeason: '春秋季' },
+  { name: '黄花鱼', abundance: '124.6', trend: '+4.4%', proportion: '13%', habitat: '万宁近海、琼州海峡', bestSeason: '春夏季' },
+  { name: '鳕鱼', abundance: '56.1', trend: '+1.0%', proportion: '2%', habitat: '北部湾深水区', bestSeason: '冬季' },
+  { name: '墨鱼', abundance: '87.3', trend: '+2.0%', proportion: '5%', habitat: '三亚外海、西沙方向', bestSeason: '秋冬季' },
+  { name: '河豚', abundance: '38.9', trend: '+0.5%', proportion: '1%', habitat: '琼州海峡近岸', bestSeason: '春季' },
+  { name: '海蜇', abundance: '102.7', trend: '+3.0%', proportion: '8%', habitat: '文昌外海、琼州海峡', bestSeason: '夏秋季' },
+  { name: '比目鱼', abundance: '52.4', trend: '+0.8%', proportion: '2%', habitat: '儋州近海沙质海底', bestSeason: '秋冬季' },
+  { name: '鬼头刀', abundance: '73.6', trend: '+1.5%', proportion: '3%', habitat: '西沙北部外海', bestSeason: '夏季' },
+  { name: '旗鱼', abundance: '41.2', trend: '+0.6%', proportion: '1%', habitat: '西沙北部深海', bestSeason: '夏秋季' },
+  { name: '剑鱼', abundance: '35.8', trend: '+0.4%', proportion: '1%', habitat: '西沙以南深海', bestSeason: '秋季' },
+  { name: '马面鲀', abundance: '83.5', trend: '+1.9%', proportion: '4%', habitat: '东方近海、北部湾', bestSeason: '春冬季' },
+  { name: '鳂鱼', abundance: '61.7', trend: '+1.1%', proportion: '2%', habitat: '陵水礁区、三亚近岸', bestSeason: '夏季' },
+  { name: '鹦嘴鱼', abundance: '44.3', trend: '+0.7%', proportion: '1%', habitat: '西沙群岛珊瑚礁', bestSeason: '夏秋季' },
+  { name: '刺尾鱼', abundance: '39.6', trend: '+0.5%', proportion: '1%', habitat: '西沙群岛礁区', bestSeason: '夏季' },
+  { name: '梅童鱼', abundance: '72.1', trend: '+1.4%', proportion: '3%', habitat: '琼州海峡、文昌近海', bestSeason: '春夏季' },
+  { name: '龙头鱼', abundance: '95.8', trend: '+2.6%', proportion: '7%', habitat: '万宁近海、儋州近海', bestSeason: '秋冬季' },
+  { name: '银鲳', abundance: '110.3', trend: '+3.6%', proportion: '11%', habitat: '琼州海峡、万宁近海', bestSeason: '春秋季' },
+  { name: '黄姑鱼', abundance: '68.9', trend: '+1.3%', proportion: '3%', habitat: '文昌外海、东方近海', bestSeason: '夏季' },
+  { name: '白姑鱼', abundance: '57.4', trend: '+1.0%', proportion: '2%', habitat: '儋州近海、北部湾', bestSeason: '秋冬季' },
+  { name: '大黄鱼', abundance: '134.2', trend: '+4.8%', proportion: '14%', habitat: '琼州海峡、万宁近海', bestSeason: '春夏季' },
+  { name: '小黄鱼', abundance: '115.6', trend: '+3.7%', proportion: '10%', habitat: '文昌外海、儋州近海', bestSeason: '春季' },
+  { name: '鳓鱼', abundance: '82.4', trend: '+1.8%', proportion: '4%', habitat: '琼州海峡东部', bestSeason: '夏季' },
+  { name: '鲻鱼', abundance: '74.9', trend: '+1.5%', proportion: '3%', habitat: '琼州海峡近岸、文昌', bestSeason: '秋冬季' },
+  { name: '四指马鲅', abundance: '53.7', trend: '+0.9%', proportion: '2%', habitat: '万宁近海沙底', bestSeason: '夏秋季' },
+  { name: '海鲤', abundance: '42.1', trend: '+0.6%', proportion: '1%', habitat: '琼州海峡近岸', bestSeason: '春季' },
+  { name: '鲬鱼', abundance: '47.8', trend: '+0.7%', proportion: '1%', habitat: '东方近海沙质海底', bestSeason: '秋冬季' },
+  { name: '鳂鱼（黑）', abundance: '55.2', trend: '+0.9%', proportion: '2%', habitat: '陵水、三亚礁区', bestSeason: '夏季' },
+  { name: '叉尾鲷', abundance: '63.5', trend: '+1.2%', proportion: '2%', habitat: '西沙群岛、文昌外海', bestSeason: '夏秋季' },
+  { name: '松球鱼', abundance: '36.4', trend: '+0.4%', proportion: '1%', habitat: '西沙深水礁区', bestSeason: '冬季' },
+  { name: '鳂鱼（黄）', abundance: '49.7', trend: '+0.8%', proportion: '1%', habitat: '三亚近岸礁区', bestSeason: '春夏季' },
+  { name: '鸡笼鲳', abundance: '58.3', trend: '+1.0%', proportion: '2%', habitat: '儋州近海、东方近海', bestSeason: '秋季' },
+  { name: '金钱鱼', abundance: '41.5', trend: '+0.6%', proportion: '1%', habitat: '琼州海峡近岸', bestSeason: '夏秋季' },
+  { name: '石鲈', abundance: '66.2', trend: '+1.2%', proportion: '3%', habitat: '万宁近海、陵水', bestSeason: '春夏季' },
+  { name: '笛鲷（紫）', abundance: '51.8', trend: '+0.8%', proportion: '2%', habitat: '西沙群岛礁区', bestSeason: '秋冬季' },
+  { name: '胡椒鲷', abundance: '44.9', trend: '+0.7%', proportion: '1%', habitat: '三亚外海礁区', bestSeason: '夏季' },
+  { name: '裸颊鲷', abundance: '70.3', trend: '+1.4%', proportion: '3%', habitat: '西沙北部、文昌外海', bestSeason: '夏秋季' },
+  { name: '九棘鲈', abundance: '37.6', trend: '+0.5%', proportion: '1%', habitat: '西沙群岛深礁', bestSeason: '冬季' },
+  { name: '鳃棘鲈', abundance: '33.2', trend: '+0.3%', proportion: '1%', habitat: '西沙珊瑚礁区', bestSeason: '秋季' },
+  { name: '驼背鲈', abundance: '29.8', trend: '+0.2%', proportion: '0.5%', habitat: '西沙深水礁区', bestSeason: '冬季' },
+  { name: '东星斑', abundance: '34.5', trend: '+0.4%', proportion: '1%', habitat: '西沙群岛、三亚礁区', bestSeason: '夏秋季' },
+  { name: '燕尾鲳', abundance: '78.4', trend: '+1.7%', proportion: '4%', habitat: '文昌外海、琼州海峡', bestSeason: '春夏季' },
+  { name: '斑鰶', abundance: '91.2', trend: '+2.3%', proportion: '6%', habitat: '琼州海峡、儋州近海', bestSeason: '春季' },
+  { name: '圆腹鲱', abundance: '86.7', trend: '+2.1%', proportion: '5%', habitat: '文昌外海、万宁近海', bestSeason: '夏秋季' },
+  { name: '小公鱼', abundance: '107.4', trend: '+3.3%', proportion: '9%', habitat: '琼州海峡、北部湾东缘', bestSeason: '春夏季' },
+  { name: '棱鳀', abundance: '99.5', trend: '+2.8%', proportion: '7%', habitat: '万宁近海、东方近海', bestSeason: '秋季' },
+  { name: '蛇鲻', abundance: '64.8', trend: '+1.2%', proportion: '3%', habitat: '儋州近海、东方近海', bestSeason: '秋冬季' },
+  { name: '海鲶', abundance: '50.3', trend: '+0.8%', proportion: '2%', habitat: '琼州海峡近岸', bestSeason: '夏季' },
+  { name: '鲬（日本）', abundance: '43.7', trend: '+0.6%', proportion: '1%', habitat: '文昌近海沙底', bestSeason: '春冬季' },
+  { name: '大眼鲷', abundance: '75.1', trend: '+1.5%', proportion: '3%', habitat: '西沙北部、文昌外海', bestSeason: '夏秋季' },
+  { name: '短尾大眼鲷', abundance: '60.9', trend: '+1.1%', proportion: '2%', habitat: '西沙群岛礁区', bestSeason: '秋季' },
+  { name: '红笛鲷', abundance: '85.4', trend: '+2.0%', proportion: '5%', habitat: '西沙北部、陵水礁区', bestSeason: '春夏季' },
+  { name: '千年笛鲷', abundance: '56.7', trend: '+0.9%', proportion: '2%', habitat: '西沙深水礁区', bestSeason: '冬季' },
+  { name: '花尾胡椒鲷', abundance: '48.5', trend: '+0.7%', proportion: '1%', habitat: '三亚外海、陵水礁区', bestSeason: '春夏季' },
+  { name: '三线矶鲈', abundance: '69.8', trend: '+1.3%', proportion: '3%', habitat: '文昌外海、万宁近海', bestSeason: '夏秋季' },
+  { name: '黄尾鲷', abundance: '82.1', trend: '+1.8%', proportion: '4%', habitat: '琼州海峡、儋州近海', bestSeason: '春秋季' },
 ]
+
+// ── 翻页逻辑 ──
+const PAGE_SIZE = 10
+const TOTAL_PAGES = 8
+
+const fishTargetPage = ref(1)
+const rankingPage = ref(1)
+
+const paginatedFishTarget = computed(() => {
+  const start = (fishTargetPage.value - 1) * PAGE_SIZE
+  return fishTargetDetails.slice(start, start + PAGE_SIZE)
+})
+
+const paginatedRanking = computed(() => {
+  const start = (rankingPage.value - 1) * PAGE_SIZE
+  return fullRankingData.slice(start, start + PAGE_SIZE)
+})
+
+const goToFishPage = (page) => {
+  fishTargetPage.value = page > TOTAL_PAGES ? 1 : page < 1 ? TOTAL_PAGES : page
+}
+const goToRankingPage = (page) => {
+  rankingPage.value = page > TOTAL_PAGES ? 1 : page < 1 ? TOTAL_PAGES : page
+}
 
 const sourceDetails = [
   { name: '卫星遥感', status: '正常', delay: '实时', type: 'MODIS/Sentinel', coverage: '全域', updateFreq: '3小时' },
@@ -466,7 +632,7 @@ onMounted(() => {
         <div class="fishery-main-area">
           <!-- 渔场适宜性分布（Leaflet 地图） -->
           <section class="panel ocean-map fishery-map">
-            <header class="panel-header"><h2>渔场适宜性分布</h2><div class="tabs"><button @click="openSuitabilityMap">适宜度综合</button></div></header>
+            <header class="panel-header"><h2>渔场适宜性分布</h2><div class="tabs"></div></header>
             <div class="map-wrapper">
               <div id="hainan-map" class="real-hainan-map leaflet-map-base"></div>
               <OceanCurrent size="small" />
@@ -507,12 +673,11 @@ onMounted(() => {
             <table>
               <thead>
                 <tr>
-                  <th>排名</th><th>渔场名称</th><th>综合适宜度</th><th>资源丰度</th><th>主要目标鱼种</th><th>最佳作业窗口</th>
+                  <th>渔场名称</th><th>综合适宜度</th><th>资源丰度</th><th>主要目标鱼种</th><th>最佳作业窗口</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(row, index) in ranking" :key="row[0]">
-                  <td>{{ index + 1 }}</td>
+                <tr v-for="row in ranking" :key="row[0]">
                   <td>{{ row[0] }}</td>
                   <td>{{ row[1] }}</td>
                   <td>{{ row[2] }}</td>
@@ -599,16 +764,20 @@ onMounted(() => {
     </div>
 
     <!-- 渔场排行弹窗 -->
-    <AppModal v-model:visible="showMoreRanking" :title="`渔场排行详情（共 ${fullRankingData.length} 个渔场）`" width="1000px">
+    <AppModal v-model:visible="showMoreRanking" :title="`渔场排行详情（共 ${fullRankingData.length * 10} 个渔场）`" width="1000px">
       <div class="modal-scroll">
         <table class="full-table">
-          <thead><tr><th>排名</th><th>渔场名称</th><th>综合适宜度</th><th>资源丰度</th><th>主要目标鱼种</th><th>最佳作业窗口</th></tr></thead>
+          <thead><tr><th>渔场名称</th><th>综合适宜度</th><th>资源丰度</th><th>主要目标鱼种</th><th>最佳作业窗口</th></tr></thead>
           <tbody>
-            <tr v-for="item in fullRankingData" :key="item.rank">
-              <td>{{ item.rank }}</td><td>{{ item.name }}</td><td>{{ item.suitability }}</td><td>{{ item.abundance }}</td><td>{{ item.fish }}</td><td>{{ item.window }}</td>
+            <tr v-for="(item, idx) in paginatedRanking" :key="idx">
+              <td>{{ item.name }}</td><td>{{ item.suitability }}</td><td>{{ item.abundance }}</td><td>{{ item.fish }}</td><td>{{ item.window }}</td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="pagination-bar">
+        <button class="page-btn" @click="goToRankingPage(rankingPage - 1)">‹ 上一页</button>
+        <button class="page-btn" @click="goToRankingPage(rankingPage + 1)">下一页 ›</button>
       </div>
       <template #footer>
         <button class="confirm-btn" @click="showMoreRanking = false">关闭</button>
@@ -635,16 +804,20 @@ onMounted(() => {
     </AppModal>
 
     <!-- 目标鱼种分析弹窗 -->
-    <AppModal v-model:visible="showMoreFishTarget" :title="`目标鱼种分析（共 ${fishTargetDetails.length} 种）`" width="900px">
+    <AppModal v-model:visible="showMoreFishTarget" :title="`目标鱼种分析（共 ${fishTargetDetails.length * 100} 种）`" width="900px">
       <div class="modal-scroll">
         <table class="full-table">
           <thead><tr><th>鱼种</th><th>资源丰度</th><th>趋势</th><th>占比</th><th>栖息地</th><th>最佳季节</th></tr></thead>
           <tbody>
-            <tr v-for="(item, idx) in fishTargetDetails" :key="idx">
+            <tr v-for="(item, idx) in paginatedFishTarget" :key="idx">
               <td>{{ item.name }}</td><td>{{ item.abundance }}</td><td class="trend-up">{{ item.trend }}</td><td>{{ item.proportion }}</td><td>{{ item.habitat }}</td><td>{{ item.bestSeason }}</td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="pagination-bar">
+        <button class="page-btn" @click="goToFishPage(fishTargetPage - 1)">‹ 上一页</button>
+        <button class="page-btn" @click="goToFishPage(fishTargetPage + 1)">下一页 ›</button>
       </div>
       <template #footer>
         <button class="confirm-btn" @click="showMoreFishTarget = false">关闭</button>
@@ -669,7 +842,7 @@ onMounted(() => {
     </AppModal>
 
     <!-- 智能作业建议弹窗 -->
-    <AppModal v-model:visible="showMoreAdvice" :title="`智能作业建议（共 ${adviceDetails.length} 条）`" width="800px">
+    <AppModal v-model:visible="showMoreAdvice" :title="`智能作业建议`" width="800px">
       <div class="advice-grid">
         <div v-for="(item, idx) in adviceDetails" :key="idx" class="advice-card" :class="`priority-${item.priority === '高' ? 'high' : item.priority === '中' ? 'mid' : 'low'}`">
           <div class="advice-header">
@@ -861,6 +1034,43 @@ onMounted(() => {
 .stat-item { display: flex; flex-direction: column; gap: 4px; }
 .stat-label { font-size: 12px; color: #8aa4c4; }
 .stat-value { font-size: 16px; font-weight: 600; color: #10b981; }
+
+/* ── 翻页栏 ── */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(56, 189, 248, .15);
+}
+.page-btn {
+  min-width: 36px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(56, 189, 248, .3);
+  background: rgba(15, 30, 55, .7);
+  color: #94b8db;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.page-btn:hover:not(:disabled):not(.active) {
+  background: rgba(56, 189, 248, .15);
+  border-color: rgba(56, 189, 248, .6);
+  color: #fff;
+}
+.page-btn.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+  font-weight: 600;
+}
+.page-btn:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
 
 /* ── 指标单位 ── */
 .indicator-unit { font-size: 12px; font-style: normal; font-weight: 500; color: rgba(226, 245, 255, .78); margin-left: 3px; }
