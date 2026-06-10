@@ -1,0 +1,39 @@
+# ---- Git & IDE ----
+.git
+.gitignore
+.claude
+.codex
+.agents
+
+# ---- Python ----
+server/.venv
+server/.Ocean
+server/app/__pycache__
+**/*.pyc
+**/__pycache__
+
+# ---- Node / Bun ----
+client/node_modules
+client/dist
+client/.bun-cache
+
+# ---- Dev docs & images ----
+dev-doc
+dev.md
+*.png
+
+# ---- Env files (mount or pass via -e instead) ----
+.env
+server/.env
+server/.env.backup
+
+# ---- Docker itself ----
+Dockerfile
+**/Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# ---- Claude Code ----
+CLAUDE.md
+AGENTS.md
+FRONTEND_DEV_GUIDE.md

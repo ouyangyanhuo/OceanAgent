@@ -81,13 +81,14 @@
       "description": "中国最大渔场，位于东海北部，受赤潮影响显著"
     },
     "expanded": {
-      "monitoring_buoys": true
+      "monitoring_buoys": true,
+      "ecological_species": true
     },
     "metadata": {
       "source": "seed",
       "parent_node": null,
       "created_at": "2026-06-04T05:49:17",
-      "updated_at": "2026-06-04T12:07:02",
+      "updated_at": "2026-06-07T03:59:25",
       "version": 1,
       "locked": true
     }
@@ -1374,6 +1375,74 @@
       "parent_node": "red_tide_event_90013806",
       "created_at": "2026-06-07T03:27:56",
       "updated_at": "2026-06-07T03:27:56",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_3921bd6b",
+    "type": "Species",
+    "name": "银鲳",
+    "properties": {
+      "description": "舟山渔场重要经济鱼类，喜栖息于近海，受赤潮影响较大"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_4e448f69",
+    "type": "Species",
+    "name": "三疣梭子蟹",
+    "properties": {
+      "description": "舟山渔场主要渔获物，对水质变化敏感"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_db44a393",
+    "type": "Species",
+    "name": "海蜇",
+    "properties": {
+      "description": "舟山渔场常见水母，其数量波动与环境因子相关"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "species_fdeaf972",
+    "type": "Species",
+    "name": "日本对虾",
+    "properties": {
+      "description": "舟山渔场重要经济虾类，栖息于沙泥底质海域"
+    },
+    "expanded": {},
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
       "version": 1,
       "locked": true
     }

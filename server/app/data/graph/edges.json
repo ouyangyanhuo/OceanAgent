@@ -1652,5 +1652,77 @@
       "version": 1,
       "locked": true
     }
+  },
+  {
+    "id": "edge_5e8e412f",
+    "source": "fishery_area_196d437c",
+    "target": "species_3921bd6b",
+    "relation": "correlated_with",
+    "weight": 0.7,
+    "properties": {
+      "description": "舟山渔场环境状况与银鲳资源量变化相关"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_788b8f70",
+    "source": "fishery_area_196d437c",
+    "target": "species_4e448f69",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "舟山渔场水质变化影响三疣梭子蟹栖息与繁殖"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_80671a9c",
+    "source": "fishery_area_196d437c",
+    "target": "species_db44a393",
+    "relation": "correlated_with",
+    "weight": 0.5,
+    "properties": {
+      "description": "舟山渔场环境因子与海蜇种群数量存在关联"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
+  },
+  {
+    "id": "edge_3b9c11e1",
+    "source": "fishery_area_196d437c",
+    "target": "species_fdeaf972",
+    "relation": "correlated_with",
+    "weight": 0.6,
+    "properties": {
+      "description": "舟山渔场底质和水温影响日本对虾分布"
+    },
+    "metadata": {
+      "source": "generated",
+      "parent_node": "fishery_area_196d437c",
+      "created_at": "2026-06-07T03:59:25",
+      "updated_at": "2026-06-07T03:59:25",
+      "version": 1,
+      "locked": true
+    }
   }
 ]

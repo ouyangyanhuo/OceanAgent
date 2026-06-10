@@ -331,5 +331,25 @@
     "summary": "为2025年浙江近海赤潮事件扩展了相关叶绿素异常观测、历史赤潮事件和温度异常观测，共3个节点和3条边。",
     "created_at": "2026-06-07T03:27:56",
     "updated_at": "2026-06-07T03:27:56"
+  },
+  "fishery_area_196d437c:ecological_species": {
+    "node_id": "fishery_area_196d437c",
+    "expand_type": "ecological_species",
+    "expanded": true,
+    "generated_node_ids": [
+      "species_3921bd6b",
+      "species_4e448f69",
+      "species_db44a393",
+      "species_fdeaf972"
+    ],
+    "generated_edge_ids": [
+      "edge_5e8e412f",
+      "edge_788b8f70",
+      "edge_80671a9c",
+      "edge_3b9c11e1"
+    ],
+    "summary": "为舟山渔场扩展了四种生态物种节点：银鲳、三疣梭子蟹、海蜇、日本对虾，并建立了与渔场的相关关系。",
+    "created_at": "2026-06-07T03:59:25",
+    "updated_at": "2026-06-07T03:59:25"
   }
 }

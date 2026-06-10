@@ -1,6 +1,15 @@
 {
   "notifications": [
     {
+      "id": "c7532ec1d055",
+      "type": "graph_expansion",
+      "title": "图谱扩展完成",
+      "message": "节点「舟山渔场」的 ecological_species 扩展已完成，新增 4 个节点和 4 条边",
+      "read": false,
+      "created_at": "2026-06-07T11:59:25.669936",
+      "related_node_id": "fishery_area_196d437c"
+    },
+    {
       "id": "542afd243837",
       "type": "graph_expansion",
       "title": "图谱扩展完成",
@@ -35,15 +44,6 @@
       "read": false,
       "created_at": "2026-06-07T11:25:53.446580",
       "related_node_id": "fishery_area_196d437c"
-    },
-    {
-      "id": "ca941263e11f",
-      "type": "graph_expansion",
-      "title": "图谱扩展完成",
-      "message": "节点「长江口盐水入侵」的 risk_factors 扩展已完成，新增 3 个节点和 3 条边",
-      "read": false,
-      "created_at": "2026-06-07T11:07:32.522237",
-      "related_node_id": "risk_factor_f6c1585e"
     }
   ],
   "unread_count": 5
