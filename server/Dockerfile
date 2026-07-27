@@ -1,41 +1,40 @@
-# ---- Backend Dockerfile ----
-# Ocean Agent Intelligence Platform — FastAPI backend
+# syntax=docker/dockerfile:1
 
-FROM python:3.12-slim AS base
+# Build context: repository root
+# Build with:
+#   docker build -f server/Dockerfile -t ocean-agent-backend .
 
-WORKDIR /app
+FROM python:3.12-slim AS production
 
-# System deps (none needed for this minimal stack, but keep the layer for future)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install dependencies first (cache-friendly layer)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY app/ app/
-
-# Ensure data directories exist at build time
-# (startup event also creates them, but having them in the image avoids mount surprises)
-RUN mkdir -p app/data/graph app/data/cache app/data/prompts app/data/mock app/data/snapshots
-
-# Non-root user for production
-RUN adduser --disabled-password --gecos '' appuser \
-    && chown -R appuser:appuser /app
-USER appuser
-
-EXPOSE 8000
-
-# Default env — override at runtime via -e or .env file
-ENV APP_NAME="Ocean KG Agent" \
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    APP_NAME="Ocean KG Agent" \
     APP_ENV=production \
     CORS_ORIGINS="*" \
     LLM_PROVIDER=mock
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+WORKDIR /app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Install dependencies in a separate cache-friendly layer.
+COPY server/requirements.txt ./
+RUN python -m pip install -r requirements.txt
+
+# Run the API as an unprivileged user. app/data remains writable because the
+# application persists graph state, caches, snapshots and notifications there.
+RUN adduser --system --group --no-create-home appuser
+COPY --chown=appuser:appuser server/app ./app
+
+USER appuser
+
+EXPOSE 8000
+
+# All mutable backend JSON/JSONL data lives here. Compose attaches a named
+# volume to the same path so data survives container replacement.
+VOLUME ["/app/app/data"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

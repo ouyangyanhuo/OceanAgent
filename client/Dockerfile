@@ -1,74 +1,38 @@
-# ---- Frontend Dockerfile ----
-# Ocean Agent Intelligence Platform — Vue 3 frontend
-#
-# Multi-stage build:
-#   1. Build stage  — Bun installs deps + Vite builds static assets
-#   2. Serve stage  — Nginx serves the built assets + reverse-proxies /api to backend
+# syntax=docker/dockerfile:1
 
-# ---------- Stage 1: Build ----------
-FROM oven/bun:1.1-alpine AS build
+# Build context: repository root
+#   docker build -f client/Dockerfile -t ocean-agent-frontend .
+
+# ---------- Build ----------
+FROM oven/bun:1.3.14-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies first (cache-friendly layer)
-COPY package.json bun.lock ./
+COPY client/package.json client/bun.lock ./
 RUN bun install --frozen-lockfile
 
-# Copy source and build
-COPY . .
+COPY client/index.html client/vite.config.js ./
+COPY client/src ./src
+
 RUN bun run build
 
-# ---------- Stage 2: Serve ----------
-FROM nginx:1.27-alpine AS production
+# ---------- Runtime ----------
+FROM oven/bun:1.3.14-alpine AS production
 
-# Remove default config
-RUN rm /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-# Nginx config: serve static files + reverse-proxy /api and /health to backend
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build --chown=bun:bun /app/dist ./dist
+COPY --chown=bun:bun client/package.json client/server.js ./
 
-RUN cat > /etc/nginx/conf.d/default.conf <<'NGINX'
-server {
-    listen 80;
-    server_name _;
+ENV HOST=0.0.0.0 \
+    PORT=5173 \
+    API_TARGET=http://backend:8000
 
-    root /usr/share/nginx/html;
-    index index.html;
+USER bun
 
-    # API_TARGET is resolved at container start via envsubst
-    # Default to host.docker.internal for Docker Desktop / Linux
-    set $api_target "${API_TARGET}";
+EXPOSE 5173
 
-    location /api/ {
-        proxy_pass $api_target;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["bun", "-e", "fetch('http://127.0.0.1:5173/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
 
-    location /health {
-        proxy_pass $api_target;
-        proxy_set_header Host $host;
-    }
-
-    # SPA fallback — serve index.html for unknown routes
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Cache static assets aggressively
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?)$ {
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-    }
-}
-NGINX
-
-# envsubst template at startup so API_TARGET is configurable at runtime
-ENV API_TARGET="http://host.docker.internal:8000"
-
-EXPOSE 80
-
-# Use envsubst to bake API_TARGET into the nginx config at container start
-CMD ["/bin/sh", "-c", "envsubst '${API_TARGET}' < /etc/nginx/conf.d/default.conf > /tmp/default.conf && mv /tmp/default.conf /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["bun", "run", "start"]
